@@ -70,6 +70,7 @@ CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 CompletionResponse response = service.getCompletions(request);
@@ -99,6 +100,7 @@ CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 service.getCompletionsAsync(request, new ResponseHandler<CompletionResponse>() {
@@ -144,6 +146,7 @@ CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 service.streamCompletions(request, new StreamingResponseHandler() {
@@ -181,6 +184,7 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.addSystemMessage("You are a helpful assistant")
 	.addUserMessage("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 ChatCompletionResponse response = service.getChatCompletions(request);
@@ -211,6 +215,7 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.addSystemMessage("You are a helpful assistant")
 	.addUserMessage("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 service.getChatCompletionsAsync(request, new ResponseHandler<ChatCompletionResponse>() {
@@ -257,6 +262,7 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.addSystemMessage("You are a helpful assistant")
 	.addUserMessage("Write a poem about ChatGPT")
 	.temperature(0.9)
+	...
 	.build();
 
 service.streamChatCompletions(request, new StreamingResponseHandler() {
@@ -271,6 +277,66 @@ service.streamChatCompletions(request, new StreamingResponseHandler() {
 
 	}
 	
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
+
+# Embeddings
+
+## Synchronously
+
+Easy way:
+```
+List<Float> embedding = service.getEmbedding("Write a poem about ChatGPT");
+```
+
+Customizable way:
+```
+EmbeddingRequest request = EmbeddingRequest.builder()
+	.model(TEXT_EMBEDDING_ADA_002)
+	.input("Write a poem about ChatGPT", "Write a haiku about ChatGPT")
+	...
+	.build();
+
+EmbeddingResponse embedding = service.getEmbeddings(request);
+```
+
+## Asynchronously
+
+Easy way:
+```
+service.getEmbeddingAsync("Write a poem about ChatGPT", new ResponseHandler<List<Float>>() {
+
+	@Override
+	public void onResponse(List<Float> embedding) {
+
+	}
+
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
+
+Customizable way:
+```
+EmbeddingRequest request = EmbeddingRequest.builder()
+	.model(TEXT_EMBEDDING_ADA_002)
+	.input("Write a poem about ChatGPT", "Write a haiku about ChatGPT")
+	...
+	.build();
+
+service.getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
+
+	@Override
+	public void onResponse(EmbeddingResponse response) {
+
+	}
+
 	@Override
 	public void onFailure(Throwable t) {
 
