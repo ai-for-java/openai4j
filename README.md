@@ -39,14 +39,14 @@ Easy way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiService openAiService = new OpenAiService(apiKey);
+OpenAiService service = new OpenAiService(apiKey);
 ```
 
 Flexible way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiService openAiServiceMy = OpenAiService.builder()
+OpenAiService service = OpenAiService.builder()
     .apiKey(apiKey)
     .timeout(Duration.ofSeconds(60))
     .build();
@@ -56,7 +56,7 @@ OpenAiService openAiServiceMy = OpenAiService.builder()
 ## Synchronously
 Easy way:
 ```
-String response = openAiService.getCompletion("Write a poem about ChatGPT");
+String response = service.getCompletion("Write a poem about ChatGPT");
 ```
 
 Flexible way:
@@ -67,13 +67,13 @@ CompletionRequest request = CompletionRequest.builder()
 	  .temperature(0.9)
 	  .build();
 
-CompletionResponse response = openAiService.getCompletions(request);
+CompletionResponse response = service.getCompletions(request);
 ```
 
 ## Asynchronously
 Easy way:
 ```
-openAiService.getCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
+service.getCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
 
 	@Override
 	public void onResponse(String response) {
