@@ -1,17 +1,23 @@
-# (Unofficial) Java Client for OpenAI
+# Java Client for OpenAI
+This is an (unofficial) java client library that helps to connect your java applications with OpenAI.
 
 ## Current capabilities:
-- Completions
+- [Completions](https://platform.openai.com/docs/api-reference/completions)
   - synchronous
   - asynchronous
   - streaming
-- Chat Completions
+- [Chat Completions](https://platform.openai.com/docs/api-reference/chat)
   - synchronous
   - asynchronous
   - streaming
-- Embeddings
+- [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
   - synchronous
   - asynchronous
+
+## Coming soon:
+- Detailed javadocs
+- The rest of endpoints
+- [Tell us what you need](https://github.com/ai-for-java/openai4j/issues/new)
 
 ## Start using
 Maven:
