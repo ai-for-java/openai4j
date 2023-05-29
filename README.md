@@ -167,3 +167,113 @@ service.streamCompletions(request, new StreamingResponseHandler() {
 
 # Get Chat Completions
 
+## Synchronously
+
+Easy way:
+```
+String completion = service.getChatCompletion("Write a poem about ChatGPT");
+```
+
+Customizable way:
+```
+ChatCompletionRequest request = ChatCompletionRequest.builder()
+	.model(GPT_3_5_TURBO)
+	.addSystemMessage("You are a helpful assistant")
+	.addUserMessage("Write a poem about ChatGPT")
+	.temperature(0.9)
+	.build();
+
+ChatCompletionResponse response = service.getChatCompletions(request);
+```
+
+## Asynchronously
+
+Easy way:
+```
+service.getChatCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
+
+	@Override
+	public void onResponse(String response) {
+
+	}
+
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
+
+Customizable way:
+```
+ChatCompletionRequest request = ChatCompletionRequest.builder()
+	.model(GPT_3_5_TURBO)
+	.addSystemMessage("You are a helpful assistant")
+	.addUserMessage("Write a poem about ChatGPT")
+	.temperature(0.9)
+	.build();
+
+service.getChatCompletionsAsync(request, new ResponseHandler<ChatCompletionResponse>() {
+
+	@Override
+	public void onResponse(ChatCompletionResponse response) {
+
+	}
+
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
+
+## Streaming
+
+Easy way:
+```
+service.streamChatCompletion("Write a poem about ChatGPT", new StreamingResponseHandler() {
+
+	@Override
+	public void onPartialResponse(String partialResponse) {
+
+	}
+
+	@Override
+	public void onCompleteResponse(String completeResponse) {
+
+	}
+	
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
+
+Customizable way:
+```
+ChatCompletionRequest request = ChatCompletionRequest.builder()
+	.model(GPT_3_5_TURBO)
+	.addSystemMessage("You are a helpful assistant")
+	.addUserMessage("Write a poem about ChatGPT")
+	.temperature(0.9)
+	.build();
+
+service.streamChatCompletions(request, new StreamingResponseHandler() {
+
+	@Override
+	public void onPartialResponse(String partialResponse) {
+
+	}
+
+	@Override
+	public void onCompleteResponse(String completeResponse) {
+
+	}
+	
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
+```
