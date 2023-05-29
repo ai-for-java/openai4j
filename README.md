@@ -49,6 +49,7 @@ String apiKey = System.getenv("OPENAI_API_KEY");
 OpenAiService service = OpenAiService.builder()
     .apiKey(apiKey)
     .timeout(Duration.ofSeconds(60))
+    // other customizations coming soon!
     .build();
 ```
 
