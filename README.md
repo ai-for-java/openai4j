@@ -1,5 +1,5 @@
 # Java Client for OpenAI
-This is an (unofficial) java client library that helps to connect your java applications with OpenAI.
+This is an unofficial Java client library that helps to connect your Java applications with OpenAI.
 
 ## Current capabilities:
 - [Completions](https://platform.openai.com/docs/api-reference/completions)
