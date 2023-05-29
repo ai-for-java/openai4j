@@ -19,7 +19,7 @@ This is an (unofficial) java client library that helps to connect your java appl
 - The rest of endpoints
 - [Tell us what you need](https://github.com/ai-for-java/openai4j/issues/new)
 
-## Start using
+# Start using
 Maven:
 ```
 <dependency>
@@ -34,14 +34,15 @@ Gradle:
 implementation 'dev.ai4j:openai4j:0.1.0'
 ```
 
-## How to use
-Create service (easy):
+# Create a Service
+Easy way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiService openAiService = new OpenAiService();
+OpenAiService openAiService = new OpenAiService(apiKey);
 ```
-Create service (flexible):
+
+Flexible way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
@@ -51,13 +52,37 @@ OpenAiService openAiServiceMy = OpenAiService.builder()
     .build();
 ```
 
-Get completions:
+# Get Completions
+## Synchronously
+Easy way:
+```
+String response = openAiService.getCompletion("Write a poem about ChatGPT");
+```
+
+Flexible way:
 ```
 CompletionRequest request = CompletionRequest.builder()
 	  .model(GPT_3_5_TURBO)
-	  .prompt("Write a poem about ChatGpt")
+	  .prompt("Write a poem about ChatGPT")
 	  .temperature(0.9)
 	  .build();
 
 CompletionResponse response = openAiService.getCompletions(request);
+```
+
+## Asynchronously
+Easy way:
+```
+openAiService.getCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
+
+	@Override
+	public void onResponse(String response) {
+
+	}
+
+	@Override
+	public void onFailure(Throwable t) {
+
+	}
+});
 ```
