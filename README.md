@@ -24,9 +24,9 @@ This is an unofficial Java client library that helps to connect your Java applic
 Maven:
 ```
 <dependency>
-	<groupId>dev.ai4j</groupId>
-	<artifactId>openai4j</artifactId>
-	<version>0.1.0</version>
+    <groupId>dev.ai4j</groupId>
+    <artifactId>openai4j</artifactId>
+    <version>0.1.0</version>
 </dependency>
 ```
 
@@ -35,7 +35,7 @@ Gradle:
 implementation 'dev.ai4j:openai4j:0.1.0'
 ```
 
-# Create a Service
+# Create an OpenAI Service
 
 Easy way:
 ```
@@ -50,7 +50,7 @@ String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiService service = OpenAiService.builder()
 	.apiKey(apiKey)
-	.timeout(Duration.ofSeconds(60))
+	.timeout(ofSeconds(60))
 	// other customizations coming soon!
 	.build();
 ```
