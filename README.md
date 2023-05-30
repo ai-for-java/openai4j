@@ -358,18 +358,18 @@ OpenAi openAi = OpenAi.builder()
 	.build();
 
 // sync
-CompletionResponse response = openAi.completion().get(request);
+CompletionResponse response = openAi.completion().sync(request);
 
 
 // async
-openAi.completion().getAsync(request)
+openAi.completion().async(request)
 	.onResponse(response -> ...)
 	.onFailure(failure -> ...)
 	.execute();
 	
 
 // async
-openAi.completion().getAsync(request, new ResponseHandler<String>() {
+openAi.completion().async(request, new ResponseHandler<String>() {
 
 	@Override
 	public void onResponse(String response) {
