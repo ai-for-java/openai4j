@@ -18,9 +18,17 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "Write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
-    static Stream<Arguments> testWithBuilder() {
+    @Test
+    void testSimpleApi() {
+
+        String response = service.getChatCompletion(USER_MESSAGE);
+
+        assertThat(response).containsIgnoringCase("hello world");
+    }
+
+    static Stream<Arguments> testCustomizableApi() {
         return Stream.of(
                 Arguments.of(
                         ChatCompletionRequest.builder()
@@ -42,9 +50,9 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @MethodSource
     @ParameterizedTest
-    void testWithBuilder(ChatCompletionRequest request) {
+    void testCustomizableApi(ChatCompletionRequest request) {
 
-        ChatCompletionResponse response = openAiService.getChatCompletions(request);
+        ChatCompletionResponse response = service.getChatCompletions(request);
 
 
         assertThat(response.choices()).hasSize(1);
@@ -52,13 +60,5 @@ class ChatCompletionTest extends RateLimitAwareTest {
         assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
-    }
-
-    @Test
-    void testWithUserMessage() {
-
-        String response = openAiService.getChatCompletion(USER_MESSAGE);
-
-        assertThat(response).containsIgnoringCase("hello world");
     }
 }

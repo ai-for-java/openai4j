@@ -17,9 +17,17 @@ public class EmbeddingsTest extends RateLimitAwareTest {
 
     private static final String INPUT = "hello";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
-    static Stream<Arguments> testWithBuilder() {
+    @Test
+    void testSimpleApi() {
+
+        List<Float> embedding = service.getEmbedding("hello");
+
+        assertThat(embedding).hasSize(1536);
+    }
+
+    static Stream<Arguments> testCustomizableApi() {
         return Stream.of(
                 Arguments.of(
                         EmbeddingRequest.builder()
@@ -36,22 +44,14 @@ public class EmbeddingsTest extends RateLimitAwareTest {
 
     @MethodSource
     @ParameterizedTest
-    void testWithBuilder(EmbeddingRequest request) {
+    void testCustomizableApi(EmbeddingRequest request) {
 
-        EmbeddingResponse response = openAiService.getEmbeddings(request);
+        EmbeddingResponse response = service.getEmbeddings(request);
 
 
         assertThat(response.data()).hasSize(1);
         assertThat(response.data().get(0).embedding()).hasSize(1536);
 
         assertThat(response.embedding()).hasSize(1536);
-    }
-
-    @Test
-    void testWithInput() {
-
-        List<Float> embedding = openAiService.getEmbedding("hello");
-
-        assertThat(embedding).hasSize(1536);
     }
 }

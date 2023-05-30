@@ -22,7 +22,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
     static Stream<Arguments> testWithBuilder() {
         return Stream.of(
@@ -52,7 +52,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
-        openAiService.streamChatCompletions(request, new StreamingResponseHandler() {
+        service.streamChatCompletions(request, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {
@@ -85,7 +85,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
-        openAiService.streamChatCompletion(USER_MESSAGE, new StreamingResponseHandler() {
+        service.streamChatCompletion(USER_MESSAGE, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {

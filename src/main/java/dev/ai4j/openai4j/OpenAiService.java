@@ -22,6 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;
@@ -128,6 +129,76 @@ public class OpenAiService {
     }
 
     @Experimental
+    public OnResponseStep<CompletionResponse> getCompletionsAsync(CompletionRequest request) {
+
+        return new OnResponseStep<CompletionResponse>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<CompletionResponse> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getCompletionsAsync(request, new ResponseHandler<CompletionResponse>() {
+
+                                    @Override
+                                    public void onResponse(CompletionResponse response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+
+    @Experimental
+    public OnResponseStep<String> getCompletionAsync(String prompt) {
+
+        return new OnResponseStep<String>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<String> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getCompletionAsync(prompt, new ResponseHandler<String>() {
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+
+    @Experimental
     public void getCompletionsAsync(CompletionRequest request, ResponseHandler<CompletionResponse> handler) {
 
         if (request.stream() != null && request.stream()) {
@@ -228,6 +299,76 @@ public class OpenAiService {
         ChatCompletionResponse response = getChatCompletions(request);
 
         return response.content();
+    }
+
+    @Experimental
+    public OnResponseStep<ChatCompletionResponse> getChatCompletionsAsync(ChatCompletionRequest request) {
+
+        return new OnResponseStep<ChatCompletionResponse>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<ChatCompletionResponse> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getChatCompletionsAsync(request, new ResponseHandler<ChatCompletionResponse>() {
+
+                                    @Override
+                                    public void onResponse(ChatCompletionResponse response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+
+    @Experimental
+    public OnResponseStep<String> getChatCompletionAsync(String userMessage) {
+
+        return new OnResponseStep<String>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<String> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getChatCompletionAsync(userMessage, new ResponseHandler<String>() {
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
     }
 
     @Experimental
@@ -335,6 +476,76 @@ public class OpenAiService {
         EmbeddingResponse response = getEmbeddings(request);
 
         return response.embedding();
+    }
+
+    @Experimental
+    public OnResponseStep<EmbeddingResponse> getEmbeddingsAsync(EmbeddingRequest request) {
+
+        return new OnResponseStep<EmbeddingResponse>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<EmbeddingResponse> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
+
+                                    @Override
+                                    public void onResponse(EmbeddingResponse response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+
+    @Experimental
+    public OnResponseStep<List<Float>> getEmbeddingAsync(String input) {
+
+        return new OnResponseStep<List<Float>>() {
+
+            @Override
+            public OnFailureStep onResponse(Consumer<List<Float>> onResponse) {
+                return new OnFailureStep() {
+
+                    @Override
+                    public ExecutionStep onFailure(Consumer<Throwable> onFailure) {
+                        return new ExecutionStep() {
+
+                            @Override
+                            public void execute() {
+                                getEmbeddingAsync(input, new ResponseHandler<List<Float>>() {
+
+                                    @Override
+                                    public void onResponse(List<Float> response) {
+                                        onResponse.accept(response);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        onFailure.accept(t);
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
+        };
     }
 
     @Experimental

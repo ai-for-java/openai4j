@@ -22,9 +22,75 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
 
     private static final String INPUT = "hello";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
-    static Stream<Arguments> testWithBuilder() {
+    @Test
+    void testSimpleFluentApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        CompletableFuture<List<Float>> future = new CompletableFuture<>();
+
+
+        service.getEmbeddingAsync(INPUT)
+                .onResponse(future::complete)
+                .onFailure(future::completeExceptionally)
+                .execute();
+
+
+        List<Float> response = future.get(30, SECONDS);
+
+        assertThat(response).hasSize(1536);
+    }
+
+    @Test
+    void testCustomizableFluentApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        EmbeddingRequest request = EmbeddingRequest.builder()
+                .input(INPUT)
+                .build();
+
+        CompletableFuture<EmbeddingResponse> future = new CompletableFuture<>();
+
+
+        service.getEmbeddingsAsync(request)
+                .onResponse(future::complete)
+                .onFailure(future::completeExceptionally)
+                .execute();
+
+
+        EmbeddingResponse response = future.get(30, SECONDS);
+
+        assertThat(response.data()).hasSize(1);
+        assertThat(response.data().get(0).embedding()).hasSize(1536);
+
+        assertThat(response.embedding()).hasSize(1536);
+    }
+
+    @Test
+    void testSimpleLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        CompletableFuture<List<Float>> future = new CompletableFuture<>();
+
+
+        service.getEmbeddingAsync(INPUT, new ResponseHandler<List<Float>>() {
+
+            @Override
+            public void onResponse(List<Float> embedding) {
+                future.complete(embedding);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+
+
+        List<Float> response = future.get(30, SECONDS);
+
+        assertThat(response).hasSize(1536);
+    }
+
+    static Stream<Arguments> testCustomizableLegacyApi() {
         return Stream.of(
                 Arguments.of(
                         EmbeddingRequest.builder()
@@ -41,11 +107,12 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
 
     @MethodSource
     @ParameterizedTest
-    void testWithBuilder(EmbeddingRequest request) throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableLegacyApi(EmbeddingRequest request) throws ExecutionException, InterruptedException, TimeoutException {
 
         CompletableFuture<EmbeddingResponse> future = new CompletableFuture<>();
 
-        openAiService.getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
+
+        service.getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
 
             @Override
             public void onResponse(EmbeddingResponse response) {
@@ -61,35 +128,9 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
 
         EmbeddingResponse response = future.get(30, SECONDS);
 
-
         assertThat(response.data()).hasSize(1);
         assertThat(response.data().get(0).embedding()).hasSize(1536);
 
         assertThat(response.embedding()).hasSize(1536);
-    }
-
-    @Test
-    void testWithInput() throws ExecutionException, InterruptedException, TimeoutException {
-
-        CompletableFuture<List<Float>> future = new CompletableFuture<>();
-
-        openAiService.getEmbeddingAsync(INPUT, new ResponseHandler<List<Float>>() {
-
-            @Override
-            public void onResponse(List<Float> embedding) {
-                future.complete(embedding);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-
-
-        List<Float> response = future.get(30, SECONDS);
-
-
-        assertThat(response).hasSize(1536);
     }
 }

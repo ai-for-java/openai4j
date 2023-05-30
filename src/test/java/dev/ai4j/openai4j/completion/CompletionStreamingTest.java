@@ -16,7 +16,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
 
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
     @Test
     void testWithBuilder() throws ExecutionException, InterruptedException, TimeoutException {
@@ -30,7 +30,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
 
-        openAiService.streamCompletions(request, new StreamingResponseHandler() {
+        service.streamCompletions(request, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {
@@ -65,7 +65,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
 
-        openAiService.streamCompletion(PROMPT, new StreamingResponseHandler() {
+        service.streamCompletion(PROMPT, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {

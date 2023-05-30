@@ -10,30 +10,30 @@ class CompletionTest extends RateLimitAwareTest {
 
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService openAiService = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
 
     @Test
-    void testWithBuilder() {
+    void testSimpleApi() {
+
+        String response = service.getCompletion(PROMPT);
+
+        assertThat(response).containsIgnoringCase("hello world");
+    }
+
+    @Test
+    void testCustomizableApi() {
 
         CompletionRequest request = CompletionRequest.builder()
                 .prompt(PROMPT)
                 .build();
 
 
-        CompletionResponse response = openAiService.getCompletions(request);
+        CompletionResponse response = service.getCompletions(request);
 
 
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).text()).containsIgnoringCase("hello world");
 
         assertThat(response.text()).containsIgnoringCase("hello world");
-    }
-
-    @Test
-    void testWithPrompt() {
-
-        String response = openAiService.getCompletion(PROMPT);
-
-        assertThat(response).containsIgnoringCase("hello world");
     }
 }
