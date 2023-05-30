@@ -343,3 +343,70 @@ service.getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
 	}
 });
 ```
+
+# Experimental
+
+```
+// simple
+OpenAi openAi = new OpenAi(apiKey);
+
+// customizable
+OpenAi openAi = OpenAi.builder()
+	.apiKey(apiKey)
+	.timeout(ofSeconds(60))
+	...
+	.build();
+
+// sync
+CompletionResponse response = openAi.completion().get(request);
+
+
+// async
+openAi.completion().getAsync(request)
+	.onResponse(response -> ...)
+	.onFailure(failure -> ...)
+	.execute();
+	
+
+// async
+openAi.completion().getAsync(request, new ResponseHandler<String>() {
+
+	@Override
+	public void onResponse(String response) {
+		...
+	}
+
+	@Override
+	public void onFailure(Throwable failure) {
+		...
+	}
+});
+
+
+// stream
+openAi.completion().stream(request)
+	.onPartialResponse(partialResponse -> ...)
+	.onComplete(completeResponse -> ...)
+	.onFailure(failure -> ...)
+	.execute();
+
+
+// stream
+openAi.completion().stream(request, new StreamingResponseHandler<String>() {
+
+	@Override
+	public void onPartialResponse(String partialResponse) {
+		...
+	}
+	
+	@Override
+	public void onComplete(String completeResponse) {
+		...
+	}
+
+	@Override
+	public void onFailure(Throwable failure) {
+		...
+	}
+});
+```
