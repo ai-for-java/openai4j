@@ -9,3 +9,4 @@
 - option to define defaults in service builder: model, temperature, etc
 - chat completion methods in service with a list/varargs of messages
 - proxy
+- way to stop async/streaming

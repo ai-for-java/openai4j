@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
+import static dev.ai4j.openai4j.RequestLoggingInterceptor.inOneLine;
 
 class ResponseLoggingInterceptor implements Interceptor {
 
@@ -21,27 +20,34 @@ class ResponseLoggingInterceptor implements Interceptor {
         Request request = chain.request();
         Response response = chain.proceed(request);
 
-        log.debug("Response code: {}", response.code());
-        log.debug("Response headers: {}", inOneLine(response));
-
-        if (isEventStream(response)) {
-            log.debug("Response body: [skipping response body due to streaming]");
-        } else {
-            log.debug("Response body: {}", response.peekBody(Long.MAX_VALUE).string());
+        try {
+            log(response);
+        } catch (Exception e) {
+            log.warn("Exception while logging response", e);
         }
 
         return response;
     }
 
+    private static void log(Response response) throws IOException {
+        log.debug(
+                "Response:\n- status code: {}\n- headers: {}\n- body: {}",
+                response.code(),
+                inOneLine(response.headers()),
+                getBody(response)
+        );
+    }
+
+    private static String getBody(Response response) throws IOException {
+        if (isEventStream(response)) {
+            return "[skipping response body due to streaming]";
+        } else {
+            return response.peekBody(Long.MAX_VALUE).string();
+        }
+    }
+
     private static boolean isEventStream(Response response) {
         String contentType = response.header("content-type");
         return contentType != null && contentType.contains("event-stream");
-    }
-
-    private static String inOneLine(Response response) {
-        return stream(response.headers().toString().split("\n"))
-                .filter(header -> header != null && !header.isEmpty())
-                .map(header -> "[" + header + "]")
-                .collect(Collectors.joining(", "));
     }
 }

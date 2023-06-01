@@ -22,7 +22,11 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
 
     private static final String INPUT = "hello";
 
-    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = OpenAiService.builder()
+            .apiKey(System.getenv("OPENAI_API_KEY"))
+            .logRequests()
+            .logResponses()
+            .build();
 
     @Test
     void testSimpleFluentApi() throws ExecutionException, InterruptedException, TimeoutException {

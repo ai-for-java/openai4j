@@ -1,14 +1,19 @@
 package dev.ai4j.openai4j;
 
+import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.Buffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.StreamSupport.stream;
 
 class RequestLoggingInterceptor implements Interceptor {
 
@@ -21,9 +26,36 @@ class RequestLoggingInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        log.debug("Request: {}", maskApiToken(request.toString()));
+        try {
+            log(request);
+        } catch (Exception e) {
+            log.warn("Exception while logging request", e);
+        }
 
         return chain.proceed(request);
+    }
+
+    private static void log(Request request) {
+        log.debug("Request:\n- method: {}\n- url: {}\n- headers: {}\n- body: {}",
+                request.method(),
+                request.url(),
+                inOneLine(request.headers()),
+                getBody(request)
+        );
+    }
+
+    static String inOneLine(Headers headers) {
+
+        return stream(headers.spliterator(), false)
+                .map(header -> {
+                    String headerKey = header.component1();
+                    String headerValue = header.component2();
+                    if (headerKey.contains("Authorization")) {
+                        headerValue = maskApiToken(headerValue);
+                    }
+                    return String.format("[%s: %s]", headerKey, headerValue);
+                })
+                .collect(joining(", "));
     }
 
     private static String maskApiToken(String request) {
@@ -40,6 +72,17 @@ class RequestLoggingInterceptor implements Interceptor {
             return sb.toString();
         } catch (Exception e) {
             return "Failed to mask the API key. Therefore, avoid logging the entire request.";
+        }
+    }
+
+    private static String getBody(Request request) {
+        try {
+            Buffer buffer = new Buffer();
+            request.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (Exception e) {
+            log.warn("Exception happened while reading request body", e);
+            return "[Exception happened while reading request body. Check logs for more details.]";
         }
     }
 }

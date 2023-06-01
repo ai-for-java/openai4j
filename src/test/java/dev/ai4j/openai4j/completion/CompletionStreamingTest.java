@@ -16,21 +16,22 @@ class CompletionStreamingTest extends RateLimitAwareTest {
 
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = OpenAiService.builder()
+            .apiKey(System.getenv("OPENAI_API_KEY"))
+            .logRequests()
+            .logResponses()
+            .logStreamingResponses()
+            .build();
 
     @Test
-    void testWithBuilder() throws ExecutionException, InterruptedException, TimeoutException {
-
-        CompletionRequest request = CompletionRequest.builder()
-                .prompt(PROMPT)
-                .build();
+    void testSimpleLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
 
-        service.streamCompletions(request, new StreamingResponseHandler() {
+        service.streamCompletion(PROMPT, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {
@@ -58,14 +59,18 @@ class CompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @Test
-    void testWithPrompt() throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        CompletionRequest request = CompletionRequest.builder()
+                .prompt(PROMPT)
+                .build();
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
         CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
 
 
-        service.streamCompletion(PROMPT, new StreamingResponseHandler() {
+        service.streamCompletions(request, new StreamingResponseHandler() {
 
             @Override
             public void onPartialResponse(String partialResponse) {

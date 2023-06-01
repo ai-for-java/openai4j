@@ -34,28 +34,36 @@ public class OpenAiService {
     private final String url;
     private final OkHttpClient okHttpClient;
     private final OpenAiApi openAiApi;
+    private final boolean logStreamingResponses;
 
     public OpenAiService(String apiKey) {
         this(builder().apiKey(apiKey));
     }
 
-    private OpenAiService(Builder builder) {
+    private OpenAiService(Builder serviceBuilder) {
 
-        this.url = builder.url;
+        this.url = serviceBuilder.url;
 
-        this.okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new ApiKeyInsertingInterceptor(builder.apiKey))
-                .addInterceptor(new RequestLoggingInterceptor())
-                .addInterceptor(new ResponseLoggingInterceptor())
-                .callTimeout(builder.timeout)
-                .build();
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
+                .addInterceptor(new ApiKeyInsertingInterceptor(serviceBuilder.apiKey))
+                .callTimeout(serviceBuilder.timeout);
+
+        if (serviceBuilder.logRequests) {
+            okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
+        }
+        if (serviceBuilder.logResponses) {
+            okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor());
+        }
+        this.logStreamingResponses = serviceBuilder.logStreamingResponses;
+
+        this.okHttpClient = okHttpClientBuilder.build();
 
         Gson gson = new GsonBuilder()
                 .setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(builder.url)
+                .baseUrl(serviceBuilder.url)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -75,6 +83,9 @@ public class OpenAiService {
         private String url = "https://api.openai.com/";
         private String apiKey;
         private Duration timeout = Duration.ofSeconds(60);
+        private boolean logRequests;
+        private boolean logResponses;
+        private boolean logStreamingResponses;
 
         public Builder url(String url) {
             if (url == null || url.trim().isEmpty()) {
@@ -97,6 +108,21 @@ public class OpenAiService {
                 throw new IllegalArgumentException("Timeout cannot be null");
             }
             this.timeout = timeout;
+            return this;
+        }
+
+        public Builder logRequests() {
+            this.logRequests = true;
+            return this;
+        }
+
+        public Builder logResponses() {
+            this.logResponses = true;
+            return this;
+        }
+
+        public Builder logStreamingResponses() {
+            this.logStreamingResponses = true;
             return this;
         }
 
@@ -248,6 +274,7 @@ public class OpenAiService {
             }
         });
     }
+
 
     @Experimental
     public void streamCompletions(CompletionRequest request, StreamingResponseHandler handler) {
@@ -615,12 +642,16 @@ public class OpenAiService {
 
             @Override
             public void onOpen(EventSource eventSource, Response response) {
-                log.trace("onOpen() {}", response);
+                if (logStreamingResponses) {
+                    log.debug("onOpen() {}", response);
+                }
             }
 
             @Override
             public void onEvent(EventSource eventSource, String id, String type, String data) {
-                log.trace("onEvent() data: {}", data);
+                if (logStreamingResponses) {
+                    log.debug("onEvent() data: {}", data);
+                }
 
                 if ("[DONE]".equals(data)) {
                     handler.onCompleteResponse(completeResponseBuilder.toString());
@@ -641,12 +672,17 @@ public class OpenAiService {
 
             @Override
             public void onClosed(EventSource eventSource) {
-                log.trace("onClosed()");
+                if (logStreamingResponses) {
+                    log.debug("onClosed()");
+                }
             }
 
             @Override
             public void onFailure(EventSource eventSource, Throwable t, Response response) {
-                log.trace("onFailure()\nThrowable: {}\nResponse: {}", t, response);
+                if (logStreamingResponses) {
+                    log.debug("onFailure()\nThrowable: {}\nResponse: {}", t, response);
+                }
+
                 // TODO
                 if (t != null) {
                     handler.onFailure(t);

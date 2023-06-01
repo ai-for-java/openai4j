@@ -18,7 +18,11 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "Write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = new OpenAiService(System.getenv("OPENAI_API_KEY"));
+    private final OpenAiService service = OpenAiService.builder()
+            .apiKey(System.getenv("OPENAI_API_KEY"))
+            .logRequests()
+            .logResponses()
+            .build();
 
     @Test
     void testSimpleApi() {
