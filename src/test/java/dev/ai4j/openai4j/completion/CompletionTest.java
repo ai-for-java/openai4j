@@ -1,6 +1,6 @@
 package dev.ai4j.openai4j.completion;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ class CompletionTest extends RateLimitAwareTest {
 
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
@@ -19,7 +19,7 @@ class CompletionTest extends RateLimitAwareTest {
     @Test
     void testSimpleApi() {
 
-        String response = service.getCompletion(PROMPT);
+        String response = client.completion(PROMPT).execute();
 
         assertThat(response).containsIgnoringCase("hello world");
     }
@@ -32,7 +32,7 @@ class CompletionTest extends RateLimitAwareTest {
                 .build();
 
 
-        CompletionResponse response = service.getCompletions(request);
+        CompletionResponse response = client.completion(request).execute();
 
 
         assertThat(response.choices()).hasSize(1);

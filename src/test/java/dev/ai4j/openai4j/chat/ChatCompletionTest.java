@@ -1,6 +1,6 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "Write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
@@ -27,9 +27,23 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @Test
     void testSimpleApi() {
 
-        String response = service.getChatCompletion(USER_MESSAGE);
+        String response = client.chatCompletion(USER_MESSAGE).execute();
 
         assertThat(response).containsIgnoringCase("hello world");
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    void testCustomizableApi(ChatCompletionRequest request) {
+
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+
+        assertThat(response.choices()).hasSize(1);
+        assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
+        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
+
+        assertThat(response.content()).containsIgnoringCase("hello world");
     }
 
     static Stream<Arguments> testCustomizableApi() {
@@ -50,19 +64,5 @@ class ChatCompletionTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    void testCustomizableApi(ChatCompletionRequest request) {
-
-        ChatCompletionResponse response = service.getChatCompletions(request);
-
-
-        assertThat(response.choices()).hasSize(1);
-        assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
-
-        assertThat(response.content()).containsIgnoringCase("hello world");
     }
 }

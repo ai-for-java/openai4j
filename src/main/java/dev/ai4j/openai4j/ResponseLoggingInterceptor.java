@@ -20,22 +20,22 @@ class ResponseLoggingInterceptor implements Interceptor {
         Request request = chain.request();
         Response response = chain.proceed(request);
 
-        try {
-            log(response);
-        } catch (Exception e) {
-            log.warn("Exception while logging response", e);
-        }
+        log(response);
 
         return response;
     }
 
-    private static void log(Response response) throws IOException {
-        log.debug(
-                "Response:\n- status code: {}\n- headers: {}\n- body: {}",
-                response.code(),
-                inOneLine(response.headers()),
-                getBody(response)
-        );
+    static void log(Response response) {
+        try {
+            log.debug(
+                    "Response:\n- status code: {}\n- headers: {}\n- body: {}",
+                    response.code(),
+                    inOneLine(response.headers()),
+                    getBody(response)
+            );
+        } catch (IOException e) {
+            log.warn("Failed to log response", e);
+        }
     }
 
     private static String getBody(Response response) throws IOException {

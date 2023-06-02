@@ -1,8 +1,7 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
-import dev.ai4j.openai4j.ResponseHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,21 +22,21 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
             .build();
 
     @Test
-    void testSimpleFluentApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
 
         CompletableFuture<String> future = new CompletableFuture<>();
 
 
-        service.getChatCompletionAsync(USER_MESSAGE)
+        client.chatCompletion(USER_MESSAGE)
                 .onResponse(future::complete)
-                .onFailure(future::completeExceptionally)
+                .onError(future::completeExceptionally)
                 .execute();
 
 
@@ -46,19 +45,20 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         assertThat(response).containsIgnoringCase("hello world");
     }
 
-    @Test
-    void testCustomizableFluentApi() throws ExecutionException, InterruptedException, TimeoutException {
-
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .addUserMessage(USER_MESSAGE)
-                .build();
+    @MethodSource
+    @ParameterizedTest
+    void testCustomizableApi(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
 
         CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
 
-
-        service.getChatCompletionsAsync(request)
+        client.chatCompletion(request)
                 .onResponse(future::complete)
-                .onFailure(future::completeExceptionally)
+                .ignoreErrors()
+                .execute();
+
+        client.chatCompletion(request)
+                .onResponse(future::complete)
+                .onError(future::completeExceptionally)
                 .execute();
 
 
@@ -71,32 +71,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         assertThat(response.content()).containsIgnoringCase("hello world");
     }
 
-    @Test
-    void testSimpleLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
-
-        CompletableFuture<String> future = new CompletableFuture<>();
-
-
-        service.getChatCompletionAsync(USER_MESSAGE, new ResponseHandler<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                future.complete(response);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-
-
-        String response = future.get(30, SECONDS);
-
-        assertThat(response).containsIgnoringCase("hello world");
-    }
-
-    static Stream<Arguments> testCustomizableLegacyApi() {
+    static Stream<Arguments> testCustomizableApi() {
         return Stream.of(
                 Arguments.of(
                         ChatCompletionRequest.builder()
@@ -114,35 +89,5 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    void testCustomizableLegacyApi(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
-
-        CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
-
-
-        service.getChatCompletionsAsync(request, new ResponseHandler<ChatCompletionResponse>() {
-
-            @Override
-            public void onResponse(ChatCompletionResponse response) {
-                future.complete(response);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                future.completeExceptionally(t);
-            }
-        });
-
-
-        ChatCompletionResponse response = future.get(30, SECONDS);
-
-        assertThat(response.choices()).hasSize(1);
-        assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
-
-        assertThat(response.content()).containsIgnoringCase("hello world");
     }
 }

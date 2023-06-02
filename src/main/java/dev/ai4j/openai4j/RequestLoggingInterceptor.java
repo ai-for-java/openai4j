@@ -26,22 +26,22 @@ class RequestLoggingInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        try {
-            log(request);
-        } catch (Exception e) {
-            log.warn("Exception while logging request", e);
-        }
+        log(request);
 
         return chain.proceed(request);
     }
 
     private static void log(Request request) {
-        log.debug("Request:\n- method: {}\n- url: {}\n- headers: {}\n- body: {}",
-                request.method(),
-                request.url(),
-                inOneLine(request.headers()),
-                getBody(request)
-        );
+        try {
+            log.debug("Request:\n- method: {}\n- url: {}\n- headers: {}\n- body: {}",
+                    request.method(),
+                    request.url(),
+                    inOneLine(request.headers()),
+                    getBody(request)
+            );
+        } catch (Exception e) {
+            log.warn("Failed to log request", e);
+        }
     }
 
     static String inOneLine(Headers headers) {

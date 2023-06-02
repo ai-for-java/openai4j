@@ -1,8 +1,7 @@
 package dev.ai4j.openai4j.completion;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
-import dev.ai4j.openai4j.StreamingResponseHandler;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +15,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
 
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
@@ -24,76 +23,42 @@ class CompletionStreamingTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
 
         StringBuilder responseBuilder = new StringBuilder();
-        CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
-        CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
+        CompletableFuture<String> future = new CompletableFuture<>();
 
 
-        service.streamCompletion(PROMPT, new StreamingResponseHandler() {
-
-            @Override
-            public void onPartialResponse(String partialResponse) {
-                responseBuilder.append(partialResponse);
-            }
-
-            @Override
-            public void onCompleteResponse(String completeResponse) {
-                partialResponseFuture.complete(responseBuilder.toString());
-                completeResponseFuture.complete(completeResponse);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                partialResponseFuture.completeExceptionally(t);
-            }
-        });
+        client.completion(PROMPT)
+                .onPartialResponse(responseBuilder::append)
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(Throwable::printStackTrace)
+                .execute();
 
 
-        String completeResponseBuiltFromPartialResponses = partialResponseFuture.get(30, SECONDS);
-        assertThat(completeResponseBuiltFromPartialResponses).containsIgnoringCase("hello world");
-
-        String providedCompleteResponse = completeResponseFuture.get(30, SECONDS);
-        assertThat(providedCompleteResponse).isEqualTo(completeResponseBuiltFromPartialResponses);
+        String response = future.get(30, SECONDS);
+        assertThat(response).containsIgnoringCase("hello world");
     }
 
     @Test
-    void testCustomizableLegacyApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        StringBuilder responseBuilder = new StringBuilder();
+        CompletableFuture<String> future = new CompletableFuture<>();
 
         CompletionRequest request = CompletionRequest.builder()
                 .prompt(PROMPT)
                 .build();
 
-        StringBuilder responseBuilder = new StringBuilder();
-        CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
-        CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
+
+        client.completion(request)
+                .onPartialResponse(response -> responseBuilder.append(response.text()))
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(Throwable::printStackTrace)
+                .execute();
 
 
-        service.streamCompletions(request, new StreamingResponseHandler() {
-
-            @Override
-            public void onPartialResponse(String partialResponse) {
-                responseBuilder.append(partialResponse);
-            }
-
-            @Override
-            public void onCompleteResponse(String completeResponse) {
-                partialResponseFuture.complete(responseBuilder.toString());
-                completeResponseFuture.complete(completeResponse);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                partialResponseFuture.completeExceptionally(t);
-            }
-        });
-
-
-        String completeResponseBuiltFromPartialResponses = partialResponseFuture.get(30, SECONDS);
-        assertThat(completeResponseBuiltFromPartialResponses).containsIgnoringCase("hello world");
-
-        String providedCompleteResponse = completeResponseFuture.get(30, SECONDS);
-        assertThat(providedCompleteResponse).isEqualTo(completeResponseBuiltFromPartialResponses);
+        String response = future.get(30, SECONDS);
+        assertThat(response).containsIgnoringCase("hello world");
     }
 }

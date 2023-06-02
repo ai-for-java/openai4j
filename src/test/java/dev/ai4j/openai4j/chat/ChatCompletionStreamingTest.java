@@ -1,8 +1,7 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
-import dev.ai4j.openai4j.StreamingResponseHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,14 +21,56 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     private static final String USER_MESSAGE = "write exactly the following 2 words: 'hello world'";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
             .logStreamingResponses()
             .build();
 
-    static Stream<Arguments> testWithBuilder() {
+    @Test
+    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+
+        StringBuilder responseBuilder = new StringBuilder();
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+
+        client.chatCompletion(USER_MESSAGE)
+                .onPartialResponse(responseBuilder::append)
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(future::completeExceptionally)
+                .execute();
+
+
+        String response = future.get(30, SECONDS);
+        assertThat(response).containsIgnoringCase("hello world");
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    void testCustomizableApi(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
+
+        StringBuilder responseBuilder = new StringBuilder();
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+
+        client.chatCompletion(request)
+                .onPartialResponse(partialResponse -> {
+                    String content = partialResponse.choices().get(0).delta().content();
+                    if (content != null) {
+                        responseBuilder.append(content);
+                    }
+                })
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(future::completeExceptionally)
+                .execute();
+
+
+        String response = future.get(30, SECONDS);
+        assertThat(response).containsIgnoringCase("hello world");
+    }
+
+    static Stream<Arguments> testCustomizableApi() {
         return Stream.of(
                 Arguments.of(
                         ChatCompletionRequest.builder()
@@ -47,72 +88,5 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    void testWithBuilder(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
-
-        StringBuilder responseBuilder = new StringBuilder();
-        CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
-        CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
-
-        service.streamChatCompletions(request, new StreamingResponseHandler() {
-
-            @Override
-            public void onPartialResponse(String partialResponse) {
-                responseBuilder.append(partialResponse);
-            }
-
-            @Override
-            public void onCompleteResponse(String completeResponse) {
-                partialResponseFuture.complete(responseBuilder.toString());
-                completeResponseFuture.complete(completeResponse);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                partialResponseFuture.completeExceptionally(t);
-            }
-        });
-
-        String completeResponseBuiltFromPartialResponses = partialResponseFuture.get(30, SECONDS);
-        assertThat(completeResponseBuiltFromPartialResponses).containsIgnoringCase("hello world");
-
-        String providedCompleteResponse = completeResponseFuture.get(30, SECONDS);
-        assertThat(providedCompleteResponse).isEqualTo(completeResponseBuiltFromPartialResponses);
-    }
-
-    @Test
-    void testWithUserMessage() throws ExecutionException, InterruptedException, TimeoutException {
-
-        StringBuilder responseBuilder = new StringBuilder();
-        CompletableFuture<String> partialResponseFuture = new CompletableFuture<>();
-        CompletableFuture<String> completeResponseFuture = new CompletableFuture<>();
-
-        service.streamChatCompletion(USER_MESSAGE, new StreamingResponseHandler() {
-
-            @Override
-            public void onPartialResponse(String partialResponse) {
-                responseBuilder.append(partialResponse);
-            }
-
-            @Override
-            public void onCompleteResponse(String completeResponse) {
-                partialResponseFuture.complete(responseBuilder.toString());
-                completeResponseFuture.complete(completeResponse);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                partialResponseFuture.completeExceptionally(t);
-            }
-        });
-
-        String completeResponseBuiltFromPartialResponses = partialResponseFuture.get(30, SECONDS);
-        assertThat(completeResponseBuiltFromPartialResponses).containsIgnoringCase("hello world");
-
-        String providedCompleteResponse = completeResponseFuture.get(30, SECONDS);
-        assertThat(providedCompleteResponse).isEqualTo(completeResponseBuiltFromPartialResponses);
     }
 }

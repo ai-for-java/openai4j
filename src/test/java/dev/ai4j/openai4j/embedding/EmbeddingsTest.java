@@ -1,6 +1,6 @@
 package dev.ai4j.openai4j.embedding;
 
-import dev.ai4j.openai4j.OpenAiService;
+import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +17,7 @@ public class EmbeddingsTest extends RateLimitAwareTest {
 
     private static final String INPUT = "hello";
 
-    private final OpenAiService service = OpenAiService.builder()
+    private final OpenAiClient client = OpenAiClient.builder()
             .apiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
@@ -26,9 +26,22 @@ public class EmbeddingsTest extends RateLimitAwareTest {
     @Test
     void testSimpleApi() {
 
-        List<Float> embedding = service.getEmbedding("hello");
+        List<Float> embedding = client.embedding("hello").execute();
 
         assertThat(embedding).hasSize(1536);
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    void testCustomizableApi(EmbeddingRequest request) {
+
+        EmbeddingResponse response = client.embedding(request).execute();
+
+
+        assertThat(response.data()).hasSize(1);
+        assertThat(response.data().get(0).embedding()).hasSize(1536);
+
+        assertThat(response.embedding()).hasSize(1536);
     }
 
     static Stream<Arguments> testCustomizableApi() {
@@ -44,18 +57,5 @@ public class EmbeddingsTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    void testCustomizableApi(EmbeddingRequest request) {
-
-        EmbeddingResponse response = service.getEmbeddings(request);
-
-
-        assertThat(response.data()).hasSize(1);
-        assertThat(response.data().get(0).embedding()).hasSize(1536);
-
-        assertThat(response.embedding()).hasSize(1536);
     }
 }

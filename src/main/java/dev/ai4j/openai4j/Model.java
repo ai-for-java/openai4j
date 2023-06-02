@@ -10,7 +10,11 @@ public enum Model {
     GPT_4("gpt-4"),
 
     // embeddings
-    TEXT_EMBEDDING_ADA_002("text-embedding-ada-002");
+    TEXT_EMBEDDING_ADA_002("text-embedding-ada-002"),
+
+    // moderations
+    TEXT_MODERATION_STABLE("text-moderation-stable"),
+    TEXT_MODERATION_LATEST("text-moderation-latest");
 
     private final String stringValue;
 

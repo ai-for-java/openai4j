@@ -1,6 +1,6 @@
 package dev.ai4j.openai4j;
 
-public interface ExecutionStep {
+public interface ErrorHandling {
 
     void execute();
 }

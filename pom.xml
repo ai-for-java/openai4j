@@ -4,7 +4,7 @@
 
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <name>openai4j</name>
     <description>Java client library for OpenAI API</description>
