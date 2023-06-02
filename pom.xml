@@ -4,10 +4,10 @@
 
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 
-    <name>openai4j</name>
-    <description>Java client library for OpenAI API</description>
+    <name>Java Client for OpenAI (ChatGPT)</name>
+    <description>Java Client for OpenAI (ChatGPT)</description>
     <url>https://github.com/ai-for-java/openai4j</url>
 
     <licenses>
