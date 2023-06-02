@@ -40,7 +40,7 @@ implementation 'dev.ai4j:openai4j:0.2.0'
 
 # Create an OpenAI Client
 
-Easy way:
+Simple way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
@@ -64,7 +64,7 @@ OpenAiClient client = OpenAiClient.builder()
 
 ## Synchronously
 
-Easy way:
+Simple way:
 ```
 String completion = client.completion("Write a poem about ChatGPT").execute();
 ```
@@ -83,7 +83,7 @@ CompletionResponse response = client.completion(request).execute();
 
 ## Asynchronously
 
-Easy way:
+Simple way:
 ```
 client.completion("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -108,7 +108,7 @@ client.completion(request)
 
 ## Streaming
 
-Easy way:
+Simple way:
 ```
 client.completion("Write a poem about ChatGPT")
 	.onPartialResponse(partialResponse -> ...)
@@ -137,7 +137,7 @@ client.completion(request)
 
 ## Synchronously
 
-Easy way:
+Simple way:
 ```
 String completion = client.chatCompletion("Write a poem about ChatGPT").execute();
 ```
@@ -157,7 +157,7 @@ ChatCompletionResponse response = client.chatCompletions(request).execute();
 
 ## Asynchronously
 
-Easy way:
+Simple way:
 ```
 client.chatCompletion("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -183,7 +183,7 @@ client.chatCompletion(request)
 
 ## Streaming
 
-Easy way:
+Simple way:
 ```
 client.chatCompletion("Write a poem about ChatGPT")
 	.onPartialResponse(partialResponse -> ...)
@@ -213,7 +213,7 @@ client.chatCompletion(request)
 
 ## Synchronously
 
-Easy way:
+Simple way:
 ```
 List<Float> embedding = client.embedding("Write a poem about ChatGPT").execute();
 ```
@@ -231,7 +231,7 @@ EmbeddingResponse embedding = client.embedding(request).execute();
 
 ## Asynchronously
 
-Easy way:
+Simple way:
 ```
 client.embedding("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -257,7 +257,7 @@ client.embedding(request)
 
 ## Synchronously
 
-Easy way:
+Simple way:
 ```
 ModerationResult moderationResult = client.moderation("Write a poem about ChatGPT").execute();
 ```
@@ -274,7 +274,7 @@ ModerationResponse response = client.moderation(request).execute();
 
 ## Asynchronously
 
-Easy way:
+Simple way:
 ```
 client.moderation("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
