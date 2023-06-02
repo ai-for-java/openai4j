@@ -38,7 +38,7 @@ Gradle:
 implementation 'dev.ai4j:openai4j:0.2.0'
 ```
 
-# Create an OpenAI Service
+# Create an OpenAI Client
 
 Easy way:
 ```
