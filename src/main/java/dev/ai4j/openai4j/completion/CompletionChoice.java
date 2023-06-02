@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j.completion;
 
+import java.util.Objects;
+
 public final class CompletionChoice {
 
     private final String text;
@@ -38,19 +40,19 @@ public final class CompletionChoice {
     }
 
     private boolean equalTo(CompletionChoice another) {
-        return text.equals(another.text)
-                && index.equals(another.index)
-                && logprobs.equals(another.logprobs)
-                && finishReason.equals(another.finishReason);
+        return Objects.equals(text, another.text)
+                && Objects.equals(index, another.index)
+                && Objects.equals(logprobs, another.logprobs)
+                && Objects.equals(finishReason, another.finishReason);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + text.hashCode();
-        h += (h << 5) + index.hashCode();
-        h += (h << 5) + logprobs.hashCode();
-        h += (h << 5) + finishReason.hashCode();
+        h += (h << 5) + Objects.hashCode(text);
+        h += (h << 5) + Objects.hashCode(index);
+        h += (h << 5) + Objects.hashCode(logprobs);
+        h += (h << 5) + Objects.hashCode(finishReason);
         return h;
     }
 

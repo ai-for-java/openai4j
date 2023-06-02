@@ -4,6 +4,7 @@ import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.shared.Usage;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -47,17 +48,17 @@ public final class EmbeddingResponse {
     }
 
     private boolean equalTo(EmbeddingResponse another) {
-        return model.equals(another.model)
-                && data.equals(another.data)
-                && usage.equals(another.usage);
+        return Objects.equals(model, another.model)
+                && Objects.equals(data, another.data)
+                && Objects.equals(usage, another.usage);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + model.hashCode();
-        h += (h << 5) + data.hashCode();
-        h += (h << 5) + usage.hashCode();
+        h += (h << 5) + Objects.hashCode(model);
+        h += (h << 5) + Objects.hashCode(data);
+        h += (h << 5) + Objects.hashCode(usage);
         return h;
     }
 

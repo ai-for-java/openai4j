@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j.chat;
 
+import java.util.Objects;
+
 public final class ChatCompletionChoice {
 
     private final Integer index;
@@ -34,23 +36,23 @@ public final class ChatCompletionChoice {
     public boolean equals(Object another) {
         if (this == another) return true;
         return another instanceof ChatCompletionChoice
-                && equalTo(0, (ChatCompletionChoice) another);
+                && equalTo((ChatCompletionChoice) another);
     }
 
-    private boolean equalTo(int synthetic, ChatCompletionChoice another) {
-        return index.equals(another.index)
-                && message.equals(another.message)
-                && delta.equals(another.delta)
-                && finishReason.equals(another.finishReason);
+    private boolean equalTo(ChatCompletionChoice another) {
+        return Objects.equals(index, another.index)
+                && Objects.equals(message, another.message)
+                && Objects.equals(delta, another.delta)
+                && Objects.equals(finishReason, another.finishReason);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + index.hashCode();
-        h += (h << 5) + message.hashCode();
-        h += (h << 5) + delta.hashCode();
-        h += (h << 5) + finishReason.hashCode();
+        h += (h << 5) + Objects.hashCode(index);
+        h += (h << 5) + Objects.hashCode(message);
+        h += (h << 5) + Objects.hashCode(delta);
+        h += (h << 5) + Objects.hashCode(finishReason);
         return h;
     }
 

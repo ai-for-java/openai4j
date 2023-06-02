@@ -2,6 +2,8 @@ package dev.ai4j.openai4j.chat;
 
 import dev.ai4j.openai4j.Experimental;
 
+import java.util.Objects;
+
 import static dev.ai4j.openai4j.chat.Role.*;
 
 public final class Message {
@@ -36,17 +38,17 @@ public final class Message {
     }
 
     private boolean equalTo(Message another) {
-        return role.equals(another.role)
-                && content.equals(another.content)
-                && name.equals(another.name);
+        return Objects.equals(role, another.role)
+                && Objects.equals(content, another.content)
+                && Objects.equals(name, another.name);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + role.hashCode();
-        h += (h << 5) + content.hashCode();
-        h += (h << 5) + name.hashCode();
+        h += (h << 5) + Objects.hashCode(role);
+        h += (h << 5) + Objects.hashCode(content);
+        h += (h << 5) + Objects.hashCode(name);
         return h;
     }
 

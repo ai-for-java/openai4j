@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j.chat;
 
+import java.util.Objects;
+
 public final class Delta {
 
     private final Role role;
@@ -26,15 +28,15 @@ public final class Delta {
     }
 
     private boolean equalTo(Delta another) {
-        return role.equals(another.role)
-                && content.equals(another.content);
+        return Objects.equals(role, another.role)
+                && Objects.equals(content, another.content);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + role.hashCode();
-        h += (h << 5) + content.hashCode();
+        h += (h << 5) + Objects.hashCode(role);
+        h += (h << 5) + Objects.hashCode(content);
         return h;
     }
 

@@ -3,8 +3,8 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.shared.Usage;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -60,21 +60,21 @@ public final class ChatCompletionResponse {
     }
 
     private boolean equalTo(ChatCompletionResponse another) {
-        return id.equals(another.id)
-                && created.equals(another.created)
-                && model.equals(another.model)
-                && choices.equals(another.choices)
-                && usage.equals(another.usage);
+        return Objects.equals(id, another.id)
+                && Objects.equals(created, another.created)
+                && Objects.equals(model, another.model)
+                && Objects.equals(choices, another.choices)
+                && Objects.equals(usage, another.usage);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + id.hashCode();
-        h += (h << 5) + created.hashCode();
-        h += (h << 5) + model.hashCode();
-        h += (h << 5) + choices.hashCode();
-        h += (h << 5) + usage.hashCode();
+        h += (h << 5) + Objects.hashCode(id);
+        h += (h << 5) + Objects.hashCode(created);
+        h += (h << 5) + Objects.hashCode(model);
+        h += (h << 5) + Objects.hashCode(choices);
+        h += (h << 5) + Objects.hashCode(usage);
         return h;
     }
 

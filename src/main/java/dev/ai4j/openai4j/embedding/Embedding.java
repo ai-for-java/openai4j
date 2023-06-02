@@ -1,6 +1,7 @@
 package dev.ai4j.openai4j.embedding;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -30,15 +31,15 @@ public final class Embedding {
     }
 
     private boolean equalTo(Embedding another) {
-        return embedding.equals(another.embedding)
-                && index.equals(another.index);
+        return Objects.equals(embedding, another.embedding)
+                && Objects.equals(index, another.index);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + embedding.hashCode();
-        h += (h << 5) + index.hashCode();
+        h += (h << 5) + Objects.hashCode(embedding);
+        h += (h << 5) + Objects.hashCode(index);
         return h;
     }
 

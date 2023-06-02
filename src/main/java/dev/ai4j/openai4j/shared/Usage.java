@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j.shared;
 
+import java.util.Objects;
+
 public final class Usage {
 
     private final Integer promptTokens;
@@ -32,17 +34,17 @@ public final class Usage {
     }
 
     private boolean equalTo(Usage another) {
-        return promptTokens.equals(another.promptTokens)
-                && completionTokens.equals(another.completionTokens)
-                && totalTokens.equals(another.totalTokens);
+        return Objects.equals(promptTokens, another.promptTokens)
+                && Objects.equals(completionTokens, another.completionTokens)
+                && Objects.equals(totalTokens, another.totalTokens);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + promptTokens.hashCode();
-        h += (h << 5) + completionTokens.hashCode();
-        h += (h << 5) + totalTokens.hashCode();
+        h += (h << 5) + Objects.hashCode(promptTokens);
+        h += (h << 5) + Objects.hashCode(completionTokens);
+        h += (h << 5) + Objects.hashCode(totalTokens);
         return h;
     }
 

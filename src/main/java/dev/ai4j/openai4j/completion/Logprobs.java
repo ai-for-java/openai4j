@@ -4,6 +4,7 @@ package dev.ai4j.openai4j.completion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
@@ -46,19 +47,19 @@ public final class Logprobs {
     }
 
     private boolean equalTo(Logprobs another) {
-        return tokens.equals(another.tokens)
-                && tokenLogprobs.equals(another.tokenLogprobs)
-                && topLogprobs.equals(another.topLogprobs)
-                && textOffset.equals(another.textOffset);
+        return Objects.equals(tokens, another.tokens)
+                && Objects.equals(tokenLogprobs, another.tokenLogprobs)
+                && Objects.equals(topLogprobs, another.topLogprobs)
+                && Objects.equals(textOffset, another.textOffset);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + tokens.hashCode();
-        h += (h << 5) + tokenLogprobs.hashCode();
-        h += (h << 5) + topLogprobs.hashCode();
-        h += (h << 5) + textOffset.hashCode();
+        h += (h << 5) + Objects.hashCode(tokens);
+        h += (h << 5) + Objects.hashCode(tokenLogprobs);
+        h += (h << 5) + Objects.hashCode(topLogprobs);
+        h += (h << 5) + Objects.hashCode(textOffset);
         return h;
     }
 

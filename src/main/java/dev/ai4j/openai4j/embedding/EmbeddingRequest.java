@@ -4,6 +4,7 @@ import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.Model;
 
 import java.util.List;
+import java.util.Objects;
 
 import static dev.ai4j.openai4j.Model.TEXT_EMBEDDING_ADA_002;
 import static java.util.Arrays.asList;
@@ -41,17 +42,17 @@ public final class EmbeddingRequest {
     }
 
     private boolean equalTo(EmbeddingRequest another) {
-        return model.equals(another.model)
-                && input.equals(another.input)
-                && user.equals(another.user);
+        return Objects.equals(model, another.model)
+                && Objects.equals(input, another.input)
+                && Objects.equals(user, another.user);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + model.hashCode();
-        h += (h << 5) + input.hashCode();
-        h += (h << 5) + user.hashCode();
+        h += (h << 5) + Objects.hashCode(model);
+        h += (h << 5) + Objects.hashCode(input);
+        h += (h << 5) + Objects.hashCode(user);
         return h;
     }
 

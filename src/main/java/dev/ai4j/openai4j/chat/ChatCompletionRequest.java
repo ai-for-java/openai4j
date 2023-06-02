@@ -6,6 +6,7 @@ import dev.ai4j.openai4j.Model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static dev.ai4j.openai4j.Model.GPT_3_5_TURBO;
 import static dev.ai4j.openai4j.chat.Message.*;
@@ -99,35 +100,35 @@ public final class ChatCompletionRequest {
     }
 
     private boolean equalTo(ChatCompletionRequest another) {
-        return model.equals(another.model)
-                && messages.equals(another.messages)
-                && temperature.equals(another.temperature)
-                && topP.equals(another.topP)
-                && n.equals(another.n)
-                && stream.equals(another.stream)
-                && stop.equals(another.stop)
-                && maxTokens.equals(another.maxTokens)
-                && presencePenalty.equals(another.presencePenalty)
-                && frequencyPenalty.equals(another.frequencyPenalty)
-                && logitBias.equals(another.logitBias)
-                && user.equals(another.user);
+        return Objects.equals(model, another.model)
+                && Objects.equals(messages, another.messages)
+                && Objects.equals(temperature, another.temperature)
+                && Objects.equals(topP, another.topP)
+                && Objects.equals(n, another.n)
+                && Objects.equals(stream, another.stream)
+                && Objects.equals(stop, another.stop)
+                && Objects.equals(maxTokens, another.maxTokens)
+                && Objects.equals(presencePenalty, another.presencePenalty)
+                && Objects.equals(frequencyPenalty, another.frequencyPenalty)
+                && Objects.equals(logitBias, another.logitBias)
+                && Objects.equals(user, another.user);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + model.hashCode();
-        h += (h << 5) + messages.hashCode();
-        h += (h << 5) + temperature.hashCode();
-        h += (h << 5) + topP.hashCode();
-        h += (h << 5) + n.hashCode();
-        h += (h << 5) + stream.hashCode();
-        h += (h << 5) + stop.hashCode();
-        h += (h << 5) + maxTokens.hashCode();
-        h += (h << 5) + presencePenalty.hashCode();
-        h += (h << 5) + frequencyPenalty.hashCode();
-        h += (h << 5) + logitBias.hashCode();
-        h += (h << 5) + user.hashCode();
+        h += (h << 5) + Objects.hashCode(model);
+        h += (h << 5) + Objects.hashCode(messages);
+        h += (h << 5) + Objects.hashCode(temperature);
+        h += (h << 5) + Objects.hashCode(topP);
+        h += (h << 5) + Objects.hashCode(n);
+        h += (h << 5) + Objects.hashCode(stream);
+        h += (h << 5) + Objects.hashCode(stop);
+        h += (h << 5) + Objects.hashCode(maxTokens);
+        h += (h << 5) + Objects.hashCode(presencePenalty);
+        h += (h << 5) + Objects.hashCode(frequencyPenalty);
+        h += (h << 5) + Objects.hashCode(logitBias);
+        h += (h << 5) + Objects.hashCode(user);
         return h;
     }
 
