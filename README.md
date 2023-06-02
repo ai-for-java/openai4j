@@ -60,7 +60,7 @@ OpenAiClient client = OpenAiClient.builder()
 	.build();
 ```
 
-# Get Completions
+# Completions
 
 ## Synchronously
 
@@ -133,7 +133,7 @@ client.completion(request)
 	.execute();
 ```
 
-# Get Chat Completions
+# Completions
 
 ## Synchronously
 
