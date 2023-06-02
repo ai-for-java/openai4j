@@ -13,6 +13,9 @@ This is an unofficial Java client library that helps to connect your Java applic
 - [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
   - synchronous
   - asynchronous
+- [Moderations](https://platform.openai.com/docs/api-reference/moderations)
+  - synchronous
+  - asynchronous
 
 ## Coming soon:
 - Detailed javadocs
