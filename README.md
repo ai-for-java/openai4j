@@ -26,13 +26,13 @@ Maven:
 <dependency>
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
 Gradle:
 ```
-implementation 'dev.ai4j:openai4j:0.1.0'
+implementation 'dev.ai4j:openai4j:0.2.0'
 ```
 
 # Create an OpenAI Service
@@ -41,16 +41,18 @@ Easy way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiService service = new OpenAiService(apiKey);
+OpenAiClient client = new OpenAiClient(apiKey);
 ```
 
 Customizable way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiService service = OpenAiService.builder()
+OpenAiClient client = OpenAiClient.builder()
 	.apiKey(apiKey)
 	.timeout(ofSeconds(60))
+	.logRequests()
+	.logResponses()
 	// other customizations coming soon!
 	.build();
 ```
@@ -61,7 +63,7 @@ OpenAiService service = OpenAiService.builder()
 
 Easy way:
 ```
-String completion = service.getCompletion("Write a poem about ChatGPT");
+String completion = client.completion("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
@@ -73,25 +75,17 @@ CompletionRequest request = CompletionRequest.builder()
 	...
 	.build();
 
-CompletionResponse response = service.getCompletions(request);
+CompletionResponse response = client.completion(request).execute();
 ```
 
 ## Asynchronously
 
 Easy way:
 ```
-service.getCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
-
-	@Override
-	public void onResponse(String response) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.completion("Write a poem about ChatGPT")
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 Customizable way:
@@ -103,41 +97,21 @@ CompletionRequest request = CompletionRequest.builder()
 	...
 	.build();
 
-service.getCompletionsAsync(request, new ResponseHandler<CompletionResponse>() {
-
-	@Override
-	public void onResponse(CompletionResponse response) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.completion(request)
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 ## Streaming
 
 Easy way:
 ```
-service.streamCompletion("Write a poem about ChatGPT", new StreamingResponseHandler() {
-
-	@Override
-	public void onPartialResponse(String partialResponse) {
-
-	}
-
-	@Override
-	public void onCompleteResponse(String completeResponse) {
-
-	}
-	
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.completion("Write a poem about ChatGPT")
+	.onPartialResponse(partialResponse -> ...)
+	.onComplete(() -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 Customizable way:
@@ -149,23 +123,11 @@ CompletionRequest request = CompletionRequest.builder()
 	...
 	.build();
 
-service.streamCompletions(request, new StreamingResponseHandler() {
-
-	@Override
-	public void onPartialResponse(String partialResponse) {
-
-	}
-
-	@Override
-	public void onCompleteResponse(String completeResponse) {
-
-	}
-	
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.completion(request)
+	.onPartialResponse(partialResponse -> ...)
+	.onComplete(() -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 # Get Chat Completions
@@ -174,7 +136,7 @@ service.streamCompletions(request, new StreamingResponseHandler() {
 
 Easy way:
 ```
-String completion = service.getChatCompletion("Write a poem about ChatGPT");
+String completion = client.chatCompletion("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
@@ -187,25 +149,17 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	...
 	.build();
 
-ChatCompletionResponse response = service.getChatCompletions(request);
+ChatCompletionResponse response = client.chatCompletions(request).execute();
 ```
 
 ## Asynchronously
 
 Easy way:
 ```
-service.getChatCompletionAsync("Write a poem about ChatGPT", new ResponseHandler<String>() {
-
-	@Override
-	public void onResponse(String response) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.chatCompletion("Write a poem about ChatGPT")
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 Customizable way:
@@ -218,41 +172,21 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	...
 	.build();
 
-service.getChatCompletionsAsync(request, new ResponseHandler<ChatCompletionResponse>() {
-
-	@Override
-	public void onResponse(ChatCompletionResponse response) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.chatCompletion(request)
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 ## Streaming
 
 Easy way:
 ```
-service.streamChatCompletion("Write a poem about ChatGPT", new StreamingResponseHandler() {
-
-	@Override
-	public void onPartialResponse(String partialResponse) {
-
-	}
-
-	@Override
-	public void onCompleteResponse(String completeResponse) {
-
-	}
-	
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.chatCompletion("Write a poem about ChatGPT")
+	.onPartialResponse(partialResponse -> ...)
+	.onComplete(() -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 Customizable way:
@@ -265,23 +199,11 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 	...
 	.build();
 
-service.streamChatCompletions(request, new StreamingResponseHandler() {
-
-	@Override
-	public void onPartialResponse(String partialResponse) {
-
-	}
-
-	@Override
-	public void onCompleteResponse(String completeResponse) {
-
-	}
-	
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.chatCompletion(request)
+	.onPartialResponse(partialResponse -> ...)
+	.onComplete(() -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 # Embeddings
@@ -290,7 +212,7 @@ service.streamChatCompletions(request, new StreamingResponseHandler() {
 
 Easy way:
 ```
-List<Float> embedding = service.getEmbedding("Write a poem about ChatGPT");
+List<Float> embedding = client.embedding("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
@@ -301,25 +223,17 @@ EmbeddingRequest request = EmbeddingRequest.builder()
 	...
 	.build();
 
-EmbeddingResponse embedding = service.getEmbeddings(request);
+EmbeddingResponse embedding = client.embedding(request).execute();
 ```
 
 ## Asynchronously
 
 Easy way:
 ```
-service.getEmbeddingAsync("Write a poem about ChatGPT", new ResponseHandler<List<Float>>() {
-
-	@Override
-	public void onResponse(List<Float> embedding) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.embedding("Write a poem about ChatGPT")
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
 Customizable way:
@@ -330,83 +244,50 @@ EmbeddingRequest request = EmbeddingRequest.builder()
 	...
 	.build();
 
-service.getEmbeddingsAsync(request, new ResponseHandler<EmbeddingResponse>() {
-
-	@Override
-	public void onResponse(EmbeddingResponse response) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable t) {
-
-	}
-});
+client.embedding(request)
+	.onResponse(response -> ...)
+	.onError(error -> ...)
+	.execute();
 ```
 
-# Experimental
+# Moderations
 
+## Synchronously
+
+Easy way:
 ```
-// simple
-OpenAi openAi = new OpenAi(apiKey);
+ModerationResult moderationResult = client.moderation("Write a poem about ChatGPT").execute();
+```
 
-// customizable
-OpenAi openAi = OpenAi.builder()
-	.apiKey(apiKey)
-	.timeout(ofSeconds(60))
-	...
+Customizable way:
+```
+ModerationRequest request = ModerationRequest.builder()
+	.input(INPUT)
+	.model(TEXT_MODERATION_STABLE)
 	.build();
 
-// sync
-CompletionResponse response = openAi.completion().sync(request);
+ModerationResponse response = client.moderation(request).execute();
+```
 
+## Asynchronously
 
-// async
-openAi.completion().async(request)
+Easy way:
+```
+client.moderation("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
-	.onFailure(failure -> ...)
+	.onError(error -> ...)
 	.execute();
-	
+```
 
-// async
-openAi.completion().async(request, new ResponseHandler<String>() {
+Customizable way:
+```
+ModerationRequest request = ModerationRequest.builder()
+	.input(INPUT)
+	.model(TEXT_MODERATION_STABLE)
+	.build();
 
-	@Override
-	public void onResponse(String response) {
-		...
-	}
-
-	@Override
-	public void onFailure(Throwable failure) {
-		...
-	}
-});
-
-
-// stream
-openAi.completion().stream(request)
-	.onPartialResponse(partialResponse -> ...)
-	.onComplete(completeResponse -> ...)
-	.onFailure(failure -> ...)
+client.moderation(request)
+	.onResponse(response -> ...)
+	.onError(error -> ...)
 	.execute();
-
-
-// stream
-openAi.completion().stream(request, new StreamingResponseHandler<String>() {
-
-	@Override
-	public void onPartialResponse(String partialResponse) {
-		...
-	}
-	
-	@Override
-	public void onComplete(String completeResponse) {
-		...
-	}
-
-	@Override
-	public void onFailure(Throwable failure) {
-		...
-	}
-});
 ```
