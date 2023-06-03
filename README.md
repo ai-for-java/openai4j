@@ -1,4 +1,4 @@
-# Java Client library for OpenAI API
+# Java client library for OpenAI API
 This is an unofficial Java client library that helps to connect your Java applications with OpenAI API.
 
 ## Current capabilities:
@@ -38,7 +38,9 @@ Gradle:
 implementation 'dev.ai4j:openai4j:0.2.0'
 ```
 
-# Create an OpenAI Client
+# Code examples
+
+## Create an OpenAI Client
 
 Simple way:
 ```
@@ -60,9 +62,9 @@ OpenAiClient client = OpenAiClient.builder()
 	.build();
 ```
 
-# Completions
+## Completions
 
-## Synchronously
+### Synchronously
 
 Simple way:
 ```
@@ -81,7 +83,7 @@ CompletionRequest request = CompletionRequest.builder()
 CompletionResponse response = client.completion(request).execute();
 ```
 
-## Asynchronously
+### Asynchronously
 
 Simple way:
 ```
@@ -106,7 +108,7 @@ client.completion(request)
 	.execute();
 ```
 
-## Streaming
+### Streaming
 
 Simple way:
 ```
@@ -133,9 +135,9 @@ client.completion(request)
 	.execute();
 ```
 
-# Completions
+## Chat Completions
 
-## Synchronously
+### Synchronously
 
 Simple way:
 ```
@@ -155,7 +157,7 @@ ChatCompletionRequest request = ChatCompletionRequest.builder()
 ChatCompletionResponse response = client.chatCompletions(request).execute();
 ```
 
-## Asynchronously
+### Asynchronously
 
 Simple way:
 ```
@@ -181,7 +183,7 @@ client.chatCompletion(request)
 	.execute();
 ```
 
-## Streaming
+### Streaming
 
 Simple way:
 ```
@@ -209,9 +211,9 @@ client.chatCompletion(request)
 	.execute();
 ```
 
-# Embeddings
+## Embeddings
 
-## Synchronously
+### Synchronously
 
 Simple way:
 ```
@@ -229,7 +231,7 @@ EmbeddingRequest request = EmbeddingRequest.builder()
 EmbeddingResponse embedding = client.embedding(request).execute();
 ```
 
-## Asynchronously
+### Asynchronously
 
 Simple way:
 ```
@@ -253,9 +255,9 @@ client.embedding(request)
 	.execute();
 ```
 
-# Moderations
+## Moderations
 
-## Synchronously
+### Synchronously
 
 Simple way:
 ```
@@ -272,7 +274,7 @@ ModerationRequest request = ModerationRequest.builder()
 ModerationResponse response = client.moderation(request).execute();
 ```
 
-## Asynchronously
+### Asynchronously
 
 Simple way:
 ```
