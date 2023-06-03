@@ -3,19 +3,19 @@ This is an unofficial Java client library that helps to connect your Java applic
 
 ## Current capabilities:
 - [Completions](https://platform.openai.com/docs/api-reference/completions)
-  - synchronous
-  - asynchronous
-  - streaming
+  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously)
+  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously)
+  - [streaming](https://github.com/ai-for-java/openai4j#streaming)
 - [Chat Completions](https://platform.openai.com/docs/api-reference/chat)
-  - synchronous
-  - asynchronous
-  - streaming
+  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-1)
+  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-1)
+  - [streaming](https://github.com/ai-for-java/openai4j#streaming-1)
 - [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
-  - synchronous
-  - asynchronous
+  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-2)
+  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-2)
 - [Moderations](https://platform.openai.com/docs/api-reference/moderations)
-  - synchronous
-  - asynchronous
+  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-3)
+  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-3)
 
 ## Coming soon:
 - Detailed javadocs
