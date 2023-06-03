@@ -39,10 +39,10 @@ implementation 'dev.ai4j:openai4j:0.2.0'
 ```
 
 # Useful materials
-- https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
-- https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
-- https://github.com/openai/openai-cookbook
-- https://platform.openai.com/docs/guides/gpt-best-practices
+- How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
+- Text version of above course: https://platform.openai.com/docs/guides/gpt-best-practices
+- How to build software powered by OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
+- Cookbook with examples of how to use OpenAI API: https://github.com/openai/openai-cookbook
 
 # Code examples
 
