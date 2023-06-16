@@ -2,6 +2,9 @@ package dev.ai4j.openai4j;
 
 import dev.ai4j.openai4j.completion.CompletionRequest;
 
+import static java.net.Proxy.Type.HTTP;
+import static java.time.Duration.ofSeconds;
+
 public class Test {
 
     public static void main(String[] args) {
@@ -10,19 +13,20 @@ public class Test {
 
         OpenAiClient client = OpenAiClient.builder()
                 .apiKey(apiKey)
+                .callTimeout(ofSeconds(60))
+                .connectTimeout(ofSeconds(60))
+                .readTimeout(ofSeconds(60))
+                .writeTimeout(ofSeconds(60))
+                .proxy(HTTP, "103.154.230.129", 8080)
                 .logRequests()
                 .logResponses()
                 .logStreamingResponses()
                 .build();
 
-        CompletionRequest request = CompletionRequest.builder().maxTokens(5000).build();
+        CompletionRequest request = CompletionRequest.builder()
+                .prompt("hello")
+                .build();
 
-        client.completion(request)
-                .onPartialResponse(System.out::println)
-                .onComplete(() -> System.out.println("done"))
-                .onError(Throwable::printStackTrace)
-                .execute();
-
-        client.shutdown();
+        System.out.println(client.completion(request).execute().text());
     }
 }

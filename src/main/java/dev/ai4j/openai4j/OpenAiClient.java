@@ -17,6 +17,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Duration;
 import java.util.List;
 
@@ -45,6 +47,10 @@ public class OpenAiClient {
                 .connectTimeout(serviceBuilder.connectTimeout)
                 .readTimeout(serviceBuilder.readTimeout)
                 .writeTimeout(serviceBuilder.writeTimeout);
+
+        if (serviceBuilder.proxy != null) {
+            okHttpClientBuilder = okHttpClientBuilder.proxy(serviceBuilder.proxy);
+        }
 
         if (serviceBuilder.logRequests) {
             okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
@@ -93,6 +99,7 @@ public class OpenAiClient {
         private Duration connectTimeout = Duration.ofSeconds(60);
         private Duration readTimeout = Duration.ofSeconds(60);
         private Duration writeTimeout = Duration.ofSeconds(60);
+        private Proxy proxy;
         private boolean logRequests;
         private boolean logResponses;
         private boolean logStreamingResponses;
@@ -145,6 +152,19 @@ public class OpenAiClient {
                 throw new IllegalArgumentException("writeTimeout cannot be null");
             }
             this.writeTimeout = writeTimeout;
+            return this;
+        }
+
+        public Builder proxy(Proxy.Type type, String ip, int port) {
+            this.proxy = new Proxy(type, new InetSocketAddress(ip, port));
+            return this;
+        }
+
+        public Builder proxy(Proxy proxy) {
+            if (proxy == null) {
+                throw new IllegalArgumentException("proxy cannot be null");
+            }
+            this.proxy = proxy;
             return this;
         }
 
