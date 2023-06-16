@@ -3,7 +3,6 @@
 - automatically handle 429 (wait and retry?)
 - propagate complete error message in exception if !200
 - mask all keys, not only sk-...
-- revise timeouts
 - support custom thread pools
 - custom exceptions
 - option to define defaults in service builder: model, temperature, etc

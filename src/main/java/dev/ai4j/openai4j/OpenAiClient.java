@@ -6,9 +6,9 @@ import dev.ai4j.openai4j.completion.CompletionRequest;
 import dev.ai4j.openai4j.completion.CompletionResponse;
 import dev.ai4j.openai4j.embedding.EmbeddingRequest;
 import dev.ai4j.openai4j.embedding.EmbeddingResponse;
-import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
+import dev.ai4j.openai4j.moderation.ModerationResult;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -41,7 +41,10 @@ public class OpenAiClient {
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(new ApiKeyInsertingInterceptor(serviceBuilder.apiKey))
-                .callTimeout(serviceBuilder.timeout);
+                .callTimeout(serviceBuilder.callTimeout)
+                .connectTimeout(serviceBuilder.connectTimeout)
+                .readTimeout(serviceBuilder.readTimeout)
+                .writeTimeout(serviceBuilder.writeTimeout);
 
         if (serviceBuilder.logRequests) {
             okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
@@ -86,7 +89,10 @@ public class OpenAiClient {
 
         private String url = "https://api.openai.com/";
         private String apiKey;
-        private Duration timeout = Duration.ofSeconds(60);
+        private Duration callTimeout = Duration.ofSeconds(60);
+        private Duration connectTimeout = Duration.ofSeconds(60);
+        private Duration readTimeout = Duration.ofSeconds(60);
+        private Duration writeTimeout = Duration.ofSeconds(60);
         private boolean logRequests;
         private boolean logResponses;
         private boolean logStreamingResponses;
@@ -110,11 +116,35 @@ public class OpenAiClient {
             return this;
         }
 
-        public Builder timeout(Duration timeout) {
-            if (timeout == null) {
-                throw new IllegalArgumentException("Timeout cannot be null");
+        public Builder callTimeout(Duration callTimeout) {
+            if (callTimeout == null) {
+                throw new IllegalArgumentException("callTimeout cannot be null");
             }
-            this.timeout = timeout;
+            this.callTimeout = callTimeout;
+            return this;
+        }
+
+        public Builder connectTimeout(Duration connectTimeout) {
+            if (connectTimeout == null) {
+                throw new IllegalArgumentException("connectTimeout cannot be null");
+            }
+            this.connectTimeout = connectTimeout;
+            return this;
+        }
+
+        public Builder readTimeout(Duration readTimeout) {
+            if (readTimeout == null) {
+                throw new IllegalArgumentException("readTimeout cannot be null");
+            }
+            this.readTimeout = readTimeout;
+            return this;
+        }
+
+        public Builder writeTimeout(Duration writeTimeout) {
+            if (writeTimeout == null) {
+                throw new IllegalArgumentException("writeTimeout cannot be null");
+            }
+            this.writeTimeout = writeTimeout;
             return this;
         }
 
