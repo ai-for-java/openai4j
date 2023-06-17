@@ -29,13 +29,13 @@ Maven:
 <dependency>
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 Gradle:
 ```
-implementation 'dev.ai4j:openai4j:0.2.0'
+implementation 'dev.ai4j:openai4j:0.3.0'
 ```
 
 # Useful materials
@@ -61,7 +61,11 @@ String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiClient client = OpenAiClient.builder()
 	.apiKey(apiKey)
-	.timeout(ofSeconds(60))
+	.callTimeout(ofSeconds(60))
+	.connectTimeout(ofSeconds(60))
+	.readTimeout(ofSeconds(60))
+	.writeTimeout(ofSeconds(60))
+	.proxy(HTTP, "XXX.XXX.XXX.XXX", 8080)
 	.logRequests()
 	.logResponses()
 	// other customizations coming soon!
