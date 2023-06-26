@@ -29,13 +29,13 @@ Maven:
 <dependency>
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
 Gradle:
 ```
-implementation 'dev.ai4j:openai4j:0.3.0'
+implementation 'dev.ai4j:openai4j:0.4.0'
 ```
 
 # Useful materials
