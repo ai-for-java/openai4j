@@ -169,17 +169,29 @@ public class OpenAiClient {
         }
 
         public Builder logRequests() {
-            this.logRequests = true;
+            return logRequests(true);
+        }
+
+        public Builder logRequests(boolean logRequests) {
+            this.logRequests = logRequests;
             return this;
         }
 
         public Builder logResponses() {
-            this.logResponses = true;
+            return logResponses(true);
+        }
+
+        public Builder logResponses(boolean logResponses) {
+            this.logResponses = logResponses;
             return this;
         }
 
         public Builder logStreamingResponses() {
-            this.logStreamingResponses = true;
+            return logStreamingResponses(true);
+        }
+
+        public Builder logStreamingResponses(boolean logStreamingResponses) {
+            this.logStreamingResponses = logStreamingResponses;
             return this;
         }
 
