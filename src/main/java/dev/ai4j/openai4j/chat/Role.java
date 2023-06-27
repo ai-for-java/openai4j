@@ -12,7 +12,8 @@ public enum Role {
 
     SYSTEM("system"),
     USER("user"),
-    ASSISTANT("assistant");
+    ASSISTANT("assistant"),
+    FUNCTION("function");
 
     private final String stringValue;
 
@@ -22,7 +23,7 @@ public enum Role {
 
     @Override
     public String toString() {
-        return String.valueOf(stringValue);
+        return stringValue;
     }
 
     static Role from(String stringValue) {

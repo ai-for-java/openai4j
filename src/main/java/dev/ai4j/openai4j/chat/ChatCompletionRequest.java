@@ -11,8 +11,7 @@ import java.util.Objects;
 import static dev.ai4j.openai4j.Model.GPT_3_5_TURBO;
 import static dev.ai4j.openai4j.chat.Message.*;
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.*;
 
 public final class ChatCompletionRequest {
 
@@ -28,6 +27,8 @@ public final class ChatCompletionRequest {
     private final Double frequencyPenalty;
     private final Map<String, Integer> logitBias;
     private final String user;
+    private final List<Function> functions;
+    private final Object functionCall;
 
     private ChatCompletionRequest(Builder builder) {
         this.model = builder.model;
@@ -42,6 +43,8 @@ public final class ChatCompletionRequest {
         this.frequencyPenalty = builder.frequencyPenalty;
         this.logitBias = builder.logitBias;
         this.user = builder.user;
+        this.functions = builder.functions;
+        this.functionCall = builder.functionCall;
     }
 
     public String model() {
@@ -92,6 +95,14 @@ public final class ChatCompletionRequest {
         return user;
     }
 
+    public List<Function> functions() {
+        return functions;
+    }
+
+    public Object functionCall() {
+        return functionCall;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -111,7 +122,9 @@ public final class ChatCompletionRequest {
                 && Objects.equals(presencePenalty, another.presencePenalty)
                 && Objects.equals(frequencyPenalty, another.frequencyPenalty)
                 && Objects.equals(logitBias, another.logitBias)
-                && Objects.equals(user, another.user);
+                && Objects.equals(user, another.user)
+                && Objects.equals(functions, another.functions)
+                && Objects.equals(functionCall, another.functionCall);
     }
 
     @Override
@@ -129,6 +142,8 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(frequencyPenalty);
         h += (h << 5) + Objects.hashCode(logitBias);
         h += (h << 5) + Objects.hashCode(user);
+        h += (h << 5) + Objects.hashCode(functions);
+        h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
 
@@ -147,6 +162,8 @@ public final class ChatCompletionRequest {
                 + ", frequencyPenalty=" + frequencyPenalty
                 + ", logitBias=" + logitBias
                 + ", user=" + user
+                + ", functions=" + functions
+                + ", functionCall=" + functionCall
                 + "}";
     }
 
@@ -168,6 +185,8 @@ public final class ChatCompletionRequest {
         private Double frequencyPenalty;
         private Map<String, Integer> logitBias;
         private String user;
+        private List<Function> functions;
+        private Object functionCall;
 
         private Builder() {
         }
@@ -185,6 +204,8 @@ public final class ChatCompletionRequest {
             frequencyPenalty(instance.frequencyPenalty);
             logitBias(instance.logitBias);
             user(instance.user);
+            functions(instance.functions);
+            functionCall(instance.functionCall);
             return this;
         }
 
@@ -235,6 +256,15 @@ public final class ChatCompletionRequest {
                 this.messages = new ArrayList<>();
             }
             this.messages.add(assistantMessage(assistantMessage));
+            return this;
+        }
+
+        @Experimental
+        public Builder addFunctionMessage(String name, String content) {
+            if (this.messages == null) {
+                this.messages = new ArrayList<>();
+            }
+            this.messages.add(functionMessage(name, content));
             return this;
         }
 
@@ -295,6 +325,45 @@ public final class ChatCompletionRequest {
 
         public Builder user(String user) {
             this.user = user;
+            return this;
+        }
+
+        public Builder functions(List<Function> functions) {
+            if (functions == null) {
+                return this;
+            }
+            this.functions = unmodifiableList(functions);
+            return this;
+        }
+
+        @Experimental
+        public Builder functions(Function... functions) {
+            return functions(asList(functions));
+        }
+
+        @Experimental
+        public Builder addFunction(Function function) {
+            if (this.functions == null) {
+                this.functions = new ArrayList<>();
+            }
+            this.functions.add(function);
+            return this;
+        }
+
+        public Builder functionCall(Object functionCall) {
+            this.functionCall = functionCall;
+            return this;
+        }
+
+        @Experimental
+        public Builder functionCall(FunctionCallMode mode) {
+            this.functionCall = mode.name().toLowerCase();
+            return this;
+        }
+
+        @Experimental
+        public Builder functionCall(String name) {
+            this.functionCall = singletonMap("name", name);
             return this;
         }
 

@@ -207,9 +207,9 @@
         <profile>
             <id>sign</id>
             <activation>
-                <property>
+                <constraint>
                     <name>sign</name>
-                </property>
+                </constraint>
             </activation>
             <build>
                 <plugins>

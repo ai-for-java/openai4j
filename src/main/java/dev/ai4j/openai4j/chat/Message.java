@@ -11,11 +11,13 @@ public final class Message {
     private final Role role;
     private final String content;
     private final String name;
+    private final FunctionCall functionCall;
 
     private Message(Builder builder) {
         this.role = builder.role;
         this.content = builder.content;
         this.name = builder.name;
+        this.functionCall = builder.functionCall;
     }
 
     public Role role() {
@@ -30,6 +32,10 @@ public final class Message {
         return name;
     }
 
+    public FunctionCall functionCall() {
+        return functionCall;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -40,7 +46,8 @@ public final class Message {
     private boolean equalTo(Message another) {
         return Objects.equals(role, another.role)
                 && Objects.equals(content, another.content)
-                && Objects.equals(name, another.name);
+                && Objects.equals(name, another.name)
+                && Objects.equals(functionCall, another.functionCall);
     }
 
     @Override
@@ -49,6 +56,7 @@ public final class Message {
         h += (h << 5) + Objects.hashCode(role);
         h += (h << 5) + Objects.hashCode(content);
         h += (h << 5) + Objects.hashCode(name);
+        h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
 
@@ -58,6 +66,7 @@ public final class Message {
                 + "role=" + role
                 + ", content=" + content
                 + ", name=" + name
+                + ", functionCall=" + functionCall
                 + "}";
     }
 
@@ -85,6 +94,15 @@ public final class Message {
                 .build();
     }
 
+    @Experimental
+    public static Message functionMessage(String name, String content) {
+        return Message.builder()
+                .role(FUNCTION)
+                .name(name)
+                .content(content)
+                .build();
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -94,6 +112,7 @@ public final class Message {
         private Role role;
         private String content;
         private String name;
+        private FunctionCall functionCall;
 
         private Builder() {
         }
@@ -115,6 +134,11 @@ public final class Message {
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder functionCall(FunctionCall functionCall) {
+            this.functionCall = functionCall;
             return this;
         }
 
