@@ -10,9 +10,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.chat.Constraint.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
-import static dev.ai4j.openai4j.chat.Constraint.*;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,13 +80,14 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .functions(Function.builder()
                         .name("get_current_weather")
                         .description("Get the current weather in a given location")
-                        // TODO or parameter?
-                        .addProperty("location", type("string"), description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalProperty("unit", type("string"), enums("celsius", "fahrenheit"))
+                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                        .addOptionalParameter("unit", STRING, enums("celsius", "fahrenheit"))
                         .build())
                 .build();
 
+
         ChatCompletionResponse response = client.chatCompletion(request).execute();
+
 
         Message assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
@@ -97,15 +98,25 @@ class ChatCompletionTest extends RateLimitAwareTest {
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
 
-        Message functionMessage = functionMessage("get_current_weather", "{ \"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\" }");
+
+        String weatherApiResponse = callWeatherAPI(arguments.get("location").toString());
+
+
+        Message functionMessage = functionMessage("get_current_weather", weatherApiResponse);
 
         ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
                 .model("gpt-3.5-turbo-0613")
                 .messages(userMessage, assistantMessage, functionMessage)
                 .build();
 
+
         ChatCompletionResponse secondResponse = client.chatCompletion(secondRequest).execute();
 
+
         assertThat(secondResponse.content()).contains("22");
+    }
+
+    private static String callWeatherAPI(String location) {
+        return "{ \"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\" }";
     }
 }

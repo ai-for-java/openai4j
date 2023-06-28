@@ -90,14 +90,14 @@ public class Function {
         }
 
         @Experimental
-        public Builder addProperty(String name, Constraint... constraints) {
-            addOptionalProperty(name, constraints);
+        public Builder addParameter(String name, Constraint... constraints) {
+            addOptionalParameter(name, constraints);
             this.parameters.required().add(name);
             return this;
         }
 
         @Experimental
-        public Builder addOptionalProperty(String name, Constraint... constraints) {
+        public Builder addOptionalParameter(String name, Constraint... constraints) {
             if (this.parameters == null) {
                 this.parameters = Parameters.builder().build();
             }

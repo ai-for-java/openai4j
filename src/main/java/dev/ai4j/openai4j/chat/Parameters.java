@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Parameters {
 
-    private final String type; // TODO remove completely?
+    private final String type;
     private final Map<String, Map<String, Object>> properties;
     private final List<String> required;
 
@@ -63,8 +63,8 @@ public class Parameters {
 
     public static final class Builder {
 
-        private String type = "object"; // TODO remove?
-        private Map<String, Map<String, Object>> properties = new HashMap<>(); // TODO check all new places, collection is not null
+        private String type = "object";
+        private Map<String, Map<String, Object>> properties = new HashMap<>();
         private List<String> required = new ArrayList<>();
 
         private Builder() {

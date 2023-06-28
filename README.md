@@ -1,23 +1,26 @@
 # Java client library for OpenAI API
+
 This is an unofficial Java client library that helps to connect your Java applications with OpenAI API.
 
 ## Current capabilities:
+
 - [Completions](https://platform.openai.com/docs/api-reference/completions)
-  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously)
-  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously)
-  - [streaming](https://github.com/ai-for-java/openai4j#streaming)
+    - [synchronous](https://github.com/ai-for-java/openai4j#synchronously)
+    - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously)
+    - [streaming](https://github.com/ai-for-java/openai4j#streaming)
 - [Chat Completions](https://platform.openai.com/docs/api-reference/chat)
-  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-1)
-  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-1)
-  - [streaming](https://github.com/ai-for-java/openai4j#streaming-1)
+    - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-1)
+    - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-1)
+    - [streaming](https://github.com/ai-for-java/openai4j#streaming-1)
 - [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
-  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-2)
-  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-2)
+    - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-2)
+    - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-2)
 - [Moderations](https://platform.openai.com/docs/api-reference/moderations)
-  - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-3)
-  - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-3)
+    - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-3)
+    - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-3)
 
 ## Coming soon:
+
 - Detailed javadocs
 - The rest of API endpoints
 - [Tell us what you need](https://github.com/ai-for-java/openai4j/issues/new)
@@ -25,6 +28,7 @@ This is an unofficial Java client library that helps to connect your Java applic
 # Start using
 
 Maven:
+
 ```
 <dependency>
     <groupId>dev.ai4j</groupId>
@@ -34,14 +38,17 @@ Maven:
 ```
 
 Gradle:
+
 ```
 implementation 'dev.ai4j:openai4j:0.4.0'
 ```
 
 # Useful materials
+
 - How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
 - Text version of above course: https://platform.openai.com/docs/guides/gpt-best-practices
-- How to build software powered by OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
+- How to build software powered by
+  OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
 - Cookbook with examples of how to use OpenAI API: https://github.com/openai/openai-cookbook
 
 # Code examples
@@ -49,6 +56,7 @@ implementation 'dev.ai4j:openai4j:0.4.0'
 ## Create an OpenAI Client
 
 Simple way:
+
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
@@ -56,6 +64,7 @@ OpenAiClient client = new OpenAiClient(apiKey);
 ```
 
 Customizable way:
+
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
@@ -77,11 +86,13 @@ OpenAiClient client = OpenAiClient.builder()
 ### Synchronously
 
 Simple way:
+
 ```
 String completion = client.completion("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
+
 ```
 CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
@@ -96,6 +107,7 @@ CompletionResponse response = client.completion(request).execute();
 ### Asynchronously
 
 Simple way:
+
 ```
 client.completion("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -104,6 +116,7 @@ client.completion("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
@@ -121,6 +134,7 @@ client.completion(request)
 ### Streaming
 
 Simple way:
+
 ```
 client.completion("Write a poem about ChatGPT")
 	.onPartialResponse(partialResponse -> ...)
@@ -130,6 +144,7 @@ client.completion("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 CompletionRequest request = CompletionRequest.builder()
 	.model(TEXT_DAVINCI_003)
@@ -150,11 +165,13 @@ client.completion(request)
 ### Synchronously
 
 Simple way:
+
 ```
 String completion = client.chatCompletion("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
+
 ```
 ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.model(GPT_3_5_TURBO)
@@ -170,6 +187,7 @@ ChatCompletionResponse response = client.chatCompletions(request).execute();
 ### Asynchronously
 
 Simple way:
+
 ```
 client.chatCompletion("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -178,6 +196,7 @@ client.chatCompletion("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.model(GPT_3_5_TURBO)
@@ -196,6 +215,7 @@ client.chatCompletion(request)
 ### Streaming
 
 Simple way:
+
 ```
 client.chatCompletion("Write a poem about ChatGPT")
 	.onPartialResponse(partialResponse -> ...)
@@ -205,6 +225,7 @@ client.chatCompletion("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 ChatCompletionRequest request = ChatCompletionRequest.builder()
 	.model(GPT_3_5_TURBO)
@@ -226,11 +247,13 @@ client.chatCompletion(request)
 ### Synchronously
 
 Simple way:
+
 ```
 List<Float> embedding = client.embedding("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
+
 ```
 EmbeddingRequest request = EmbeddingRequest.builder()
 	.model(TEXT_EMBEDDING_ADA_002)
@@ -244,6 +267,7 @@ EmbeddingResponse embedding = client.embedding(request).execute();
 ### Asynchronously
 
 Simple way:
+
 ```
 client.embedding("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -252,6 +276,7 @@ client.embedding("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 EmbeddingRequest request = EmbeddingRequest.builder()
 	.model(TEXT_EMBEDDING_ADA_002)
@@ -270,11 +295,13 @@ client.embedding(request)
 ### Synchronously
 
 Simple way:
+
 ```
 ModerationResult moderationResult = client.moderation("Write a poem about ChatGPT").execute();
 ```
 
 Customizable way:
+
 ```
 ModerationRequest request = ModerationRequest.builder()
 	.input(INPUT)
@@ -287,6 +314,7 @@ ModerationResponse response = client.moderation(request).execute();
 ### Asynchronously
 
 Simple way:
+
 ```
 client.moderation("Write a poem about ChatGPT")
 	.onResponse(response -> ...)
@@ -295,6 +323,7 @@ client.moderation("Write a poem about ChatGPT")
 ```
 
 Customizable way:
+
 ```
 ModerationRequest request = ModerationRequest.builder()
 	.input(INPUT)
