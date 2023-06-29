@@ -81,26 +81,28 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         .name("get_current_weather")
                         .description("Get the current weather in a given location")
                         .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums("celsius", "fahrenheit"))
+                        .addOptionalParameter("unit", STRING, enums(Unit.class))
                         .build())
                 .build();
 
-
         ChatCompletionResponse response = client.chatCompletion(request).execute();
-
 
         Message assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
-        assertThat(assistantMessage.functionCall().name()).isEqualTo("get_current_weather");
-        assertThat(assistantMessage.functionCall().arguments()).isNotBlank();
-        Map<String, Object> arguments = assistantMessage.functionCall().argumentsAsMap();
+
+        FunctionCall functionCall = assistantMessage.functionCall();
+        assertThat(functionCall.name()).isEqualTo("get_current_weather");
+        assertThat(functionCall.arguments()).isNotBlank();
+
+        Map<String, Object> arguments = functionCall.argumentsAsMap();
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
 
+        String location = functionCall.argument("location");
+        String unit = functionCall.argument("unit");
 
-        String weatherApiResponse = callWeatherAPI(arguments.get("location").toString());
-
+        String weatherApiResponse = getCurrentWeather(location, unit == null ? null : Unit.valueOf(unit));
 
         Message functionMessage = functionMessage("get_current_weather", weatherApiResponse);
 
@@ -109,14 +111,18 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .messages(userMessage, assistantMessage, functionMessage)
                 .build();
 
-
         ChatCompletionResponse secondResponse = client.chatCompletion(secondRequest).execute();
-
 
         assertThat(secondResponse.content()).contains("22");
     }
 
-    private static String callWeatherAPI(String location) {
+    public static String getCurrentWeather(String location, Unit unit) { // TODO return POJO
+        System.out.println(location);
+        System.out.println(unit);
         return "{ \"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\" }";
+    }
+
+    enum Unit {
+        CELSIUS, FAHRENHEIT
     }
 }

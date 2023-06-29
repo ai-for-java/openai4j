@@ -79,7 +79,27 @@ public class Constraint {
     }
 
     @Experimental
-    public static Constraint enums(String... enums) {
-        return from("enum", enums);
+    public static Constraint enums(String... enumValues) { // TODO names
+        return from("enum", enumValues);
+    }
+
+    @Experimental
+    public static Constraint enums(Object... enumValues) { // TODO names
+        for (Object enumValue : enumValues) {
+            if (!enumValue.getClass().isEnum()) {
+                throw new RuntimeException("Value " + enumValue.getClass().getName() + " should be enum");
+            }
+        }
+
+        return from("enum", enumValues);
+    }
+
+    @Experimental
+    public static Constraint enums(Class<?> enumClass) { // TODO names
+        if (!enumClass.isEnum()) {
+            throw new RuntimeException("Class " + enumClass.getName() + " should be enum");
+        }
+
+        return from("enum", enumClass.getEnumConstants());
     }
 }

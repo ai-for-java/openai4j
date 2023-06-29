@@ -33,6 +33,11 @@ public class FunctionCall {
         return GSON.fromJson(arguments, MAP_TYPE);
     }
 
+    public <T> T argument(String name) {
+        Map<String, Object> arguments = argumentsAsMap(); // TODO cache
+        return (T) arguments.get(name);
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
