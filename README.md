@@ -18,6 +18,7 @@ This is an unofficial Java client library that helps to connect your Java applic
 - [Moderations](https://platform.openai.com/docs/api-reference/moderations)
     - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-3)
     - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-3)
+- [Functions](https://github.com/ai-for-java/openai4j/blob/main/src/test/java/dev/ai4j/openai4j/chat/ChatCompletionTest.java)
 
 ## Coming soon:
 
@@ -33,23 +34,15 @@ Maven:
 <dependency>
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation 'dev.ai4j:openai4j:0.4.0'
+implementation 'dev.ai4j:openai4j:0.5.0'
 ```
-
-# Useful materials
-
-- How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
-- Text version of above course: https://platform.openai.com/docs/guides/gpt-best-practices
-- How to build software powered by
-  OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
-- Cookbook with examples of how to use OpenAI API: https://github.com/openai/openai-cookbook
 
 # Code examples
 
@@ -335,3 +328,11 @@ client.moderation(request)
 	.onError(error -> ...)
 	.execute();
 ```
+
+# Useful materials
+
+- How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
+- Text version of above course: https://platform.openai.com/docs/guides/gpt-best-practices
+- How to build software powered by
+  OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
+- Cookbook with examples of how to use OpenAI API: https://github.com/openai/openai-cookbook
