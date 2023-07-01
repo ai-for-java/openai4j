@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static dev.ai4j.openai4j.chat.Constraint.*;
+import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
@@ -116,7 +116,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         assertThat(secondResponse.content()).contains("22");
     }
 
-    public static String getCurrentWeather(String location, Unit unit) { // TODO return POJO
+    public static String getCurrentWeather(String location, Unit unit) {
         System.out.println(location);
         System.out.println(unit);
         return "{ \"temperature\": 22, \"unit\": \"celsius\", \"description\": \"Sunny\" }";

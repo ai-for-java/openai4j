@@ -90,24 +90,24 @@ public class Function {
         }
 
         @Experimental
-        public Builder addParameter(String name, Constraint... constraints) {
-            addOptionalParameter(name, constraints);
+        public Builder addParameter(String name, JsonSchemaProperty... jsonSchemaProperties) {
+            addOptionalParameter(name, jsonSchemaProperties);
             this.parameters.required().add(name);
             return this;
         }
 
         @Experimental
-        public Builder addOptionalParameter(String name, Constraint... constraints) {
+        public Builder addOptionalParameter(String name, JsonSchemaProperty... jsonSchemaProperties) {
             if (this.parameters == null) {
                 this.parameters = Parameters.builder().build();
             }
 
-            Map<String, Object> constraintMap = new HashMap<>();
-            for (Constraint constraint : constraints) {
-                constraintMap.put(constraint.key(), constraint.value());
+            Map<String, Object> jsonSchemaPropertiesMap = new HashMap<>();
+            for (JsonSchemaProperty jsonSchemaProperty : jsonSchemaProperties) {
+                jsonSchemaPropertiesMap.put(jsonSchemaProperty.key(), jsonSchemaProperty.value());
             }
 
-            this.parameters.properties().put(name, constraintMap);
+            this.parameters.properties().put(name, jsonSchemaPropertiesMap);
             return this;
         }
 
