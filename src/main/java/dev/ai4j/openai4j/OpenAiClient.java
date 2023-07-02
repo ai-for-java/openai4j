@@ -172,7 +172,10 @@ public class OpenAiClient {
             return logRequests(true);
         }
 
-        public Builder logRequests(boolean logRequests) {
+        public Builder logRequests(Boolean logRequests) {
+            if (logRequests == null) {
+                logRequests = false;
+            }
             this.logRequests = logRequests;
             return this;
         }
@@ -181,7 +184,10 @@ public class OpenAiClient {
             return logResponses(true);
         }
 
-        public Builder logResponses(boolean logResponses) {
+        public Builder logResponses(Boolean logResponses) {
+            if (logResponses == null) {
+                logResponses = false;
+            }
             this.logResponses = logResponses;
             return this;
         }
@@ -190,7 +196,10 @@ public class OpenAiClient {
             return logStreamingResponses(true);
         }
 
-        public Builder logStreamingResponses(boolean logStreamingResponses) {
+        public Builder logStreamingResponses(Boolean logStreamingResponses) {
+            if (logStreamingResponses == null) {
+                logStreamingResponses = false;
+            }
             this.logStreamingResponses = logStreamingResponses;
             return this;
         }
