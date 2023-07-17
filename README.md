@@ -34,14 +34,14 @@ Maven:
 <dependency>
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.2</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation 'dev.ai4j:openai4j:0.5.0'
+implementation 'dev.ai4j:openai4j:0.5.2'
 ```
 
 # Code examples
