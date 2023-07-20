@@ -6,10 +6,12 @@ public final class Delta {
 
     private final Role role;
     private final String content;
+    private final FunctionCall functionCall;
 
     private Delta(Builder builder) {
         this.role = builder.role;
         this.content = builder.content;
+        this.functionCall = builder.functionCall;
     }
 
     public Role role() {
@@ -18,6 +20,10 @@ public final class Delta {
 
     public String content() {
         return content;
+    }
+
+    public FunctionCall functionCall() {
+        return functionCall;
     }
 
     @Override
@@ -29,7 +35,8 @@ public final class Delta {
 
     private boolean equalTo(Delta another) {
         return Objects.equals(role, another.role)
-                && Objects.equals(content, another.content);
+                && Objects.equals(content, another.content)
+                && Objects.equals(functionCall, another.functionCall);
     }
 
     @Override
@@ -37,6 +44,7 @@ public final class Delta {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(role);
         h += (h << 5) + Objects.hashCode(content);
+        h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
 
@@ -45,6 +53,7 @@ public final class Delta {
         return "Delta{"
                 + "role=" + role
                 + ", content=" + content
+                + ", functionCall=" + functionCall
                 + "}";
     }
 
@@ -56,6 +65,7 @@ public final class Delta {
 
         private Role role;
         private String content;
+        private FunctionCall functionCall;
 
         private Builder() {
         }
@@ -67,6 +77,11 @@ public final class Delta {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder functionCall(FunctionCall functionCall) {
+            this.functionCall = functionCall;
             return this;
         }
 

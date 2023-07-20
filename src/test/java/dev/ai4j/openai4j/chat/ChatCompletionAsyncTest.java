@@ -7,11 +7,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
 import static java.util.Collections.singletonList;
@@ -29,7 +29,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws Exception {
 
         CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -47,14 +47,9 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
     @MethodSource
     @ParameterizedTest
-    void testCustomizableApi(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi(ChatCompletionRequest request) throws Exception {
 
         CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
-
-        client.chatCompletion(request)
-                .onResponse(future::complete)
-                .ignoreErrors()
-                .execute();
 
         client.chatCompletion(request)
                 .onResponse(future::complete)
@@ -89,5 +84,43 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
+    }
+
+    @Test
+    void testFunctions() throws Exception {
+
+        Message userMessage = userMessage("What is the weather like in Boston?");
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model("gpt-3.5-turbo-0613")
+                .messages(userMessage)
+                .functions(Function.builder()
+                        .name("get_current_weather")
+                        .description("Get the current weather in a given location")
+                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                        .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                        .build())
+                .build();
+
+        CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
+
+        client.chatCompletion(request)
+                .onResponse(future::complete)
+                .onError(future::completeExceptionally)
+                .execute();
+
+        ChatCompletionResponse response = future.get(30, SECONDS);
+
+        Message assistantMessage = response.choices().get(0).message();
+        assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
+        assertThat(assistantMessage.content()).isNull();
+
+        FunctionCall functionCall = assistantMessage.functionCall();
+        assertThat(functionCall.name()).isEqualTo("get_current_weather");
+        assertThat(functionCall.arguments()).isNotBlank();
+
+        Map<String, Object> arguments = functionCall.argumentsAsMap();
+        assertThat(arguments).hasSize(1);
+        assertThat(arguments.get("location").toString()).contains("Boston");
     }
 }

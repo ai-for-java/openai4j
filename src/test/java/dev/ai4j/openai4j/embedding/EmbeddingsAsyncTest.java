@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +21,7 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws Exception {
 
         CompletableFuture<List<Float>> future = new CompletableFuture<>();
 
@@ -40,7 +38,7 @@ public class EmbeddingsAsyncTest extends RateLimitAwareTest {
     }
 
     @Test
-    void testCustomizableApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi() throws Exception {
 
         EmbeddingRequest request = EmbeddingRequest.builder()
                 .input(INPUT)

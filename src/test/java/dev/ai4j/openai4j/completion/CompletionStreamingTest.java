@@ -5,8 +5,6 @@ import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +21,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws Exception {
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -41,7 +39,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @Test
-    void testCustomizableApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi() throws Exception {
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();

@@ -5,8 +5,6 @@ import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static dev.ai4j.openai4j.moderation.ModerationTest.assertAllFields;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -23,7 +21,7 @@ public class ModerationAsyncTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws Exception {
 
         CompletableFuture<ModerationResult> future = new CompletableFuture<>();
 
@@ -40,7 +38,7 @@ public class ModerationAsyncTest extends RateLimitAwareTest {
     }
 
     @Test
-    void testCustomizableApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi() throws Exception {
 
         ModerationRequest request = ModerationRequest.builder()
                 .input(INPUT)

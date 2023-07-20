@@ -8,10 +8,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -29,7 +28,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             .build();
 
     @Test
-    void testSimpleApi() throws ExecutionException, InterruptedException, TimeoutException {
+    void testSimpleApi() throws Exception {
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -48,7 +47,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @MethodSource
     @ParameterizedTest
-    void testCustomizableApi(ChatCompletionRequest request) throws ExecutionException, InterruptedException, TimeoutException {
+    void testCustomizableApi(ChatCompletionRequest request) throws Exception {
 
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -88,5 +87,50 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                                 .build()
                 )
         );
+    }
+
+    @Test
+    void testFunctions() throws Exception {
+
+        Message userMessage = userMessage("What is the weather like in Boston?");
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model("gpt-3.5-turbo-0613")
+                .messages(userMessage)
+                .functions(Function.builder()
+                        .name("get_current_weather")
+                        .description("Get the current weather in a given location")
+                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                        .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                        .build())
+                .build();
+
+        StringBuilder responseBuilder = new StringBuilder();
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        client.chatCompletion(request)
+                .onPartialResponse(partialResponse -> {
+                    Delta delta = partialResponse.choices().get(0).delta();
+                    String content = delta.content();
+                    FunctionCall functionCall = delta.functionCall();
+                    if (content != null) {
+                        responseBuilder.append(content);
+                    } else if (functionCall != null) {
+                        if (functionCall.name() != null) {
+                            responseBuilder.append(functionCall.name());
+                        } else if (functionCall.arguments() != null) {
+                            responseBuilder.append(functionCall.arguments());
+                        }
+                    }
+                })
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(future::completeExceptionally)
+                .execute();
+
+        String response = future.get(30, SECONDS);
+
+        assertThat(response).contains("get_current_weather");
+        assertThat(response).contains("location");
+        assertThat(response).contains("Boston");
     }
 }
