@@ -111,11 +111,11 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         client.chatCompletion(request)
                 .onPartialResponse(partialResponse -> {
                     Delta delta = partialResponse.choices().get(0).delta();
-                    String content = delta.content();
+
+                    assertThat(delta.content()).isNull();
+
                     FunctionCall functionCall = delta.functionCall();
-                    if (content != null) {
-                        responseBuilder.append(content);
-                    } else if (functionCall != null) {
+                    if (partialResponse.choices().get(0).finishReason() == null) {
                         if (functionCall.name() != null) {
                             responseBuilder.append(functionCall.name());
                         } else if (functionCall.arguments() != null) {
