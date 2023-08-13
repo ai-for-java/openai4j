@@ -161,9 +161,6 @@ public class OpenAiClient {
         }
 
         public Builder proxy(Proxy proxy) {
-            if (proxy == null) {
-                throw new IllegalArgumentException("proxy cannot be null");
-            }
             this.proxy = proxy;
             return this;
         }
