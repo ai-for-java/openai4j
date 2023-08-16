@@ -18,7 +18,7 @@ public class EmbeddingsTest extends RateLimitAwareTest {
     private static final String INPUT = "hello";
 
     private final OpenAiClient client = OpenAiClient.builder()
-            .apiKey(System.getenv("OPENAI_API_KEY"))
+            .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
             .build();

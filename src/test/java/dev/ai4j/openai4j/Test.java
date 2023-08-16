@@ -1,8 +1,7 @@
 package dev.ai4j.openai4j;
 
-import dev.ai4j.openai4j.completion.CompletionRequest;
+import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 
-import static java.net.Proxy.Type.HTTP;
 import static java.time.Duration.ofSeconds;
 
 public class Test {
@@ -12,23 +11,24 @@ public class Test {
         String apiKey = System.getenv("OPENAI_API_KEY");
 
         OpenAiClient client = OpenAiClient.builder()
-                .baseUrl("https://my-resource.openai.azure.com/openai/deployments/my-deployment/")
-                .apiVersion("2023-06-13")
-                .apiKey(apiKey)
+                .openAiApiKey(apiKey)
+//                .baseUrl("https://resource-name.openai.azure.com/openai/deployments/deployment-id/")
+//                .apiVersion("2023-05-15")
+//                .azureApiKey("...")
                 .callTimeout(ofSeconds(60))
                 .connectTimeout(ofSeconds(60))
                 .readTimeout(ofSeconds(60))
                 .writeTimeout(ofSeconds(60))
-                .proxy(HTTP, "103.154.230.129", 8080)
+//                .proxy(HTTP, "103.154.230.129", 8080)
                 .logRequests()
                 .logResponses()
                 .logStreamingResponses()
                 .build();
 
-        CompletionRequest request = CompletionRequest.builder()
-                .prompt("hello")
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .addUserMessage("hello")
                 .build();
 
-        System.out.println(client.completion(request).execute().text());
+        System.out.println(client.chatCompletion(request).execute().content());
     }
 }

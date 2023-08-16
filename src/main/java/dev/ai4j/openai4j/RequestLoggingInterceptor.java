@@ -50,18 +50,20 @@ class RequestLoggingInterceptor implements Interceptor {
                 .map(header -> {
                     String headerKey = header.component1();
                     String headerValue = header.component2();
-                    if (headerKey.contains("Authorization")) {
-                        headerValue = maskApiToken(headerValue);
+                    if (headerKey.equals("Authorization")) {
+                        headerValue = maskAuthorizationHeaderValue(headerValue);
+                    } else if (headerKey.equals("api-key")) {
+                        headerValue = maskApiKeyHeaderValue(headerValue);
                     }
                     return String.format("[%s: %s]", headerKey, headerValue);
                 })
                 .collect(joining(", "));
     }
 
-    private static String maskApiToken(String request) {
+    private static String maskAuthorizationHeaderValue(String authorizationHeaderValue) {
         try {
 
-            Matcher matcher = BEARER_PATTERN.matcher(request);
+            Matcher matcher = BEARER_PATTERN.matcher(authorizationHeaderValue);
 
             StringBuffer sb = new StringBuffer();
             while (matcher.find()) {
@@ -71,7 +73,20 @@ class RequestLoggingInterceptor implements Interceptor {
 
             return sb.toString();
         } catch (Exception e) {
-            return "Failed to mask the API key. Therefore, avoid logging the entire request.";
+            return "Failed to mask the API key.";
+        }
+    }
+
+    private static String maskApiKeyHeaderValue(String apiKeyHeaderValue) {
+        try {
+            if (apiKeyHeaderValue.length() <= 4) {
+                return apiKeyHeaderValue;
+            }
+            return apiKeyHeaderValue.substring(0, 2)
+                    + "..."
+                    + apiKeyHeaderValue.substring(apiKeyHeaderValue.length() - 2);
+        } catch (Exception e) {
+            return "Failed to mask the API key.";
         }
     }
 

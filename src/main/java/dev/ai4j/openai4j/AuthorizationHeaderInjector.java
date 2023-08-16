@@ -6,11 +6,11 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-class ApiKeyInsertingInterceptor implements Interceptor {
+class AuthorizationHeaderInjector implements Interceptor {
 
     private final String apiKey;
 
-    ApiKeyInsertingInterceptor(String apiKey) {
+    AuthorizationHeaderInjector(String apiKey) {
         this.apiKey = apiKey;
     }
 

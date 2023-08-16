@@ -35,7 +35,7 @@ public class OpenAiClient {
     private final boolean logStreamingResponses;
 
     public OpenAiClient(String apiKey) {
-        this(builder().apiKey(apiKey));
+        this(builder().openAiApiKey(apiKey));
     }
 
     private OpenAiClient(Builder serviceBuilder) {
@@ -44,21 +44,32 @@ public class OpenAiClient {
         this.apiVersion = serviceBuilder.apiVersion;
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
-                .addInterceptor(new ApiKeyInsertingInterceptor(serviceBuilder.apiKey))
                 .callTimeout(serviceBuilder.callTimeout)
                 .connectTimeout(serviceBuilder.connectTimeout)
                 .readTimeout(serviceBuilder.readTimeout)
                 .writeTimeout(serviceBuilder.writeTimeout);
 
+        if (serviceBuilder.openAiApiKey == null && serviceBuilder.azureApiKey == null) {
+            throw new IllegalArgumentException("openAiApiKey OR azureApiKey must be defined");
+        }
+        if (serviceBuilder.openAiApiKey != null && serviceBuilder.azureApiKey != null) {
+            throw new IllegalArgumentException("openAiApiKey AND azureApiKey cannot both be defined at the same time");
+        }
+        if (serviceBuilder.openAiApiKey != null) {
+            okHttpClientBuilder.addInterceptor(new AuthorizationHeaderInjector(serviceBuilder.openAiApiKey));
+        } else {
+            okHttpClientBuilder.addInterceptor(new ApiKeyHeaderInjector(serviceBuilder.azureApiKey));
+        }
+
         if (serviceBuilder.proxy != null) {
-            okHttpClientBuilder = okHttpClientBuilder.proxy(serviceBuilder.proxy);
+            okHttpClientBuilder.proxy(serviceBuilder.proxy);
         }
 
         if (serviceBuilder.logRequests) {
-            okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
+            okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
         }
         if (serviceBuilder.logResponses) {
-            okHttpClientBuilder = okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor());
+            okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor());
         }
         this.logStreamingResponses = serviceBuilder.logStreamingResponses;
 
@@ -97,7 +108,8 @@ public class OpenAiClient {
 
         private String baseUrl = "https://api.openai.com/v1/";
         private String apiVersion;
-        private String apiKey;
+        private String openAiApiKey;
+        private String azureApiKey;
         private Duration callTimeout = Duration.ofSeconds(60);
         private Duration connectTimeout = Duration.ofSeconds(60);
         private Duration readTimeout = Duration.ofSeconds(60);
@@ -133,11 +145,29 @@ public class OpenAiClient {
             return this;
         }
 
-        public Builder apiKey(String apiKey) {
-            if (apiKey == null || apiKey.trim().isEmpty()) {
-                throw new IllegalArgumentException("API key cannot be null or empty. API keys can be generated here: https://platform.openai.com/account/api-keys");
+        /**
+         * @param openAiApiKey OpenAI API key.
+         *                     Will be injected in HTTP headers like this: "Authorization: Bearer ${openAiApiKey}"
+         * @return builder
+         */
+        public Builder openAiApiKey(String openAiApiKey) {
+            if (openAiApiKey == null || openAiApiKey.trim().isEmpty()) {
+                throw new IllegalArgumentException("openAiApiKey cannot be null or empty. API keys can be generated here: https://platform.openai.com/account/api-keys");
             }
-            this.apiKey = apiKey;
+            this.openAiApiKey = openAiApiKey;
+            return this;
+        }
+
+        /**
+         * @param azureApiKey Azure API key.
+         *                    Will be injected in HTTP headers like this: "api-key: ${azureApiKey}"
+         * @return builder
+         */
+        public Builder azureApiKey(String azureApiKey) {
+            if (azureApiKey == null || azureApiKey.trim().isEmpty()) {
+                throw new IllegalArgumentException("azureApiKey cannot be null or empty");
+            }
+            this.azureApiKey = azureApiKey;
             return this;
         }
 
