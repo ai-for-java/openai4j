@@ -12,6 +12,8 @@ public class Test {
         String apiKey = System.getenv("OPENAI_API_KEY");
 
         OpenAiClient client = OpenAiClient.builder()
+                .baseUrl("https://my-resource.openai.azure.com/openai/deployments/my-deployment/")
+                .apiVersion("2023-06-13")
                 .apiKey(apiKey)
                 .callTimeout(ofSeconds(60))
                 .connectTimeout(ofSeconds(60))

@@ -29,6 +29,7 @@ public class OpenAiClient {
     private static final Logger log = LoggerFactory.getLogger(OpenAiClient.class);
 
     private final String baseUrl;
+    private final String apiVersion;
     private final OkHttpClient okHttpClient;
     private final OpenAiApi openAiApi;
     private final boolean logStreamingResponses;
@@ -40,6 +41,7 @@ public class OpenAiClient {
     private OpenAiClient(Builder serviceBuilder) {
 
         this.baseUrl = serviceBuilder.baseUrl;
+        this.apiVersion = serviceBuilder.apiVersion;
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(new ApiKeyInsertingInterceptor(serviceBuilder.apiKey))
@@ -94,6 +96,7 @@ public class OpenAiClient {
     public static class Builder {
 
         private String baseUrl = "https://api.openai.com/v1/";
+        private String apiVersion;
         private String apiKey;
         private Duration callTimeout = Duration.ofSeconds(60);
         private Duration connectTimeout = Duration.ofSeconds(60);
@@ -107,11 +110,26 @@ public class OpenAiClient {
         private Builder() {
         }
 
+        /**
+         * @param baseUrl Base URL of OpenAI API.
+         *                For OpenAI (default): "https://api.openai.com/v1/"
+         *                For Azure OpenAI: "https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/"
+         * @return builder
+         */
         public Builder baseUrl(String baseUrl) {
             if (baseUrl == null || baseUrl.trim().isEmpty()) {
                 throw new IllegalArgumentException("baseUrl cannot be null or empty");
             }
             this.baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+            return this;
+        }
+
+        /**
+         * @param apiVersion Version of the API in the YYYY-MM-DD format. Applicable only for Azure OpenAI.
+         * @return builder
+         */
+        public Builder apiVersion(String apiVersion) {
+            this.apiVersion = apiVersion;
             return this;
         }
 
@@ -208,11 +226,16 @@ public class OpenAiClient {
 
     public SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request) {
 
+        CompletionRequest syncRequest = CompletionRequest.builder()
+                .from(request)
+                .stream(null)
+                .build();
+
         return new RequestExecutor<>(
-                openAiApi.completions(CompletionRequest.builder().from(request).stream(null).build()),
+                openAiApi.completions(syncRequest, apiVersion),
                 (r) -> r,
                 okHttpClient,
-                baseUrl + "completions",
+                formatUrl("completions"),
                 () -> CompletionRequest.builder().from(request).stream(true).build(),
                 CompletionResponse.class,
                 (r) -> r,
@@ -227,11 +250,16 @@ public class OpenAiClient {
                 .prompt(prompt)
                 .build();
 
+        CompletionRequest syncRequest = CompletionRequest.builder()
+                .from(request)
+                .stream(null)
+                .build();
+
         return new RequestExecutor<>(
-                openAiApi.completions(CompletionRequest.builder().from(request).stream(null).build()),
+                openAiApi.completions(syncRequest, apiVersion),
                 CompletionResponse::text,
                 okHttpClient,
-                baseUrl + "completions",
+                formatUrl("completions"),
                 () -> CompletionRequest.builder().from(request).stream(true).build(),
                 CompletionResponse.class,
                 CompletionResponse::text,
@@ -241,11 +269,16 @@ public class OpenAiClient {
 
     public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request) {
 
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder()
+                .from(request)
+                .stream(null)
+                .build();
+
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(ChatCompletionRequest.builder().from(request).stream(null).build()),
+                openAiApi.chatCompletions(syncRequest, apiVersion),
                 (r) -> r,
                 okHttpClient,
-                baseUrl + "chat/completions",
+                formatUrl("chat/completions"),
                 () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
                 ChatCompletionResponse.class,
                 (r) -> r,
@@ -260,11 +293,16 @@ public class OpenAiClient {
                 .addUserMessage(userMessage)
                 .build();
 
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder()
+                .from(request)
+                .stream(null)
+                .build();
+
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(ChatCompletionRequest.builder().from(request).stream(null).build()),
+                openAiApi.chatCompletions(syncRequest, apiVersion),
                 ChatCompletionResponse::content,
                 okHttpClient,
-                baseUrl + "chat/completions",
+                formatUrl("chat/completions"),
                 () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
                 ChatCompletionResponse.class,
                 (r) -> r.choices().get(0).delta().content(),
@@ -274,7 +312,7 @@ public class OpenAiClient {
 
     public SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request) {
 
-        return new RequestExecutor<>(openAiApi.embeddings(request), (r) -> r);
+        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), (r) -> r);
     }
 
     @Experimental
@@ -284,12 +322,12 @@ public class OpenAiClient {
                 .input(input)
                 .build();
 
-        return new RequestExecutor<>(openAiApi.embeddings(request), EmbeddingResponse::embedding);
+        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), EmbeddingResponse::embedding);
     }
 
     public SyncOrAsync<ModerationResponse> moderation(ModerationRequest request) {
 
-        return new RequestExecutor<>(openAiApi.moderations(request), (r) -> r);
+        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), (r) -> r);
     }
 
     @Experimental
@@ -299,6 +337,17 @@ public class OpenAiClient {
                 .input(input)
                 .build();
 
-        return new RequestExecutor<>(openAiApi.moderations(request), (r) -> r.results().get(0));
+        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), (r) -> r.results().get(0));
+    }
+
+    private String formatUrl(String endpoint) {
+        return baseUrl + endpoint + apiVersionQueryParam();
+    }
+
+    private String apiVersionQueryParam() {
+        if (apiVersion == null || apiVersion.trim().isEmpty()) {
+            return "";
+        }
+        return "?api-version=" + apiVersion;
     }
 }
