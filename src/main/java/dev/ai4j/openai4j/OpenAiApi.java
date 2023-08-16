@@ -15,19 +15,19 @@ import retrofit2.http.POST;
 
 interface OpenAiApi {
 
-    @POST("v1/completions")
+    @POST("completions")
     @Headers("Content-Type: application/json")
     Call<CompletionResponse> completions(@Body CompletionRequest request);
 
-    @POST("v1/chat/completions")
+    @POST("chat/completions")
     @Headers("Content-Type: application/json")
     Call<ChatCompletionResponse> chatCompletions(@Body ChatCompletionRequest request);
 
-    @POST("v1/embeddings")
+    @POST("embeddings")
     @Headers("Content-Type: application/json")
     Call<EmbeddingResponse> embeddings(@Body EmbeddingRequest request);
 
-    @POST("v1/moderations")
+    @POST("moderations")
     @Headers("Content-Type: application/json")
     Call<ModerationResponse> moderations(@Body ModerationRequest request);
 }

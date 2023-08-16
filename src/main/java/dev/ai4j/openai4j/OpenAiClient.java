@@ -28,7 +28,7 @@ public class OpenAiClient {
 
     private static final Logger log = LoggerFactory.getLogger(OpenAiClient.class);
 
-    private final String url;
+    private final String baseUrl;
     private final OkHttpClient okHttpClient;
     private final OpenAiApi openAiApi;
     private final boolean logStreamingResponses;
@@ -39,7 +39,7 @@ public class OpenAiClient {
 
     private OpenAiClient(Builder serviceBuilder) {
 
-        this.url = serviceBuilder.url;
+        this.baseUrl = serviceBuilder.baseUrl;
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(new ApiKeyInsertingInterceptor(serviceBuilder.apiKey))
@@ -63,7 +63,7 @@ public class OpenAiClient {
         this.okHttpClient = okHttpClientBuilder.build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(serviceBuilder.url)
+                .baseUrl(serviceBuilder.baseUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(GSON))
                 .build();
@@ -93,7 +93,7 @@ public class OpenAiClient {
 
     public static class Builder {
 
-        private String url = "https://api.openai.com/";
+        private String baseUrl = "https://api.openai.com/v1/";
         private String apiKey;
         private Duration callTimeout = Duration.ofSeconds(60);
         private Duration connectTimeout = Duration.ofSeconds(60);
@@ -107,11 +107,11 @@ public class OpenAiClient {
         private Builder() {
         }
 
-        public Builder url(String url) {
-            if (url == null || url.trim().isEmpty()) {
-                throw new IllegalArgumentException("URL cannot be null or empty");
+        public Builder baseUrl(String baseUrl) {
+            if (baseUrl == null || baseUrl.trim().isEmpty()) {
+                throw new IllegalArgumentException("baseUrl cannot be null or empty");
             }
-            this.url = url.endsWith("/") ? url : url + "/";
+            this.baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
             return this;
         }
 
@@ -212,7 +212,7 @@ public class OpenAiClient {
                 openAiApi.completions(CompletionRequest.builder().from(request).stream(null).build()),
                 (r) -> r,
                 okHttpClient,
-                url + "v1/completions",
+                baseUrl + "completions",
                 () -> CompletionRequest.builder().from(request).stream(true).build(),
                 CompletionResponse.class,
                 (r) -> r,
@@ -231,7 +231,7 @@ public class OpenAiClient {
                 openAiApi.completions(CompletionRequest.builder().from(request).stream(null).build()),
                 CompletionResponse::text,
                 okHttpClient,
-                url + "v1/completions",
+                baseUrl + "completions",
                 () -> CompletionRequest.builder().from(request).stream(true).build(),
                 CompletionResponse.class,
                 CompletionResponse::text,
@@ -245,7 +245,7 @@ public class OpenAiClient {
                 openAiApi.chatCompletions(ChatCompletionRequest.builder().from(request).stream(null).build()),
                 (r) -> r,
                 okHttpClient,
-                url + "v1/chat/completions",
+                baseUrl + "chat/completions",
                 () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
                 ChatCompletionResponse.class,
                 (r) -> r,
@@ -264,7 +264,7 @@ public class OpenAiClient {
                 openAiApi.chatCompletions(ChatCompletionRequest.builder().from(request).stream(null).build()),
                 ChatCompletionResponse::content,
                 okHttpClient,
-                url + "v1/chat/completions",
+                baseUrl + "chat/completions",
                 () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
                 ChatCompletionResponse.class,
                 (r) -> r.choices().get(0).delta().content(),
