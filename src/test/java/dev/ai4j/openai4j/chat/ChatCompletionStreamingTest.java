@@ -2,17 +2,20 @@ package dev.ai4j.openai4j.chat;
 
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.ResponseHandle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -132,5 +135,66 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         assertThat(response).contains("get_current_weather");
         assertThat(response).contains("location");
         assertThat(response).contains("Boston");
+    }
+
+    @Test
+    void testCancelStreamingAfterStreamingStarted() throws InterruptedException {
+
+        AtomicBoolean streamingStarted = new AtomicBoolean(false);
+        AtomicBoolean streamingCancelled = new AtomicBoolean(false);
+        AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
+
+        ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
+                .onPartialResponse(partialResponse -> {
+                    streamingStarted.set(true);
+                    if (streamingCancelled.get()) {
+                        cancellationSucceeded.set(false);
+                    }
+                })
+                .onComplete(() -> cancellationSucceeded.set(false))
+                .onError(e -> cancellationSucceeded.set(false))
+                .execute();
+
+        while (!streamingStarted.get()) {
+            Thread.sleep(200);
+        }
+
+        newSingleThreadExecutor().execute(() -> {
+            responseHandle.cancel();
+            streamingCancelled.set(true);
+        });
+
+        while (!streamingCancelled.get()) {
+            Thread.sleep(200);
+        }
+        Thread.sleep(5000);
+
+        assertThat(cancellationSucceeded).isTrue();
+    }
+
+    @Test
+    void testCancelStreamingBeforeStreamingStarted() throws InterruptedException {
+
+        AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
+
+        ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
+                .onPartialResponse(partialResponse -> cancellationSucceeded.set(false))
+                .onComplete(() -> cancellationSucceeded.set(false))
+                .onError(e -> cancellationSucceeded.set(false))
+                .execute();
+
+        AtomicBoolean streamingCancelled = new AtomicBoolean(false);
+
+        newSingleThreadExecutor().execute(() -> {
+            responseHandle.cancel();
+            streamingCancelled.set(true);
+        });
+
+        while (!streamingCancelled.get()) {
+            Thread.sleep(200);
+        }
+        Thread.sleep(5000);
+
+        assertThat(cancellationSucceeded).isTrue();
     }
 }

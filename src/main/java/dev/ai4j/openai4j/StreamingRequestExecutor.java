@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static dev.ai4j.openai4j.ResponseLoggingInterceptor.log;
 import static dev.ai4j.openai4j.Utils.toException;
 
 class StreamingRequestExecutor<Request, Response, ResponseContent> {
@@ -56,8 +57,8 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                         return new ErrorHandling() {
 
                             @Override
-                            public void execute() {
-                                stream(
+                            public ResponseHandle execute() {
+                                return stream(
                                         partialResponseHandler,
                                         streamingCompletionCallback,
                                         errorHandler
@@ -71,8 +72,8 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                         return new ErrorHandling() {
 
                             @Override
-                            public void execute() {
-                                stream(
+                            public ResponseHandle execute() {
+                                return stream(
                                         partialResponseHandler,
                                         streamingCompletionCallback,
                                         (e) -> {
@@ -90,8 +91,8 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 return new ErrorHandling() {
 
                     @Override
-                    public void execute() {
-                        stream(
+                    public ResponseHandle execute() {
+                        return stream(
                                 partialResponseHandler,
                                 () -> {
                                     // intentionally ignoring because user did not provide callback
@@ -107,8 +108,8 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 return new ErrorHandling() {
 
                     @Override
-                    public void execute() {
-                        stream(
+                    public ResponseHandle execute() {
+                        return stream(
                                 partialResponseHandler,
                                 () -> {
                                     // intentionally ignoring because user did not provide callback
@@ -123,7 +124,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
         };
     }
 
-    private void stream(
+    private ResponseHandle stream(
             Consumer<ResponseContent> partialResponseHandler,
             Runnable streamingCompletionCallback,
             Consumer<Throwable> errorHandler
@@ -138,17 +139,29 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 .post(RequestBody.create(requestJson, MediaType.get("application/json; charset=utf-8")))
                 .build();
 
+        ResponseHandle responseHandle = new ResponseHandle();
+
         EventSourceListener eventSourceListener = new EventSourceListener() {
 
             @Override
             public void onOpen(EventSource eventSource, okhttp3.Response response) {
+                if (responseHandle.cancelled) {
+                    eventSource.cancel();
+                    return;
+                }
+
                 if (logStreamingResponses) {
-                    ResponseLoggingInterceptor.log(response);
+                    log(response);
                 }
             }
 
             @Override
             public void onEvent(EventSource eventSource, String id, String type, String data) {
+                if (responseHandle.cancelled) {
+                    eventSource.cancel();
+                    return;
+                }
+
                 if (logStreamingResponses) {
                     log.debug("onEvent() {}", data);
                 }
@@ -171,6 +184,11 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
             @Override
             public void onClosed(EventSource eventSource) {
+                if (responseHandle.cancelled) {
+                    eventSource.cancel();
+                    return;
+                }
+
                 if (logStreamingResponses) {
                     log.debug("onClosed()");
                 }
@@ -178,9 +196,13 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
             @Override
             public void onFailure(EventSource eventSource, Throwable t, okhttp3.Response response) {
+                if (responseHandle.cancelled) {
+                    return;
+                }
+
                 if (logStreamingResponses) {
                     log.debug("onFailure()", t);
-                    ResponseLoggingInterceptor.log(response);
+                    log(response);
                 }
 
                 if (t != null) {
@@ -197,5 +219,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
         EventSources.createFactory(okHttpClient)
                 .newEventSource(okHttpRequest, eventSourceListener);
+
+        return responseHandle;
     }
 }

@@ -27,7 +27,7 @@ class AsyncRequestExecutor<Response, ResponseContent> {
                 return new ErrorHandling() {
 
                     @Override
-                    public void execute() {
+                    public ResponseHandle execute() {
                         try {
                             retrofit2.Response<Response> retrofitResponse = call.execute();
                             if (retrofitResponse.isSuccessful()) {
@@ -40,6 +40,7 @@ class AsyncRequestExecutor<Response, ResponseContent> {
                         } catch (IOException e) {
                             errorHandler.accept(e);
                         }
+                        return new ResponseHandle();
                     }
                 };
             }
@@ -49,7 +50,7 @@ class AsyncRequestExecutor<Response, ResponseContent> {
                 return new ErrorHandling() {
 
                     @Override
-                    public void execute() {
+                    public ResponseHandle execute() {
                         try {
                             retrofit2.Response<Response> retrofitResponse = call.execute();
                             if (retrofitResponse.isSuccessful()) {
@@ -60,6 +61,7 @@ class AsyncRequestExecutor<Response, ResponseContent> {
                         } catch (IOException e) {
                             // intentionally ignoring, because user called ignoreErrors()
                         }
+                        return new ResponseHandle();
                     }
                 };
             }
