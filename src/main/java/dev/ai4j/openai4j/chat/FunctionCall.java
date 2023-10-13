@@ -1,17 +1,8 @@
 package dev.ai4j.openai4j.chat;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Objects;
 
 public class FunctionCall {
-
-    private static final Gson GSON = new Gson();
-    private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {
-    }.getType();
 
     private final String name;
     private final String arguments;
@@ -27,15 +18,6 @@ public class FunctionCall {
 
     public String arguments() {
         return arguments;
-    }
-
-    public Map<String, Object> argumentsAsMap() {
-        return GSON.fromJson(arguments, MAP_TYPE);
-    }
-
-    public <T> T argument(String name) {
-        Map<String, Object> arguments = argumentsAsMap(); // TODO cache
-        return (T) arguments.get(name);
     }
 
     @Override

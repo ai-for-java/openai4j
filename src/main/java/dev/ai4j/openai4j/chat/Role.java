@@ -1,13 +1,5 @@
 package dev.ai4j.openai4j.chat;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
-import java.io.IOException;
-
-@JsonAdapter(Role.RoleAdapter.class)
 public enum Role {
 
     SYSTEM("system"),
@@ -26,7 +18,7 @@ public enum Role {
         return stringValue;
     }
 
-    static Role from(String stringValue) {
+    public static Role from(String stringValue) {
         for (Role role : Role.values()) {
             if (role.stringValue.equals(stringValue)) {
                 return role;
@@ -35,16 +27,4 @@ public enum Role {
         throw new IllegalArgumentException("Unknown role: '" + stringValue + "'");
     }
 
-    static class RoleAdapter extends TypeAdapter<Role> {
-
-        @Override
-        public void write(final JsonWriter jsonWriter, final Role role) throws IOException {
-            jsonWriter.value(role.toString());
-        }
-
-        @Override
-        public Role read(JsonReader jsonReader) throws IOException {
-            return Role.from(jsonReader.nextString());
-        }
-    }
 }
