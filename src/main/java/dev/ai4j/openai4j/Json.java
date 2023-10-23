@@ -13,6 +13,7 @@ class Json {
             .setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES)
             .registerTypeAdapterFactory(MESSAGE_TYPE_ADAPTER_FACTORY)
             .registerTypeAdapter(Role.class, new RoleAdapter())
+            .setPrettyPrinting()
             .create();
 
     static String toJson(Object o) {
