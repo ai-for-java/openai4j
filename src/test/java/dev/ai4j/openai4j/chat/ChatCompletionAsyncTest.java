@@ -1,5 +1,6 @@
 package dev.ai4j.openai4j.chat;
 
+import dev.ai4j.openai4j.FunctionCallUtil;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
@@ -119,7 +120,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         assertThat(functionCall.name()).isEqualTo("get_current_weather");
         assertThat(functionCall.arguments()).isNotBlank();
 
-        Map<String, Object> arguments = functionCall.argumentsAsMap();
+        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(functionCall.arguments());
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
     }
