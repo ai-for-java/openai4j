@@ -11,6 +11,7 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
@@ -47,9 +48,7 @@ public abstract class OpenAiClient {
         }
         // fallback to the default
         return DefaultOpenAiClient.builder();
-
     }
-
 
     @SuppressWarnings("unchecked")
     public abstract static class Builder<T extends OpenAiClient, B extends Builder<T, B>> {
@@ -66,7 +65,6 @@ public abstract class OpenAiClient {
         public boolean logRequests;
         public boolean logResponses;
         public boolean logStreamingResponses;
-
 
         public abstract T build();
 
@@ -196,7 +194,5 @@ public abstract class OpenAiClient {
             this.logStreamingResponses = logStreamingResponses;
             return (B) this;
         }
-
-
     }
 }

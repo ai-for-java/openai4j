@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.ai4j.openai4j.chat.Role;
+
 import java.io.IOException;
 
 public class RoleAdapter extends TypeAdapter<Role> {

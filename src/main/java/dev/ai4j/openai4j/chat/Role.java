@@ -26,5 +26,4 @@ public enum Role {
         }
         throw new IllegalArgumentException("Unknown role: '" + stringValue + "'");
     }
-
 }
