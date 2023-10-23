@@ -53,7 +53,9 @@ Simple way:
 ```
 String apiKey = System.getenv("OPENAI_API_KEY");
 
-OpenAiClient client = new OpenAiClient(apiKey);
+OpenAiClient client = OpenAiClient.builder()
+    .openAiApiKey(apiKey)
+    .build();
 ```
 
 Customizable way:
@@ -62,7 +64,7 @@ Customizable way:
 String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiClient client = OpenAiClient.builder()
-	.apiKey(apiKey)
+	.openAiApiKey(apiKey)
 	.callTimeout(ofSeconds(60))
 	.connectTimeout(ofSeconds(60))
 	.readTimeout(ofSeconds(60))
