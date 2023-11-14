@@ -27,7 +27,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     private static final String USER_MESSAGE = "write exactly the following 2 words: 'hello world'";
 
     private final OpenAiClient client = OpenAiClient.builder()
-            .openAiApiKey("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")
+            .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
