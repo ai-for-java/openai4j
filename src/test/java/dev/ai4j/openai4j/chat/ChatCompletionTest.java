@@ -45,7 +45,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
+        assertThat(response.choices().get(0).message().content().get(0).text()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
     }
@@ -78,11 +78,14 @@ class ChatCompletionTest extends RateLimitAwareTest {
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model("gpt-3.5-turbo-0613")
                 .messages(userMessage)
-                .functions(Function.builder()
-                        .name("get_current_weather")
-                        .description("Get the current weather in a given location")
-                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums(Unit.class))
+                .tools(Tool.builder()
+                        .type(ToolType.FUNCTION.stringValue())
+                        .function(Function.builder()
+                                .name("get_current_weather")
+                                .description("Get the current weather in a given location")
+                                .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                                .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                                .build())
                         .build())
                 .build();
 

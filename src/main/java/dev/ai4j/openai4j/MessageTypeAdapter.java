@@ -6,10 +6,12 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dev.ai4j.openai4j.chat.Content;
 import dev.ai4j.openai4j.chat.FunctionCall;
 import dev.ai4j.openai4j.chat.Message;
 
 import java.io.IOException;
+import java.util.List;
 
 class MessageTypeAdapter extends TypeAdapter<Message> {
 
@@ -46,7 +48,12 @@ class MessageTypeAdapter extends TypeAdapter<Message> {
             out.nullValue();
             out.setSerializeNulls(serializeNulls);
         } else {
-            out.value(message.content());
+            if (message.content().get(0).type() != null){
+                TypeAdapter<List> contentTypeAdapter = Json.GSON.getAdapter(List.class);
+                contentTypeAdapter.write(out,message.content());
+            }else {
+                out.value(message.content().get(0).text());
+            }
         }
 
         if (message.name() != null) {

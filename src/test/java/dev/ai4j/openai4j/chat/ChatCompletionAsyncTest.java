@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.Model.GPT_4_1106_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
@@ -62,7 +63,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
+        assertThat(response.choices().get(0).message().content().get(0).text()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
     }
@@ -93,13 +94,16 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         Message userMessage = userMessage("What is the weather like in Boston?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model("gpt-3.5-turbo-0613")
+                .model(GPT_4_1106_PREVIEW)
                 .messages(userMessage)
-                .functions(Function.builder()
-                        .name("get_current_weather")
-                        .description("Get the current weather in a given location")
-                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                .tools(Tool.builder()
+                        .type(ToolType.FUNCTION.stringValue())
+                        .function(Function.builder()
+                                .name("get_current_weather")
+                                .description("Get the current weather in a given location")
+                                .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                                .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                                .build())
                         .build())
                 .build();
 

@@ -15,6 +15,7 @@ public final class ChatCompletionResponse {
     private final String model;
     private final List<ChatCompletionChoice> choices;
     private final Usage usage;
+    private final String systemFingerprint;
 
     private ChatCompletionResponse(Builder builder) {
         this.id = builder.id;
@@ -22,6 +23,7 @@ public final class ChatCompletionResponse {
         this.model = builder.model;
         this.choices = builder.choices;
         this.usage = builder.usage;
+        this.systemFingerprint = builder.systemFingerprint;
     }
 
     public String id() {
@@ -44,12 +46,16 @@ public final class ChatCompletionResponse {
         return usage;
     }
 
+    public String systemFingerprint() {
+        return systemFingerprint;
+    }
+
     /**
      * Convenience method to get the content of the message from the first choice.
      */
     @Experimental
     public String content() {
-        return choices().get(0).message().content();
+        return choices().get(0).message().content().get(0).text();
     }
 
     @Override
@@ -64,7 +70,8 @@ public final class ChatCompletionResponse {
                 && Objects.equals(created, another.created)
                 && Objects.equals(model, another.model)
                 && Objects.equals(choices, another.choices)
-                && Objects.equals(usage, another.usage);
+                && Objects.equals(usage, another.usage)
+                && Objects.equals(systemFingerprint, another.systemFingerprint);
     }
 
     @Override
@@ -75,6 +82,7 @@ public final class ChatCompletionResponse {
         h += (h << 5) + Objects.hashCode(model);
         h += (h << 5) + Objects.hashCode(choices);
         h += (h << 5) + Objects.hashCode(usage);
+        h += (h << 5) + Objects.hashCode(systemFingerprint);
         return h;
     }
 
@@ -86,6 +94,7 @@ public final class ChatCompletionResponse {
                 + ", model=" + model
                 + ", choices=" + choices
                 + ", usage=" + usage
+                + ", systemFingerprint=" + systemFingerprint
                 + "}";
     }
 
@@ -100,6 +109,8 @@ public final class ChatCompletionResponse {
         private String model;
         private List<ChatCompletionChoice> choices;
         private Usage usage;
+
+        private String systemFingerprint;
 
         private Builder() {
         }
@@ -129,6 +140,11 @@ public final class ChatCompletionResponse {
 
         public Builder usage(Usage usage) {
             this.usage = usage;
+            return this;
+        }
+
+        public Builder systemFingerprint(String systemFingerprint) {
+            this.systemFingerprint = systemFingerprint;
             return this;
         }
 

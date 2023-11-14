@@ -2,6 +2,9 @@ package dev.ai4j.openai4j.chat;
 
 import dev.ai4j.openai4j.Experimental;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static dev.ai4j.openai4j.chat.Role.*;
@@ -9,9 +12,10 @@ import static dev.ai4j.openai4j.chat.Role.*;
 public final class Message {
 
     private final Role role;
-    private final String content;
+    private final List<Content> content;
     private final String name;
     private final FunctionCall functionCall;
+
 
     private Message(Builder builder) {
         this.role = builder.role;
@@ -24,7 +28,7 @@ public final class Message {
         return role;
     }
 
-    public String content() {
+    public List<Content> content() {
         return content;
     }
 
@@ -72,34 +76,48 @@ public final class Message {
 
     @Experimental
     public static Message systemMessage(String content) {
+        Content systemContent = Content.builder().type(ContentType.TEXT.stringValue()).text(content).build();
         return Message.builder()
                 .role(SYSTEM)
-                .content(content)
+                .content(Arrays.asList(systemContent))
                 .build();
     }
 
     @Experimental
     public static Message userMessage(String content) {
+        Content userContent = Content.builder().type(ContentType.TEXT.stringValue()).text(content).build();
         return Message.builder()
                 .role(USER)
-                .content(content)
+                .content(Arrays.asList(userContent))
                 .build();
     }
 
     @Experimental
     public static Message assistantMessage(String content) {
+        Content userContent = Content.builder().type(ContentType.TEXT.stringValue()).text(content).build();
         return Message.builder()
                 .role(ASSISTANT)
-                .content(content)
+                .content(Arrays.asList(userContent))
                 .build();
     }
 
     @Experimental
     public static Message functionMessage(String name, String content) {
+        Content userContent = Content.builder().type(ContentType.TEXT.stringValue()).text(content).build();
         return Message.builder()
                 .role(FUNCTION)
                 .name(name)
-                .content(content)
+                .content(Arrays.asList(userContent))
+                .build();
+    }
+
+    @Experimental
+    public static Message ImageMessage(String url, ImageDetail detail) {
+        ImageUrl imageUrl = ImageUrl.builder().detail(detail).url(url).build();
+        Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
+        return Message.builder()
+                .role(USER)
+                .content(Arrays.asList(imageContent))
                 .build();
     }
 
@@ -110,7 +128,7 @@ public final class Message {
     public static final class Builder {
 
         private Role role;
-        private String content;
+        private List<Content> content;
         private String name;
         private FunctionCall functionCall;
 
@@ -127,7 +145,7 @@ public final class Message {
             return role(Role.from(role));
         }
 
-        public Builder content(String content) {
+        public Builder content(List<Content> content) {
             this.content = content;
             return this;
         }
