@@ -14,7 +14,9 @@ public final class Message {
     private final Role role;
     private final List<Content> content;
     private final String name;
+    @Deprecated
     private final FunctionCall functionCall;
+    private final List<ToolCalls> toolCalls;
 
 
     private Message(Builder builder) {
@@ -22,6 +24,7 @@ public final class Message {
         this.content = builder.content;
         this.name = builder.name;
         this.functionCall = builder.functionCall;
+        this.toolCalls = builder.toolCalls;
     }
 
     public Role role() {
@@ -40,6 +43,10 @@ public final class Message {
         return functionCall;
     }
 
+    public List<ToolCalls> toolCalls() {
+        return toolCalls;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -51,7 +58,8 @@ public final class Message {
         return Objects.equals(role, another.role)
                 && Objects.equals(content, another.content)
                 && Objects.equals(name, another.name)
-                && Objects.equals(functionCall, another.functionCall);
+                && Objects.equals(functionCall, another.functionCall)
+                && Objects.equals(toolCalls, another.toolCalls);
     }
 
     @Override
@@ -61,6 +69,7 @@ public final class Message {
         h += (h << 5) + Objects.hashCode(content);
         h += (h << 5) + Objects.hashCode(name);
         h += (h << 5) + Objects.hashCode(functionCall);
+        h += (h << 5) + Objects.hashCode(toolCalls);
         return h;
     }
 
@@ -71,6 +80,7 @@ public final class Message {
                 + ", content=" + content
                 + ", name=" + name
                 + ", functionCall=" + functionCall
+                + ", toolCalls=" + toolCalls
                 + "}";
     }
 
@@ -130,7 +140,9 @@ public final class Message {
         private Role role;
         private List<Content> content;
         private String name;
+        @Deprecated
         private FunctionCall functionCall;
+        private List<ToolCalls> toolCalls;
 
         private Builder() {
         }
@@ -155,8 +167,14 @@ public final class Message {
             return this;
         }
 
+        @Deprecated
         public Builder functionCall(FunctionCall functionCall) {
             this.functionCall = functionCall;
+            return this;
+        }
+
+        public Builder toolCalls(List<ToolCalls> toolCalls) {
+            this.toolCalls = toolCalls;
             return this;
         }
 

@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonWriter;
 import dev.ai4j.openai4j.chat.Content;
 import dev.ai4j.openai4j.chat.FunctionCall;
 import dev.ai4j.openai4j.chat.Message;
+import dev.ai4j.openai4j.chat.ToolCalls;
 
 import java.io.IOException;
 import java.util.List;
@@ -65,6 +66,12 @@ class MessageTypeAdapter extends TypeAdapter<Message> {
             out.name("function_call");
             TypeAdapter<FunctionCall> functionCallTypeAdapter = Json.GSON.getAdapter(FunctionCall.class);
             functionCallTypeAdapter.write(out, message.functionCall());
+        }
+
+        if (message.toolCalls() != null){
+            out.name("tool_calls");
+            TypeAdapter<List> toolCallsTypeAdapter = Json.GSON.getAdapter(List.class);
+            toolCallsTypeAdapter.write(out, message.toolCalls());
         }
 
         out.endObject();

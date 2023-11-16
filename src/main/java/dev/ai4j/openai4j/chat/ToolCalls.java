@@ -2,13 +2,13 @@ package dev.ai4j.openai4j.chat;
 
 import java.util.Objects;
 
-@Deprecated
-public class FunctionCall {
+public class ToolCalls {
+
 
     private final String name;
     private final String arguments;
 
-    private FunctionCall(Builder builder) {
+    private ToolCalls(ToolCalls.Builder builder) {
         this.name = builder.name;
         this.arguments = builder.arguments;
     }
@@ -24,11 +24,11 @@ public class FunctionCall {
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
-        return another instanceof FunctionCall
-                && equalTo((FunctionCall) another);
+        return another instanceof ToolCalls
+                && equalTo((ToolCalls) another);
     }
 
-    private boolean equalTo(FunctionCall another) {
+    private boolean equalTo(ToolCalls another) {
         return Objects.equals(name, another.name)
                 && Objects.equals(arguments, another.arguments);
     }
@@ -49,8 +49,8 @@ public class FunctionCall {
                 + "}";
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static ToolCalls.Builder builder() {
+        return new ToolCalls.Builder();
     }
 
     public static final class Builder {
@@ -61,18 +61,19 @@ public class FunctionCall {
         private Builder() {
         }
 
-        public Builder name(String name) {
+        public ToolCalls.Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder arguments(String arguments) {
+        public ToolCalls.Builder arguments(String arguments) {
             this.arguments = arguments;
             return this;
         }
 
-        public FunctionCall build() {
-            return new FunctionCall(this);
+        public ToolCalls build() {
+            return new ToolCalls(this);
         }
     }
+
 }

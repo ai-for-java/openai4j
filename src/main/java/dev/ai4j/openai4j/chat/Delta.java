@@ -1,17 +1,22 @@
 package dev.ai4j.openai4j.chat;
 
+import java.util.List;
 import java.util.Objects;
 
 public final class Delta {
 
     private final Role role;
     private final String content;
+    @Deprecated
     private final FunctionCall functionCall;
+    private final List<ToolCalls> toolCalls;
+
 
     private Delta(Builder builder) {
         this.role = builder.role;
         this.content = builder.content;
         this.functionCall = builder.functionCall;
+        this.toolCalls = builder.toolCalls;
     }
 
     public Role role() {
@@ -26,6 +31,10 @@ public final class Delta {
         return functionCall;
     }
 
+    public List<ToolCalls> toolCalls(){
+        return toolCalls;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -36,7 +45,8 @@ public final class Delta {
     private boolean equalTo(Delta another) {
         return Objects.equals(role, another.role)
                 && Objects.equals(content, another.content)
-                && Objects.equals(functionCall, another.functionCall);
+                && Objects.equals(functionCall, another.functionCall)
+                && Objects.equals(toolCalls, another.toolCalls);
     }
 
     @Override
@@ -45,6 +55,7 @@ public final class Delta {
         h += (h << 5) + Objects.hashCode(role);
         h += (h << 5) + Objects.hashCode(content);
         h += (h << 5) + Objects.hashCode(functionCall);
+        h += (h << 5) + Objects.hashCode(toolCalls);
         return h;
     }
 
@@ -54,6 +65,7 @@ public final class Delta {
                 + "role=" + role
                 + ", content=" + content
                 + ", functionCall=" + functionCall
+                + ", toolCalls=" + toolCalls
                 + "}";
     }
 
@@ -65,7 +77,9 @@ public final class Delta {
 
         private Role role;
         private String content;
+        @Deprecated
         private FunctionCall functionCall;
+        private List<ToolCalls> toolCalls;
 
         private Builder() {
         }
@@ -80,8 +94,14 @@ public final class Delta {
             return this;
         }
 
+        @Deprecated
         public Builder functionCall(FunctionCall functionCall) {
             this.functionCall = functionCall;
+            return this;
+        }
+
+        public Builder toolCalls(List<ToolCalls> toolCalls) {
+            this.toolCalls = toolCalls;
             return this;
         }
 
