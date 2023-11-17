@@ -8,9 +8,15 @@ public class ToolCalls {
     private final String name;
     private final String arguments;
 
+    private final Integer index;
+
+    private final Function function;
+
     private ToolCalls(ToolCalls.Builder builder) {
         this.name = builder.name;
         this.arguments = builder.arguments;
+        this.index = builder.index;
+        this.function = builder.function;
     }
 
     public String name() {
@@ -19,6 +25,14 @@ public class ToolCalls {
 
     public String arguments() {
         return arguments;
+    }
+
+    public Integer index(){
+        return index;
+    }
+
+    public Function function(){
+        return function;
     }
 
     @Override
@@ -30,7 +44,9 @@ public class ToolCalls {
 
     private boolean equalTo(ToolCalls another) {
         return Objects.equals(name, another.name)
-                && Objects.equals(arguments, another.arguments);
+                && Objects.equals(arguments, another.arguments)
+                && Objects.equals(index, another.index)
+                && Objects.equals(function, another.function);
     }
 
     @Override
@@ -38,6 +54,8 @@ public class ToolCalls {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(name);
         h += (h << 5) + Objects.hashCode(arguments);
+        h += (h << 5) + Objects.hashCode(index);
+        h += (h << 5) + Objects.hashCode(function);
         return h;
     }
 
@@ -46,6 +64,8 @@ public class ToolCalls {
         return "Function{"
                 + "name=" + name
                 + ", arguments=" + arguments
+                + ", index=" + index
+                + ", function=" + function
                 + "}";
     }
 
@@ -57,6 +77,9 @@ public class ToolCalls {
 
         private String name;
         private String arguments;
+        private Integer index;
+
+        private Function function;
 
         private Builder() {
         }
@@ -68,6 +91,16 @@ public class ToolCalls {
 
         public ToolCalls.Builder arguments(String arguments) {
             this.arguments = arguments;
+            return this;
+        }
+
+        public ToolCalls.Builder index(Integer index) {
+            this.index = index;
+            return this;
+        }
+
+        public ToolCalls.Builder function(Function function) {
+            this.function = function;
             return this;
         }
 

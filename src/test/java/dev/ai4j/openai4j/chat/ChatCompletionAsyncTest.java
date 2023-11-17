@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -16,6 +18,7 @@ import static dev.ai4j.openai4j.Model.GPT_4_1106_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
+import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +29,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+            .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
             .build();
@@ -120,11 +124,13 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
 
-        FunctionCall functionCall = assistantMessage.functionCall();
-        assertThat(functionCall.name()).isEqualTo("get_current_weather");
-        assertThat(functionCall.arguments()).isNotBlank();
+        Function function = assistantMessage.toolCalls().get(0).function();
 
-        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(functionCall.arguments());
+//        FunctionCall functionCall = assistantMessage.functionCall();
+        assertThat(function.name()).isEqualTo("get_current_weather");
+        assertThat(function.arguments()).isNotBlank();
+
+        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(function.arguments());
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
     }

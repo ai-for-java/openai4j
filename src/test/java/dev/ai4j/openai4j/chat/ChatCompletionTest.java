@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -15,6 +17,7 @@ import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
+import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,6 +27,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+            .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
             .build();

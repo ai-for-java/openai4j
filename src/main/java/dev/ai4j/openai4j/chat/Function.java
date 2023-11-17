@@ -12,10 +12,13 @@ public class Function {
     private final String description;
     private final Parameters parameters;
 
+    private final String arguments;
+
     private Function(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
         this.parameters = builder.parameters;
+        this.arguments = builder.arguments;
     }
 
     public String name() {
@@ -30,6 +33,10 @@ public class Function {
         return parameters;
     }
 
+    public String arguments() {
+        return arguments;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -40,7 +47,8 @@ public class Function {
     private boolean equalTo(Function another) {
         return Objects.equals(name, another.name)
                 && Objects.equals(description, another.description)
-                && Objects.equals(parameters, another.parameters);
+                && Objects.equals(parameters, another.parameters)
+                && Objects.equals(arguments, another.arguments);
     }
 
     @Override
@@ -49,6 +57,7 @@ public class Function {
         h += (h << 5) + Objects.hashCode(name);
         h += (h << 5) + Objects.hashCode(description);
         h += (h << 5) + Objects.hashCode(parameters);
+        h += (h << 5) + Objects.hashCode(arguments);
         return h;
     }
 
@@ -58,6 +67,7 @@ public class Function {
                 + "name=" + name
                 + ", description=" + description
                 + ", parameters=" + parameters
+                + ", arguments=" + arguments
                 + "}";
     }
 
@@ -70,6 +80,8 @@ public class Function {
         private String name;
         private String description;
         private Parameters parameters;
+
+        private String arguments;
 
         private Builder() {
         }
@@ -86,6 +98,11 @@ public class Function {
 
         public Builder parameters(Parameters parameters) {
             this.parameters = parameters;
+            return this;
+        }
+
+        public Builder arguments(String arguments) {
+            this.arguments = arguments;
             return this;
         }
 

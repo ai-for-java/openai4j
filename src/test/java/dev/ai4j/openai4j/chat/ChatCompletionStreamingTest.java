@@ -50,15 +50,19 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
 
         client.chatCompletion(request)
-                .onPartialResponse(responseBuilder::append)
+                .onPartialResponse(partialResponse -> {
+                    String content = partialResponse.choices().get(0).delta().content();
+                    if (content != null) {
+                        responseBuilder.append(content);
+                    }
+                })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
                 .onError(future::completeExceptionally)
                 .execute();
 
 
         String response = future.get(30, SECONDS);
-        System.out.println("-----------------:"+response);
-//        assertThat(response).containsIgnoringCase("hello world");
+        assertThat(response).containsIgnoringCase("hello world");
     }
 
     @MethodSource
@@ -130,7 +134,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         client.chatCompletion(request)
                 .onPartialResponse(partialResponse -> {
                     Delta delta = partialResponse.choices().get(0).delta();
-                    System.out.println("@@@@@@@@@@@@@@@"+delta.toString());
 
                     assertThat(delta.content()).isNull();
 
@@ -138,28 +141,17 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
                     if (partialResponse.choices().get(0).finishReason() == null) {
                         toolCalls.stream().forEach(toolCall ->{
-                            System.out.println("-----------------"+toolCall.name()+"||"+toolCall.arguments());
-                            if (toolCall.name() != null) {
-                                responseBuilder.append(toolCall.name());
-                            } else if (toolCall.arguments() != null) {
-                                responseBuilder.append(toolCall.arguments());
+                            if (toolCall.function().name() != null) {
+                                responseBuilder.append(toolCall.function().name());
+                            } else if (toolCall.function().arguments() != null) {
+                                responseBuilder.append(toolCall.function().arguments());
                             }
                         });
                     }
-
-//                    FunctionCall functionCall = delta.functionCall();
-//                    if (partialResponse.choices().get(0).finishReason() == null) {
-//                        if (functionCall.name() != null) {
-//                            responseBuilder.append(functionCall.name());
-//                        } else if (functionCall.arguments() != null) {
-//                            responseBuilder.append(functionCall.arguments());
-//                        }
-//                    }
                 })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
                 .onError(future::completeExceptionally)
                 .execute();
-
         String response = future.get(30, SECONDS);
 
         assertThat(response).contains("get_current_weather");

@@ -2,7 +2,6 @@ package dev.ai4j.openai4j.chat;
 
 import dev.ai4j.openai4j.Experimental;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
