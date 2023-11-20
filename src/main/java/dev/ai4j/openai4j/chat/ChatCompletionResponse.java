@@ -55,7 +55,7 @@ public final class ChatCompletionResponse {
      */
     @Experimental
     public String content() {
-        return choices().get(0).message().content().get(0).text();
+        return choices().get(0).message().content();
     }
 
     @Override

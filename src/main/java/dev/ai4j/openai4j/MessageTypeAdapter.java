@@ -85,54 +85,6 @@ class MessageTypeAdapter extends TypeAdapter<Message> {
 
     @Override
     public Message read(JsonReader in) throws IOException {
-//        return delegate.read(in);
-        in.beginObject();
-
-        Message.Builder builder = Message.builder();
-
-        while (in.hasNext()) {
-            String name = in.nextName();
-
-            switch (name) {
-                case "role":
-                    System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"+in.nextString());
-                    if (in.peek() == JsonToken.STRING) {
-                        builder.role(Role.valueOf(in.nextString()));
-                    } else {
-                        // 错误情况：非字符串的 JSON 令牌。可以抛出异常或者跳过这个字段。
-                        in.skipValue();
-                        // 如果这个字段是必须的，你可能需要抛出异常，例如：
-                        // throw new JsonSyntaxException("Expected a string for role field but got: " + in.peek());
-                    }
-//                    builder.role(Role.valueOf(in.nextString())); // 假设 Role 是一个枚举
-                    break;
-                case "content":
-                    if (in.peek() == JsonToken.STRING) {
-                        // 如果 content 是一个字符串，将其转化成 Content 对象
-                        String contentString = in.nextString();
-//                        Content content = //... 创建 Content 对象;
-                        Content content = Content.builder().text(contentString).type(ContentType.TEXT.stringValue()).build();
-                        builder.content(Collections.singletonList(content));
-                    } else if (in.peek() == JsonToken.BEGIN_ARRAY) {
-                        // 如果 content 是一个数组，使用标准方法来解析
-                        Type listOfContent = new TypeToken<List<Content>>(){}.getType();
-                        List<Content> contentList = GSON.fromJson(in, listOfContent);
-                        builder.content(contentList);
-                    }
-                    break;
-                case "name":
-                    builder.name(in.nextString());
-                    break;
-                case "function_call":
-                    // 解析 function_call
-                    FunctionCall functionCall = GSON.fromJson(in, FunctionCall.class);
-                    builder.functionCall(functionCall);
-                    break;
-                // 处理其他字段...
-            }
-        }
-
-        in.endObject();
-        return builder.build();
+        return delegate.read(in);
     }
 }

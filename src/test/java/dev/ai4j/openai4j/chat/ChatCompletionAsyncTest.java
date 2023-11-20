@@ -3,6 +3,7 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.FunctionCallUtil;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.ToolCallsUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,7 +30,6 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-            .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
             .build();
@@ -67,7 +67,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content().get(0).text()).containsIgnoringCase("hello world");
+        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
     }
@@ -120,17 +120,16 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
         ChatCompletionResponse response = future.get(30, SECONDS);
 
-        Message assistantMessage = response.choices().get(0).message();
+        MessageResponse assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
 
         Function function = assistantMessage.toolCalls().get(0).function();
-
-//        FunctionCall functionCall = assistantMessage.functionCall();
         assertThat(function.name()).isEqualTo("get_current_weather");
         assertThat(function.arguments()).isNotBlank();
 
-        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(function.arguments());
+        Map<String, Object> arguments = ToolCallsUtil.argumentsAsMap(function.arguments());
+
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
     }

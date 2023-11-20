@@ -3,6 +3,7 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.FunctionCallUtil;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.ToolCallsUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,12 +11,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
+import static dev.ai4j.openai4j.chat.MessageResponse.assistantMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
 import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
@@ -27,7 +30,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-            .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
             .build();
@@ -49,7 +51,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).message().role()).isEqualTo(ASSISTANT);
-        assertThat(response.choices().get(0).message().content().get(0).text()).containsIgnoringCase("hello world");
+        assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
     }
@@ -95,28 +97,31 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
         ChatCompletionResponse response = client.chatCompletion(request).execute();
 
-        Message assistantMessage = response.choices().get(0).message();
+        MessageResponse assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
 
-        FunctionCall functionCall = assistantMessage.functionCall();
-        assertThat(functionCall.name()).isEqualTo("get_current_weather");
-        assertThat(functionCall.arguments()).isNotBlank();
+        List<ToolCalls> toolCalls = assistantMessage.toolCalls();
+        assertThat(toolCalls.get(0).function().name()).isEqualTo("get_current_weather");
+        assertThat(toolCalls.get(0).function().arguments()).isNotBlank();
 
-        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(functionCall.arguments());
+        Map<String, Object> arguments = ToolCallsUtil.argumentsAsMap(toolCalls.get(0).function().arguments());
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
 
-        String location = FunctionCallUtil.argument(functionCall, "location");
-        String unit = FunctionCallUtil.argument(functionCall, "unit");
+        String location = ToolCallsUtil.argument(toolCalls.get(0).function(), "location");
+        String unit = ToolCallsUtil.argument(toolCalls.get(0).function(), "unit");
+
 
         String weatherApiResponse = getCurrentWeather(location, unit == null ? null : Unit.valueOf(unit));
 
         Message functionMessage = functionMessage("get_current_weather", weatherApiResponse);
 
+        Message assistantAssembleMessage = assistantMessage(assistantMessage.content());
+
         ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
                 .model("gpt-3.5-turbo-0613")
-                .messages(userMessage, assistantMessage, functionMessage)
+                .messages(userMessage, assistantAssembleMessage, functionMessage)
                 .build();
 
         ChatCompletionResponse secondResponse = client.chatCompletion(secondRequest).execute();

@@ -30,7 +30,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-            .proxy(new Proxy(HTTP, new InetSocketAddress("127.0.0.1",7890)))
             .logRequests()
             .logResponses()
             .logStreamingResponses()
