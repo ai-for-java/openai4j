@@ -2,7 +2,7 @@ package dev.ai4j.openai4j.chat;
 
 public enum ResponseFormatType {
 
-    TEXT("text "),
+    TEXT("text"),
     JSON_OBJECT("json_object");
 
     private final String stringValue;
