@@ -122,7 +122,13 @@ public final class Message {
 
     @Experimental
     public static Message imageMessage(String url, ImageDetail detail) {
-        ImageUrl imageUrl = ImageUrl.builder().detail(detail).build();
+        ImageUrl.Builder builder = ImageUrl.builder();
+        if (detail != null){
+            builder.url(url).detail(detail);
+        }else {
+            builder.url(url);
+        }
+        ImageUrl imageUrl = builder.build();
         Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
         return Message.builder()
                 .role(USER)
