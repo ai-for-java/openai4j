@@ -121,12 +121,20 @@ public final class Message {
     }
 
     @Experimental
-    public static Message ImageMessage(String url, ImageDetail detail) {
-        ImageUrl imageUrl = ImageUrl.builder().detail(detail).url(url).build();
+    public static Message imageMessage(String url, ImageDetail detail) {
+        ImageUrl imageUrl = ImageUrl.builder().detail(detail).build();
         Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
         return Message.builder()
                 .role(USER)
                 .content(Arrays.asList(imageContent))
+                .build();
+    }
+
+    @Experimental
+    public static Message userMessage(List<Content> messages) {
+        return Message.builder()
+                .role(USER)
+                .content(messages)
                 .build();
     }
 

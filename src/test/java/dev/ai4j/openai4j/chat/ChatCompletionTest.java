@@ -11,10 +11,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.Model.GPT_4_VISION_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
@@ -138,4 +140,24 @@ class ChatCompletionTest extends RateLimitAwareTest {
     enum Unit {
         CELSIUS, FAHRENHEIT
     }
+
+    @Test
+    void testImageMessageApi() {
+        String url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String text = "What’s in this image?";
+        ImageUrl imageUrl = ImageUrl.builder().url(url).build();
+        Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
+        Content textContent = Content.builder().type(ContentType.TEXT.stringValue()).text(text).build();
+        List<Content> list = Arrays.asList(textContent,imageContent);
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4_VISION_PREVIEW)
+                .messages(userMessage(list))
+                .maxTokens(500)
+                .build();
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        MessageResponse assistantMessage = response.choices().get(0).message();
+        assertThat(assistantMessage.content()).containsIgnoringCase("green");
+    }
+
 }
