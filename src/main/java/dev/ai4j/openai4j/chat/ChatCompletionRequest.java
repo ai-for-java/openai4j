@@ -27,8 +27,11 @@ public final class ChatCompletionRequest {
     private final Double frequencyPenalty;
     private final Map<String, Integer> logitBias;
     private final String user;
-    private final List<Function> functions;
-    private final Object functionCall;
+    private final List<Tool> tools;
+    private final Object toolChoice;
+    private final ResponseFormat responseFormat;
+    private final Integer seed;
+
 
     private ChatCompletionRequest(Builder builder) {
         this.model = builder.model;
@@ -43,8 +46,10 @@ public final class ChatCompletionRequest {
         this.frequencyPenalty = builder.frequencyPenalty;
         this.logitBias = builder.logitBias;
         this.user = builder.user;
-        this.functions = builder.functions;
-        this.functionCall = builder.functionCall;
+        this.tools = builder.tools;
+        this.toolChoice = builder.toolChoice;
+        this.seed = builder.seed;
+        this.responseFormat = builder.responseFormat;
     }
 
     public String model() {
@@ -95,12 +100,20 @@ public final class ChatCompletionRequest {
         return user;
     }
 
-    public List<Function> functions() {
-        return functions;
+    public List<Tool> tools() {
+        return tools;
     }
 
-    public Object functionCall() {
-        return functionCall;
+    public Object toolChoice() {
+        return toolChoice;
+    }
+
+    public Integer seed(){
+        return seed;
+    }
+
+    public ResponseFormat responseFormat(){
+        return responseFormat;
     }
 
     @Override
@@ -123,8 +136,10 @@ public final class ChatCompletionRequest {
                 && Objects.equals(frequencyPenalty, another.frequencyPenalty)
                 && Objects.equals(logitBias, another.logitBias)
                 && Objects.equals(user, another.user)
-                && Objects.equals(functions, another.functions)
-                && Objects.equals(functionCall, another.functionCall);
+                && Objects.equals(tools, another.tools)
+                && Objects.equals(toolChoice, another.toolChoice)
+                && Objects.equals(seed, another.seed)
+                && Objects.equals(responseFormat, another.responseFormat);
     }
 
     @Override
@@ -142,8 +157,10 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(frequencyPenalty);
         h += (h << 5) + Objects.hashCode(logitBias);
         h += (h << 5) + Objects.hashCode(user);
-        h += (h << 5) + Objects.hashCode(functions);
-        h += (h << 5) + Objects.hashCode(functionCall);
+        h += (h << 5) + Objects.hashCode(tools);
+        h += (h << 5) + Objects.hashCode(toolChoice);
+        h += (h << 5) + Objects.hashCode(seed);
+        h += (h << 5) + Objects.hashCode(responseFormat);
         return h;
     }
 
@@ -162,8 +179,10 @@ public final class ChatCompletionRequest {
                 + ", frequencyPenalty=" + frequencyPenalty
                 + ", logitBias=" + logitBias
                 + ", user=" + user
-                + ", functions=" + functions
-                + ", functionCall=" + functionCall
+                + ", tools=" + tools
+                + ", toolChoice=" + toolChoice
+                + ", seed=" + seed
+                + ", responseFormat=" + responseFormat
                 + "}";
     }
 
@@ -185,8 +204,12 @@ public final class ChatCompletionRequest {
         private Double frequencyPenalty;
         private Map<String, Integer> logitBias;
         private String user;
-        private List<Function> functions;
-        private Object functionCall;
+        private List<Tool> tools;
+        private Object toolChoice;
+
+        private Integer seed;
+
+        private ResponseFormat responseFormat;
 
         private Builder() {
         }
@@ -204,8 +227,10 @@ public final class ChatCompletionRequest {
             frequencyPenalty(instance.frequencyPenalty);
             logitBias(instance.logitBias);
             user(instance.user);
-            functions(instance.functions);
-            functionCall(instance.functionCall);
+            tools(instance.tools);
+            toolChoice(instance.toolChoice);
+            seed(instance.seed);
+            responseFormat(instance.responseFormat);
             return this;
         }
 
@@ -328,42 +353,52 @@ public final class ChatCompletionRequest {
             return this;
         }
 
-        public Builder functions(List<Function> functions) {
-            if (functions == null) {
+        public Builder tools(List<Tool> tools) {
+            if (tools == null) {
                 return this;
             }
-            this.functions = unmodifiableList(functions);
+            this.tools = unmodifiableList(tools);
             return this;
         }
 
         @Experimental
-        public Builder functions(Function... functions) {
-            return functions(asList(functions));
+        public Builder tools(Tool... tools) {
+            return tools(asList(tools));
         }
 
         @Experimental
-        public Builder addFunction(Function function) {
-            if (this.functions == null) {
-                this.functions = new ArrayList<>();
+        public Builder addTool(Tool tool) {
+            if (this.tools == null) {
+                this.tools = new ArrayList<>();
             }
-            this.functions.add(function);
+            this.tools.add(tool);
             return this;
         }
 
-        public Builder functionCall(Object functionCall) {
-            this.functionCall = functionCall;
-            return this;
-        }
-
-        @Experimental
-        public Builder functionCall(FunctionCallMode mode) {
-            this.functionCall = mode.name().toLowerCase();
+        public Builder toolChoice(Object toolChoice) {
+            this.toolChoice = toolChoice;
             return this;
         }
 
         @Experimental
-        public Builder functionCall(String name) {
-            this.functionCall = singletonMap("name", name);
+        public Builder toolChoice(ToolCallMode mode) {
+            this.toolChoice = mode.name().toLowerCase();
+            return this;
+        }
+
+        @Experimental
+        public Builder toolChoice(String name) {
+            this.toolChoice = singletonMap("name", name);
+            return this;
+        }
+
+        public Builder seed(Integer seed) {
+            this.seed = seed;
+            return this;
+        }
+
+        public Builder responseFormat(ResponseFormat responseFormat) {
+            this.responseFormat = responseFormat;
             return this;
         }
 

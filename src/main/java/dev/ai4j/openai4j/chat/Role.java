@@ -5,6 +5,8 @@ public enum Role {
     SYSTEM("system"),
     USER("user"),
     ASSISTANT("assistant"),
+    TOOL("tool"),
+    @Deprecated
     FUNCTION("function");
 
     private final String stringValue;

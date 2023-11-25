@@ -3,18 +3,26 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.FunctionCallUtil;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.ToolCallsUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.Model.GPT_4_VISION_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.functionMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
+import static dev.ai4j.openai4j.chat.MessageResponse.assistantMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
+import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,38 +86,44 @@ class ChatCompletionTest extends RateLimitAwareTest {
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model("gpt-3.5-turbo-0613")
                 .messages(userMessage)
-                .functions(Function.builder()
-                        .name("get_current_weather")
-                        .description("Get the current weather in a given location")
-                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums(Unit.class))
+                .tools(Tool.builder()
+                        .type(ToolType.FUNCTION.stringValue())
+                        .function(Function.builder()
+                                .name("get_current_weather")
+                                .description("Get the current weather in a given location")
+                                .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                                .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                                .build())
                         .build())
                 .build();
 
         ChatCompletionResponse response = client.chatCompletion(request).execute();
 
-        Message assistantMessage = response.choices().get(0).message();
+        MessageResponse assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
 
-        FunctionCall functionCall = assistantMessage.functionCall();
-        assertThat(functionCall.name()).isEqualTo("get_current_weather");
-        assertThat(functionCall.arguments()).isNotBlank();
+        List<ToolCalls> toolCalls = assistantMessage.toolCalls();
+        assertThat(toolCalls.get(0).function().name()).isEqualTo("get_current_weather");
+        assertThat(toolCalls.get(0).function().arguments()).isNotBlank();
 
-        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(functionCall.arguments());
+        Map<String, Object> arguments = ToolCallsUtil.argumentsAsMap(toolCalls.get(0).function().arguments());
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
 
-        String location = FunctionCallUtil.argument(functionCall, "location");
-        String unit = FunctionCallUtil.argument(functionCall, "unit");
+        String location = ToolCallsUtil.argument(toolCalls.get(0).function(), "location");
+        String unit = ToolCallsUtil.argument(toolCalls.get(0).function(), "unit");
+
 
         String weatherApiResponse = getCurrentWeather(location, unit == null ? null : Unit.valueOf(unit));
 
         Message functionMessage = functionMessage("get_current_weather", weatherApiResponse);
 
+        Message assistantAssembleMessage = assistantMessage(assistantMessage.content());
+
         ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
                 .model("gpt-3.5-turbo-0613")
-                .messages(userMessage, assistantMessage, functionMessage)
+                .messages(userMessage, assistantAssembleMessage, functionMessage)
                 .build();
 
         ChatCompletionResponse secondResponse = client.chatCompletion(secondRequest).execute();
@@ -126,4 +140,24 @@ class ChatCompletionTest extends RateLimitAwareTest {
     enum Unit {
         CELSIUS, FAHRENHEIT
     }
+
+    @Test
+    void testImageMessageApi() {
+        String url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String text = "What’s in this image?";
+        ImageUrl imageUrl = ImageUrl.builder().url(url).build();
+        Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
+        Content textContent = Content.builder().type(ContentType.TEXT.stringValue()).text(text).build();
+        List<Content> list = Arrays.asList(textContent,imageContent);
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4_VISION_PREVIEW)
+                .messages(userMessage(list))
+                .maxTokens(500)
+                .build();
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        MessageResponse assistantMessage = response.choices().get(0).message();
+        assertThat(assistantMessage.content()).containsIgnoringCase("green");
+    }
+
 }

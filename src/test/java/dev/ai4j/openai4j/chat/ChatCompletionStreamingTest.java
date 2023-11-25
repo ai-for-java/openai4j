@@ -8,12 +8,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.Model.GPT_4_1106_PREVIEW;
+import static dev.ai4j.openai4j.Model.GPT_4_VISION_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
+import static dev.ai4j.openai4j.chat.Message.imageMessage;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
+import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -36,9 +44,20 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
 
+        Message userMessage = userMessage(USER_MESSAGE);
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4_1106_PREVIEW)
+                .messages(userMessage,userMessage)
+                .build();
 
-        client.chatCompletion(USER_MESSAGE)
-                .onPartialResponse(responseBuilder::append)
+
+        client.chatCompletion(request)
+                .onPartialResponse(partialResponse -> {
+                    String content = partialResponse.choices().get(0).delta().content();
+                    if (content != null) {
+                        responseBuilder.append(content);
+                    }
+                })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
                 .onError(future::completeExceptionally)
                 .execute();
@@ -98,13 +117,16 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         Message userMessage = userMessage("What is the weather like in Boston?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model("gpt-3.5-turbo-0613")
+                .model(GPT_4_1106_PREVIEW)
                 .messages(userMessage)
-                .functions(Function.builder()
-                        .name("get_current_weather")
-                        .description("Get the current weather in a given location")
-                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                .tools(Tool.builder()
+                        .type(ToolType.FUNCTION.stringValue())
+                        .function(Function.builder()
+                                .name("get_current_weather")
+                                .description("Get the current weather in a given location")
+                                .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                                .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                                .build())
                         .build())
                 .build();
 
@@ -117,19 +139,21 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
                     assertThat(delta.content()).isNull();
 
-                    FunctionCall functionCall = delta.functionCall();
+                    List<ToolCalls> toolCalls = delta.toolCalls();
+
                     if (partialResponse.choices().get(0).finishReason() == null) {
-                        if (functionCall.name() != null) {
-                            responseBuilder.append(functionCall.name());
-                        } else if (functionCall.arguments() != null) {
-                            responseBuilder.append(functionCall.arguments());
-                        }
+                        toolCalls.stream().forEach(toolCall ->{
+                            if (toolCall.function().name() != null) {
+                                responseBuilder.append(toolCall.function().name());
+                            } else if (toolCall.function().arguments() != null) {
+                                responseBuilder.append(toolCall.function().arguments());
+                            }
+                        });
                     }
                 })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
                 .onError(future::completeExceptionally)
                 .execute();
-
         String response = future.get(30, SECONDS);
 
         assertThat(response).contains("get_current_weather");
@@ -197,4 +221,37 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
         assertThat(cancellationSucceeded).isTrue();
     }
+
+    @Test
+    void testImageMessageApi()throws Exception{
+        StringBuilder responseBuilder = new StringBuilder();
+        CompletableFuture<String> future = new CompletableFuture<>();
+        String url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String text = "What’s in this image?";
+        ImageUrl imageUrl = ImageUrl.builder().url(url).build();
+        Content imageContent = Content.builder().type(ContentType.IMAGE_URL.stringValue()).imageUrl(imageUrl).build();
+        Content textContent = Content.builder().type(ContentType.TEXT.stringValue()).text(text).build();
+        List<Content> list = Arrays.asList(textContent,imageContent);
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4_VISION_PREVIEW)
+                .messages(userMessage(list))
+                .maxTokens(500)
+                .build();
+
+        client.chatCompletion(request)
+                .onPartialResponse(partialResponse -> {
+                    String content = partialResponse.choices().get(0).delta().content();
+                    if (content != null) {
+                        responseBuilder.append(content);
+                    }
+                })
+                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onError(future::completeExceptionally)
+                .execute();
+
+
+        String response = future.get(30, SECONDS);
+        assertThat(response).containsIgnoringCase("green");
+    }
+
 }

@@ -3,18 +3,23 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.FunctionCallUtil;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.ToolCallsUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static dev.ai4j.openai4j.Model.GPT_4_1106_PREVIEW;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
 import static dev.ai4j.openai4j.chat.Message.userMessage;
 import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
+import static java.net.Proxy.Type.HTTP;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,13 +98,16 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         Message userMessage = userMessage("What is the weather like in Boston?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model("gpt-3.5-turbo-0613")
+                .model(GPT_4_1106_PREVIEW)
                 .messages(userMessage)
-                .functions(Function.builder()
-                        .name("get_current_weather")
-                        .description("Get the current weather in a given location")
-                        .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-                        .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                .tools(Tool.builder()
+                        .type(ToolType.FUNCTION.stringValue())
+                        .function(Function.builder()
+                                .name("get_current_weather")
+                                .description("Get the current weather in a given location")
+                                .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
+                                .addOptionalParameter("unit", STRING, enums(ChatCompletionTest.Unit.class))
+                                .build())
                         .build())
                 .build();
 
@@ -112,15 +120,16 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
         ChatCompletionResponse response = future.get(30, SECONDS);
 
-        Message assistantMessage = response.choices().get(0).message();
+        MessageResponse assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.role()).isEqualTo(ASSISTANT);
         assertThat(assistantMessage.content()).isNull();
 
-        FunctionCall functionCall = assistantMessage.functionCall();
-        assertThat(functionCall.name()).isEqualTo("get_current_weather");
-        assertThat(functionCall.arguments()).isNotBlank();
+        Function function = assistantMessage.toolCalls().get(0).function();
+        assertThat(function.name()).isEqualTo("get_current_weather");
+        assertThat(function.arguments()).isNotBlank();
 
-        Map<String, Object> arguments = FunctionCallUtil.argumentsAsMap(functionCall.arguments());
+        Map<String, Object> arguments = ToolCallsUtil.argumentsAsMap(function.arguments());
+
         assertThat(arguments).hasSize(1);
         assertThat(arguments.get("location").toString()).contains("Boston");
     }
