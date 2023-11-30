@@ -1,6 +1,5 @@
 package dev.ai4j.openai4j.embedding;
 
-import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.shared.Usage;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public final class EmbeddingResponse {
     /**
      * Convenience method to get the embedding from the first data.
      */
-    @Experimental
     public List<Float> embedding() {
         return data.get(0).embedding();
     }
@@ -90,10 +88,9 @@ public final class EmbeddingResponse {
         }
 
         public Builder data(List<Embedding> data) {
-            if (data == null) {
-                return this;
+            if (data != null) {
+                this.data = unmodifiableList(data);
             }
-            this.data = unmodifiableList(data);
             return this;
         }
 

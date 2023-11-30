@@ -88,38 +88,35 @@ public final class Logprobs {
         }
 
         public Builder tokens(List<String> tokens) {
-            if (tokens == null) {
-                return this;
+            if (tokens != null) {
+                this.tokens = unmodifiableList(tokens);
             }
-            this.tokens = unmodifiableList(tokens);
             return this;
         }
 
         public Builder tokenLogprobs(List<Double> tokenLogprobs) {
-            if (tokenLogprobs == null) {
-                return this;
+            if (tokenLogprobs != null) {
+                this.tokenLogprobs = unmodifiableList(tokenLogprobs);
             }
-            this.tokenLogprobs = unmodifiableList(tokenLogprobs);
             return this;
         }
 
         public Builder topLogprobs(List<Map<String, Double>> topLogprobs) {
-            if (topLogprobs == null) {
-                return this;
+            if (topLogprobs != null) {
+                List<Map<String, Double>> topLogprobsCopy = new ArrayList<>();
+                for (Map<String, Double> map : topLogprobs) {
+                    topLogprobsCopy.add(unmodifiableMap(map));
+                }
+                this.topLogprobs = unmodifiableList(topLogprobsCopy);
             }
-            List<Map<String, Double>> topLogprobsCopy = new ArrayList<>();
-            for (Map<String, Double> map : topLogprobs) {
-                topLogprobsCopy.add(unmodifiableMap(map));
-            }
-            this.topLogprobs = unmodifiableList(topLogprobsCopy);
+
             return this;
         }
 
         public Builder textOffset(List<Integer> textOffset) {
-            if (textOffset == null) {
-                return this;
+            if (textOffset != null) {
+                this.textOffset = unmodifiableList(textOffset);
             }
-            this.textOffset = unmodifiableList(textOffset);
             return this;
         }
 

@@ -1,17 +1,14 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.Experimental;
-import dev.ai4j.openai4j.Model;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static dev.ai4j.openai4j.Model.GPT_3_5_TURBO;
-import static dev.ai4j.openai4j.chat.Message.*;
+import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_3_5_TURBO;
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 
 public final class ChatCompletionRequest {
 
@@ -27,11 +24,14 @@ public final class ChatCompletionRequest {
     private final Double frequencyPenalty;
     private final Map<String, Integer> logitBias;
     private final String user;
-    private final List<Tool> tools;
-    private final Object toolChoice;
     private final ResponseFormat responseFormat;
     private final Integer seed;
-
+    private final List<Tool> tools;
+    private final Object toolChoice;
+    @Deprecated
+    private final List<Function> functions;
+    @Deprecated
+    private final FunctionCall functionCall;
 
     private ChatCompletionRequest(Builder builder) {
         this.model = builder.model;
@@ -46,10 +46,12 @@ public final class ChatCompletionRequest {
         this.frequencyPenalty = builder.frequencyPenalty;
         this.logitBias = builder.logitBias;
         this.user = builder.user;
+        this.responseFormat = builder.responseFormat;
+        this.seed = builder.seed;
         this.tools = builder.tools;
         this.toolChoice = builder.toolChoice;
-        this.seed = builder.seed;
-        this.responseFormat = builder.responseFormat;
+        this.functions = builder.functions;
+        this.functionCall = builder.functionCall;
     }
 
     public String model() {
@@ -100,6 +102,14 @@ public final class ChatCompletionRequest {
         return user;
     }
 
+    public ResponseFormat responseFormat() {
+        return responseFormat;
+    }
+
+    public Integer seed() {
+        return seed;
+    }
+
     public List<Tool> tools() {
         return tools;
     }
@@ -108,12 +118,14 @@ public final class ChatCompletionRequest {
         return toolChoice;
     }
 
-    public Integer seed(){
-        return seed;
+    @Deprecated
+    public List<Function> functions() {
+        return functions;
     }
 
-    public ResponseFormat responseFormat(){
-        return responseFormat;
+    @Deprecated
+    public FunctionCall functionCall() {
+        return functionCall;
     }
 
     @Override
@@ -136,10 +148,12 @@ public final class ChatCompletionRequest {
                 && Objects.equals(frequencyPenalty, another.frequencyPenalty)
                 && Objects.equals(logitBias, another.logitBias)
                 && Objects.equals(user, another.user)
+                && Objects.equals(responseFormat, another.responseFormat)
+                && Objects.equals(seed, another.seed)
                 && Objects.equals(tools, another.tools)
                 && Objects.equals(toolChoice, another.toolChoice)
-                && Objects.equals(seed, another.seed)
-                && Objects.equals(responseFormat, another.responseFormat);
+                && Objects.equals(functions, another.functions)
+                && Objects.equals(functionCall, another.functionCall);
     }
 
     @Override
@@ -157,10 +171,12 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(frequencyPenalty);
         h += (h << 5) + Objects.hashCode(logitBias);
         h += (h << 5) + Objects.hashCode(user);
+        h += (h << 5) + Objects.hashCode(responseFormat);
+        h += (h << 5) + Objects.hashCode(seed);
         h += (h << 5) + Objects.hashCode(tools);
         h += (h << 5) + Objects.hashCode(toolChoice);
-        h += (h << 5) + Objects.hashCode(seed);
-        h += (h << 5) + Objects.hashCode(responseFormat);
+        h += (h << 5) + Objects.hashCode(functions);
+        h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
 
@@ -179,10 +195,12 @@ public final class ChatCompletionRequest {
                 + ", frequencyPenalty=" + frequencyPenalty
                 + ", logitBias=" + logitBias
                 + ", user=" + user
+                + ", responseFormat=" + responseFormat
+                + ", seed=" + seed
                 + ", tools=" + tools
                 + ", toolChoice=" + toolChoice
-                + ", seed=" + seed
-                + ", responseFormat=" + responseFormat
+                + ", functions=" + functions
+                + ", functionCall=" + functionCall
                 + "}";
     }
 
@@ -192,7 +210,7 @@ public final class ChatCompletionRequest {
 
     public static final class Builder {
 
-        private String model = GPT_3_5_TURBO.stringValue();
+        private String model = GPT_3_5_TURBO.toString();
         private List<Message> messages;
         private Double temperature;
         private Double topP;
@@ -204,12 +222,14 @@ public final class ChatCompletionRequest {
         private Double frequencyPenalty;
         private Map<String, Integer> logitBias;
         private String user;
+        private ResponseFormat responseFormat;
+        private Integer seed;
         private List<Tool> tools;
         private Object toolChoice;
-
-        private Integer seed;
-
-        private ResponseFormat responseFormat;
+        @Deprecated
+        private List<Function> functions;
+        @Deprecated
+        private FunctionCall functionCall;
 
         private Builder() {
         }
@@ -227,11 +247,17 @@ public final class ChatCompletionRequest {
             frequencyPenalty(instance.frequencyPenalty);
             logitBias(instance.logitBias);
             user(instance.user);
+            responseFormat(instance.responseFormat);
+            seed(instance.seed);
             tools(instance.tools);
             toolChoice(instance.toolChoice);
-            seed(instance.seed);
-            responseFormat(instance.responseFormat);
+            functions(instance.functions);
+            functionCall(instance.functionCall);
             return this;
+        }
+
+        public Builder model(ChatCompletionModel model) {
+            return model(model.toString());
         }
 
         public Builder model(String model) {
@@ -239,57 +265,46 @@ public final class ChatCompletionRequest {
             return this;
         }
 
-        @Experimental
-        public Builder model(Model model) {
-            return model(model.stringValue());
-        }
-
         public Builder messages(List<Message> messages) {
-            if (messages == null) {
-                return this;
+            if (messages != null) {
+                this.messages = unmodifiableList(messages);
             }
-            this.messages = unmodifiableList(messages);
             return this;
         }
 
-        @Experimental
         public Builder messages(Message... messages) {
             return messages(asList(messages));
         }
 
-        @Experimental
         public Builder addSystemMessage(String systemMessage) {
             if (this.messages == null) {
                 this.messages = new ArrayList<>();
             }
-            this.messages.add(systemMessage(systemMessage));
+            this.messages.add(SystemMessage.from(systemMessage));
             return this;
         }
 
-        @Experimental
         public Builder addUserMessage(String userMessage) {
             if (this.messages == null) {
                 this.messages = new ArrayList<>();
             }
-            this.messages.add(userMessage(userMessage));
+            this.messages.add(UserMessage.from(userMessage));
             return this;
         }
 
-        @Experimental
         public Builder addAssistantMessage(String assistantMessage) {
             if (this.messages == null) {
                 this.messages = new ArrayList<>();
             }
-            this.messages.add(assistantMessage(assistantMessage));
+            this.messages.add(AssistantMessage.from(assistantMessage));
             return this;
         }
 
-        @Experimental
-        public Builder addFunctionMessage(String name, String content) {
+        public Builder addToolMessage(String toolCallId, String content) {
             if (this.messages == null) {
                 this.messages = new ArrayList<>();
             }
-            this.messages.add(functionMessage(name, content));
+            this.messages.add(ToolMessage.from(toolCallId, content));
             return this;
         }
 
@@ -314,10 +329,9 @@ public final class ChatCompletionRequest {
         }
 
         public Builder stop(List<String> stop) {
-            if (stop == null) {
-                return this;
+            if (stop != null) {
+                this.stop = unmodifiableList(stop);
             }
-            this.stop = unmodifiableList(stop);
             return this;
         }
 
@@ -341,10 +355,9 @@ public final class ChatCompletionRequest {
         }
 
         public Builder logitBias(Map<String, Integer> logitBias) {
-            if (logitBias == null) {
-                return this;
+            if (logitBias != null) {
+                this.logitBias = unmodifiableMap(logitBias);
             }
-            this.logitBias = unmodifiableMap(logitBias);
             return this;
         }
 
@@ -353,42 +366,12 @@ public final class ChatCompletionRequest {
             return this;
         }
 
-        public Builder tools(List<Tool> tools) {
-            if (tools == null) {
-                return this;
-            }
-            this.tools = unmodifiableList(tools);
-            return this;
+        public Builder responseFormat(ResponseFormatType responseFormatType) {
+            return responseFormat(new ResponseFormat(responseFormatType));
         }
 
-        @Experimental
-        public Builder tools(Tool... tools) {
-            return tools(asList(tools));
-        }
-
-        @Experimental
-        public Builder addTool(Tool tool) {
-            if (this.tools == null) {
-                this.tools = new ArrayList<>();
-            }
-            this.tools.add(tool);
-            return this;
-        }
-
-        public Builder toolChoice(Object toolChoice) {
-            this.toolChoice = toolChoice;
-            return this;
-        }
-
-        @Experimental
-        public Builder toolChoice(ToolCallMode mode) {
-            this.toolChoice = mode.name().toLowerCase();
-            return this;
-        }
-
-        @Experimental
-        public Builder toolChoice(String name) {
-            this.toolChoice = singletonMap("name", name);
+        public Builder responseFormat(ResponseFormat responseFormat) {
+            this.responseFormat = responseFormat;
             return this;
         }
 
@@ -397,8 +380,57 @@ public final class ChatCompletionRequest {
             return this;
         }
 
-        public Builder responseFormat(ResponseFormat responseFormat) {
-            this.responseFormat = responseFormat;
+        public Builder tools(List<Tool> tools) {
+            if (tools != null) {
+                this.tools = unmodifiableList(tools);
+            }
+            return this;
+        }
+
+        public Builder tools(Tool... tools) {
+            return tools(asList(tools));
+        }
+
+        public Builder toolChoice(ToolChoiceMode toolChoiceMode) {
+            this.toolChoice = toolChoiceMode;
+            return this;
+        }
+
+        public Builder toolChoice(String functionName) {
+            return toolChoice(ToolChoice.from(functionName));
+        }
+
+        public Builder toolChoice(Object toolChoice) {
+            this.toolChoice = toolChoice;
+            return this;
+        }
+
+        @Deprecated
+        public Builder functions(Function... functions) {
+            return functions(asList(functions));
+        }
+
+        @Deprecated
+        public Builder functions(List<Function> functions) {
+            if (functions != null) {
+                this.functions = unmodifiableList(functions);
+            }
+            return this;
+        }
+
+        @Deprecated
+        public Builder functionCall(String functionName) {
+            if (functionName != null) {
+                this.functionCall = FunctionCall.builder()
+                        .name(functionName)
+                        .build();
+            }
+            return this;
+        }
+
+        @Deprecated
+        public Builder functionCall(FunctionCall functionCall) {
+            this.functionCall = functionCall;
             return this;
         }
 

@@ -1,6 +1,5 @@
 package dev.ai4j.openai4j.completion;
 
-import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.shared.Usage;
 
 import java.util.List;
@@ -47,7 +46,6 @@ public final class CompletionResponse {
     /**
      * Convenience method to get the text from the first choice.
      */
-    @Experimental
     public String text() {
         return choices().get(0).text();
     }
@@ -120,10 +118,9 @@ public final class CompletionResponse {
         }
 
         public Builder choices(List<CompletionChoice> choices) {
-            if (choices == null) {
-                return this;
+            if (choices != null) {
+                this.choices = unmodifiableList(choices);
             }
-            this.choices = unmodifiableList(choices);
             return this;
         }
 

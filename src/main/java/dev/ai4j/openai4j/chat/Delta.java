@@ -3,20 +3,21 @@ package dev.ai4j.openai4j.chat;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Collections.unmodifiableList;
+
 public final class Delta {
 
     private final Role role;
     private final String content;
+    private final List<ToolCall> toolCalls;
     @Deprecated
     private final FunctionCall functionCall;
-    private final List<ToolCalls> toolCalls;
-
 
     private Delta(Builder builder) {
         this.role = builder.role;
         this.content = builder.content;
-        this.functionCall = builder.functionCall;
         this.toolCalls = builder.toolCalls;
+        this.functionCall = builder.functionCall;
     }
 
     public Role role() {
@@ -27,12 +28,13 @@ public final class Delta {
         return content;
     }
 
-    public FunctionCall functionCall() {
-        return functionCall;
+    public List<ToolCall> toolCalls() {
+        return toolCalls;
     }
 
-    public List<ToolCalls> toolCalls(){
-        return toolCalls;
+    @Deprecated
+    public FunctionCall functionCall() {
+        return functionCall;
     }
 
     @Override
@@ -45,8 +47,8 @@ public final class Delta {
     private boolean equalTo(Delta another) {
         return Objects.equals(role, another.role)
                 && Objects.equals(content, another.content)
-                && Objects.equals(functionCall, another.functionCall)
-                && Objects.equals(toolCalls, another.toolCalls);
+                && Objects.equals(toolCalls, another.toolCalls)
+                && Objects.equals(functionCall, another.functionCall);
     }
 
     @Override
@@ -54,8 +56,8 @@ public final class Delta {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(role);
         h += (h << 5) + Objects.hashCode(content);
-        h += (h << 5) + Objects.hashCode(functionCall);
         h += (h << 5) + Objects.hashCode(toolCalls);
+        h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
 
@@ -64,8 +66,8 @@ public final class Delta {
         return "Delta{"
                 + "role=" + role
                 + ", content=" + content
-                + ", functionCall=" + functionCall
                 + ", toolCalls=" + toolCalls
+                + ", functionCall=" + functionCall
                 + "}";
     }
 
@@ -77,9 +79,9 @@ public final class Delta {
 
         private Role role;
         private String content;
+        private List<ToolCall> toolCalls;
         @Deprecated
         private FunctionCall functionCall;
-        private List<ToolCalls> toolCalls;
 
         private Builder() {
         }
@@ -94,16 +96,19 @@ public final class Delta {
             return this;
         }
 
+        public Builder toolCalls(List<ToolCall> toolCalls) {
+            if (toolCalls != null) {
+                this.toolCalls = unmodifiableList(toolCalls);
+            }
+            return this;
+        }
+
         @Deprecated
         public Builder functionCall(FunctionCall functionCall) {
             this.functionCall = functionCall;
             return this;
         }
 
-        public Builder toolCalls(List<ToolCalls> toolCalls) {
-            this.toolCalls = toolCalls;
-            return this;
-        }
 
         public Delta build() {
             return new Delta(this);

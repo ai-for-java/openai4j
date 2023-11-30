@@ -2,17 +2,15 @@ package dev.ai4j.openai4j;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.ai4j.openai4j.chat.Role;
 
 import static com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;
-import static dev.ai4j.openai4j.MessageTypeAdapter.MESSAGE_TYPE_ADAPTER_FACTORY;
 
 class Json {
 
     static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES)
-            .registerTypeAdapterFactory(MESSAGE_TYPE_ADAPTER_FACTORY)
-            .registerTypeAdapter(Role.class, new RoleAdapter())
+            .registerTypeHierarchyAdapter(Enum.class, new EnumSerializer())
+            .registerTypeHierarchyAdapter(Enum.class, new EnumDeserializer())
             .setPrettyPrinting()
             .create();
 

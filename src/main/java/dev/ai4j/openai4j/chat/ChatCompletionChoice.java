@@ -5,7 +5,7 @@ import java.util.Objects;
 public final class ChatCompletionChoice {
 
     private final Integer index;
-    private final MessageResponse message;
+    private final AssistantMessage message;
     private final Delta delta;
     private final String finishReason;
 
@@ -20,7 +20,7 @@ public final class ChatCompletionChoice {
         return index;
     }
 
-    public MessageResponse message() {
+    public AssistantMessage message() {
         return message;
     }
 
@@ -73,7 +73,7 @@ public final class ChatCompletionChoice {
     public static final class Builder {
 
         private Integer index;
-        private MessageResponse message;
+        private AssistantMessage message;
         private Delta delta;
         private String finishReason;
 
@@ -85,7 +85,7 @@ public final class ChatCompletionChoice {
             return this;
         }
 
-        public Builder message(MessageResponse message) {
+        public Builder message(AssistantMessage message) {
             this.message = message;
             return this;
         }

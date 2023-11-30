@@ -21,22 +21,18 @@ public abstract class OpenAiClient {
 
     public abstract SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request);
 
-    @Experimental
     public abstract SyncOrAsyncOrStreaming<String> completion(String prompt);
 
     public abstract SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request);
 
-    @Experimental
     public abstract SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage);
 
     public abstract SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request);
 
-    @Experimental
     public abstract SyncOrAsync<List<Float>> embedding(String input);
 
     public abstract SyncOrAsync<ModerationResponse> moderation(ModerationRequest request);
 
-    @Experimental
     public abstract SyncOrAsync<ModerationResult> moderation(String input);
 
     public abstract void shutdown();

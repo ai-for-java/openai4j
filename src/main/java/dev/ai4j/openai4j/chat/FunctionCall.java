@@ -2,7 +2,6 @@ package dev.ai4j.openai4j.chat;
 
 import java.util.Objects;
 
-@Deprecated
 public class FunctionCall {
 
     private final String name;
@@ -43,7 +42,7 @@ public class FunctionCall {
 
     @Override
     public String toString() {
-        return "Function{"
+        return "FunctionCall{"
                 + "name=" + name
                 + ", arguments=" + arguments
                 + "}";

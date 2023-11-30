@@ -5,20 +5,18 @@ import java.util.Objects;
 public class ImageUrl {
 
     private final String url;
+    private final ImageDetail detail;
 
-    private final String detail;
-
-    private ImageUrl(Builder builder){
+    private ImageUrl(Builder builder) {
         this.url = builder.url;
         this.detail = builder.detail;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ImageUrl imageUrl = (ImageUrl) o;
-        return Objects.equals(url, imageUrl.url) && Objects.equals(detail, imageUrl.detail);
+    public boolean equals(Object another) {
+        if (this == another) return true;
+        return another instanceof ImageUrl
+                && equalTo((ImageUrl) another);
     }
 
     private boolean equalTo(ImageUrl another) {
@@ -37,38 +35,35 @@ public class ImageUrl {
     @Override
     public String toString() {
         return "ImageUrl{" +
-                "url='" + url + '\'' +
-                ", detail='" + detail + '\'' +
-                '}';
+                "url=" + url +
+                ", detail=" + detail +
+                "}";
     }
 
-    public static ImageUrl.Builder builder() {
-        return new ImageUrl.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
+    public static final class Builder {
 
-    public static final class Builder{
         private String url;
+        private ImageDetail detail;
 
-        private String detail = ImageDetail.AUTO.stringValue();
-
-        private Builder(){
-
+        private Builder() {
         }
 
-        public Builder detail(ImageDetail detail){
-            this.detail = detail.stringValue();
-            return this;
-        }
-
-        public Builder url(String url){
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
 
-        public ImageUrl build(){
+        public Builder detail(ImageDetail detail) {
+            this.detail = detail;
+            return this;
+        }
+
+        public ImageUrl build() {
             return new ImageUrl(this);
         }
     }
-
 }

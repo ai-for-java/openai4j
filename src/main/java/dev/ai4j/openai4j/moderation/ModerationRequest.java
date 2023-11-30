@@ -1,29 +1,27 @@
 package dev.ai4j.openai4j.moderation;
 
-import dev.ai4j.openai4j.Experimental;
-import dev.ai4j.openai4j.Model;
-
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
 
 public class ModerationRequest {
 
-    private final List<String> input;
     private final String model;
+    private final List<String> input;
 
     private ModerationRequest(Builder builder) {
-        this.input = builder.input;
         this.model = builder.model;
-    }
-
-    public List<String> input() {
-        return input;
+        this.input = builder.input;
     }
 
     public String model() {
         return model;
+    }
+
+    public List<String> input() {
+        return input;
     }
 
     @Override
@@ -34,23 +32,23 @@ public class ModerationRequest {
     }
 
     private boolean equalTo(ModerationRequest another) {
-        return Objects.equals(input, another.input)
-                && Objects.equals(model, another.model);
+        return Objects.equals(model, another.model)
+                && Objects.equals(input, another.input);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + Objects.hashCode(input);
         h += (h << 5) + Objects.hashCode(model);
+        h += (h << 5) + Objects.hashCode(input);
         return h;
     }
 
     @Override
     public String toString() {
         return "ModerationRequest{"
-                + "input=" + input
-                + ", model=" + model
+                + "model=" + model
+                + ", input=" + input
                 + "}";
     }
 
@@ -60,19 +58,14 @@ public class ModerationRequest {
 
     public static final class Builder {
 
-        private List<String> input;
         private String model;
+        private List<String> input;
 
         private Builder() {
         }
 
-        public Builder input(List<String> input) {
-            this.input = input;
-            return this;
-        }
-
-        public Builder input(String input) {
-            return input(singletonList(input));
+        public Builder model(ModerationModel model) {
+            return model(model.toString());
         }
 
         public Builder model(String model) {
@@ -80,9 +73,15 @@ public class ModerationRequest {
             return this;
         }
 
-        @Experimental
-        public Builder model(Model model) {
-            return model(model.stringValue());
+        public Builder input(List<String> input) {
+            if (input != null) {
+                this.input = unmodifiableList(input);
+            }
+            return this;
+        }
+
+        public Builder input(String input) {
+            return input(singletonList(input));
         }
 
         public ModerationRequest build() {

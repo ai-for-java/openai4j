@@ -64,10 +64,9 @@ public final class Embedding {
         }
 
         public Builder embedding(List<Float> embedding) {
-            if (embedding == null) {
-                return this;
+            if (embedding != null) {
+                this.embedding = unmodifiableList(embedding);
             }
-            this.embedding = unmodifiableList(embedding);
             return this;
         }
 

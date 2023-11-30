@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public final class Content {
 
-    private final String type;
+    private final ContentType type;
     private final String text;
     private final ImageUrl imageUrl;
 
@@ -14,7 +14,7 @@ public final class Content {
         this.imageUrl = builder.imageUrl;
     }
 
-    public String type() {
+    public ContentType type() {
         return type;
     }
 
@@ -27,11 +27,10 @@ public final class Content {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Content content = (Content) o;
-        return Objects.equals(type, content.type) && Objects.equals(text, content.text) && Objects.equals(imageUrl, content.imageUrl);
+    public boolean equals(Object another) {
+        if (this == another) return true;
+        return another instanceof Content
+                && equalTo((Content) another);
     }
 
     private boolean equalTo(Content another) {
@@ -52,32 +51,33 @@ public final class Content {
     @Override
     public String toString() {
         return "Content{" +
-                "type='" + type + '\'' +
-                ", text='" + text + '\'' +
+                "type=" + type +
+                ", text=" + text +
                 ", imageUrl=" + imageUrl +
-                '}';
+                "}";
     }
 
-    public static Content.Builder builder() {
-        return new Content.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static final class Builder {
-        private String type;
+
+        private ContentType type;
         private String text;
         private ImageUrl imageUrl;
 
-        public Content.Builder type(String type) {
+        public Builder type(ContentType type) {
             this.type = type;
             return this;
         }
 
-        public Content.Builder text(String text) {
+        public Builder text(String text) {
             this.text = text;
             return this;
         }
 
-        public Content.Builder imageUrl(ImageUrl imageUrl) {
+        public Builder imageUrl(ImageUrl imageUrl) {
             this.imageUrl = imageUrl;
             return this;
         }
@@ -85,8 +85,5 @@ public final class Content {
         public Content build() {
             return new Content(this);
         }
-
     }
-
-
 }

@@ -1,13 +1,10 @@
 package dev.ai4j.openai4j.completion;
 
-import dev.ai4j.openai4j.Experimental;
-import dev.ai4j.openai4j.Model;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static dev.ai4j.openai4j.Model.TEXT_DAVINCI_003;
+import static dev.ai4j.openai4j.completion.CompletionModel.TEXT_DAVINCI_003;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
@@ -189,7 +186,7 @@ public final class CompletionRequest {
 
     public static final class Builder {
 
-        private String model = TEXT_DAVINCI_003.stringValue();
+        private String model = TEXT_DAVINCI_003.toString();
         private String prompt;
         private String suffix;
         private Integer maxTokens;
@@ -209,7 +206,6 @@ public final class CompletionRequest {
         private Builder() {
         }
 
-        @Experimental
         public Builder from(CompletionRequest request) {
             model(request.model);
             prompt(request.prompt);
@@ -230,14 +226,13 @@ public final class CompletionRequest {
             return this;
         }
 
+        public Builder model(CompletionModel model) {
+            return model(model.toString());
+        }
+
         public Builder model(String model) {
             this.model = model;
             return this;
-        }
-
-        @Experimental
-        public Builder model(Model model) {
-            return model(model.stringValue());
         }
 
         public Builder prompt(String prompt) {
@@ -286,10 +281,9 @@ public final class CompletionRequest {
         }
 
         public Builder stop(List<String> stop) {
-            if (stop == null) {
-                return this;
+            if (stop != null) {
+                this.stop = unmodifiableList(stop);
             }
-            this.stop = unmodifiableList(stop);
             return this;
         }
 
@@ -309,10 +303,9 @@ public final class CompletionRequest {
         }
 
         public Builder logitBias(Map<String, Integer> logitBias) {
-            if (logitBias == null) {
-                return this;
+            if (logitBias != null) {
+                this.logitBias = unmodifiableMap(logitBias);
             }
-            this.logitBias = unmodifiableMap(logitBias);
             return this;
         }
 

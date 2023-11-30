@@ -1,10 +1,7 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.Experimental;
-
 import java.util.Objects;
 
-@Experimental
 public class JsonSchemaProperty {
 
     public static final JsonSchemaProperty STRING = type("string");
@@ -58,46 +55,39 @@ public class JsonSchemaProperty {
                 + "}";
     }
 
-    @Experimental
     public static JsonSchemaProperty from(String key, Object value) {
         return new JsonSchemaProperty(key, value);
     }
 
-    @Experimental
     public static JsonSchemaProperty property(String key, Object value) {
         return from(key, value);
     }
 
-    @Experimental
     public static JsonSchemaProperty type(String value) {
         return from("type", value);
     }
 
-    @Experimental
     public static JsonSchemaProperty description(String value) {
         return from("description", value);
     }
 
-    @Experimental
     public static JsonSchemaProperty enums(String... enumValues) {
         return from("enum", enumValues);
     }
 
-    @Experimental
     public static JsonSchemaProperty enums(Object... enumValues) {
         for (Object enumValue : enumValues) {
             if (!enumValue.getClass().isEnum()) {
-                throw new RuntimeException("Value " + enumValue.getClass().getName() + " should be enum");
+                throw new RuntimeException("Value " + enumValue.getClass().getName() + " must be enum");
             }
         }
 
         return from("enum", enumValues);
     }
 
-    @Experimental
     public static JsonSchemaProperty enums(Class<?> enumClass) {
         if (!enumClass.isEnum()) {
-            throw new RuntimeException("Class " + enumClass.getName() + " should be enum");
+            throw new RuntimeException("Class " + enumClass.getName() + " must be enum");
         }
 
         return from("enum", enumClass.getEnumConstants());

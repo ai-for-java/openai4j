@@ -50,7 +50,7 @@ public final class ModerationResult {
 
     @Override
     public String toString() {
-        return "Moderation{"
+        return "ModerationResult{"
                 + "categories=" + categories
                 + ", categoryScores=" + categoryScores
                 + ", flagged=" + flagged

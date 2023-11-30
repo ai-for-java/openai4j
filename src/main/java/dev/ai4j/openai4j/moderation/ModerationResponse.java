@@ -53,7 +53,7 @@ public final class ModerationResponse {
 
     @Override
     public String toString() {
-        return "EmbeddingResponse{"
+        return "ModerationResponse{"
                 + "id=" + id
                 + ", model=" + model
                 + ", results=" + results
@@ -84,10 +84,9 @@ public final class ModerationResponse {
         }
 
         public Builder results(List<ModerationResult> results) {
-            if (results == null) {
-                return this;
+            if (results != null) {
+                this.results = unmodifiableList(results);
             }
-            this.results = unmodifiableList(results);
             return this;
         }
 

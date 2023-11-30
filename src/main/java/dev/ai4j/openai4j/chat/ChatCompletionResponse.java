@@ -1,6 +1,5 @@
 package dev.ai4j.openai4j.chat;
 
-import dev.ai4j.openai4j.Experimental;
 import dev.ai4j.openai4j.shared.Usage;
 
 import java.util.List;
@@ -53,7 +52,6 @@ public final class ChatCompletionResponse {
     /**
      * Convenience method to get the content of the message from the first choice.
      */
-    @Experimental
     public String content() {
         return choices().get(0).message().content();
     }
@@ -109,7 +107,6 @@ public final class ChatCompletionResponse {
         private String model;
         private List<ChatCompletionChoice> choices;
         private Usage usage;
-
         private String systemFingerprint;
 
         private Builder() {
@@ -131,10 +128,9 @@ public final class ChatCompletionResponse {
         }
 
         public Builder choices(List<ChatCompletionChoice> choices) {
-            if (choices == null) {
-                return this;
+            if (choices != null) {
+                this.choices = unmodifiableList(choices);
             }
-            this.choices = unmodifiableList(choices);
             return this;
         }
 

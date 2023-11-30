@@ -129,7 +129,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    @Experimental
     public SyncOrAsyncOrStreaming<String> completion(String prompt) {
 
         CompletionRequest request = CompletionRequest.builder()
@@ -174,7 +173,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    @Experimental
     public SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage) {
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
@@ -205,7 +203,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    @Experimental
     public SyncOrAsync<List<Float>> embedding(String input) {
 
         EmbeddingRequest request = EmbeddingRequest.builder()
@@ -222,7 +219,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    @Experimental
     public SyncOrAsync<ModerationResult> moderation(String input) {
 
         ModerationRequest request = ModerationRequest.builder()
