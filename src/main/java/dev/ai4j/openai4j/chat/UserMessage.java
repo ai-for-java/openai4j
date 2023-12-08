@@ -12,11 +12,11 @@ import static java.util.Collections.unmodifiableList;
 public final class UserMessage implements Message {
 
     private final Role role = USER;
-    private final List<Content> content;
+    private final Object content;
     private final String name;
 
     private UserMessage(Builder builder) {
-        this.content = builder.content;
+        this.content = builder.stringContent != null ? builder.stringContent : builder.content;
         this.name = builder.name;
     }
 
@@ -24,7 +24,7 @@ public final class UserMessage implements Message {
         return role;
     }
 
-    public List<Content> content() {
+    public Object content() {
         return content;
     }
 
@@ -63,6 +63,12 @@ public final class UserMessage implements Message {
                 + "}";
     }
 
+    public static UserMessage from(String text) {
+        return UserMessage.builder()
+                .content(text)
+                .build();
+    }
+
     public static UserMessage from(String text, String... imageUrls) {
         return UserMessage.builder()
                 .addText(text)
@@ -76,6 +82,7 @@ public final class UserMessage implements Message {
 
     public static final class Builder {
 
+        private String stringContent; // keeping it for compatibility with other OpenAI-like APIs
         private List<Content> content;
         private String name;
 
@@ -124,6 +131,11 @@ public final class UserMessage implements Message {
             if (content != null) {
                 this.content = unmodifiableList(content);
             }
+            return this;
+        }
+
+        public Builder content(String content) {
+            this.stringContent = content;
             return this;
         }
 

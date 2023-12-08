@@ -429,4 +429,27 @@ class ChatCompletionTest extends RateLimitAwareTest {
         // then
         assertThat(response.content()).containsIgnoringCase("green");
     }
+
+    @ParameterizedTest
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613" // I don't have access to these models
+    })
+    void testUserMessageWithStringContent(ChatCompletionModel model) {
+
+        // given
+        UserMessage userMessage = UserMessage.builder()
+                .content("What is the capital of Germany?")
+                .build();
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(model)
+                .messages(userMessage)
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        assertThat(response.content()).contains("Berlin");
+    }
 }
