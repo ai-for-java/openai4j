@@ -2,6 +2,8 @@ package dev.ai4j.openai4j.image;
 
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_3;
 
+import java.util.Objects;
+
 public class ImageRequest {
 
   private final String model;
@@ -18,6 +20,35 @@ public class ImageRequest {
     this.size = builder.size;
     this.quality = builder.quality;
     this.style = builder.style;
+  }
+
+  @Override
+  public boolean equals(Object another) {
+    if (this == another) return true;
+    return another instanceof ImageRequest && equalTo((ImageRequest) another);
+  }
+
+  private boolean equalTo(ImageRequest another) {
+    return (
+      n == another.n &&
+      Objects.equals(model, another.model) &&
+      Objects.equals(prompt, another.prompt) &&
+      Objects.equals(size, another.size) &&
+      Objects.equals(quality, another.quality) &&
+      Objects.equals(style, another.style)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    int h = 2381;
+    h += (h << 5) + Objects.hashCode(model);
+    h += (h << 5) + Objects.hashCode(prompt);
+    h += (h << 5) + n;
+    h += (h << 5) + Objects.hashCode(size);
+    h += (h << 5) + Objects.hashCode(quality);
+    h += (h << 5) + Objects.hashCode(style);
+    return h;
   }
 
   public static Builder builder() {
