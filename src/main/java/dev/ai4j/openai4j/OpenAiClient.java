@@ -80,6 +80,7 @@ public abstract class OpenAiClient {
     public boolean logRequests;
     public boolean logResponses;
     public boolean logStreamingResponses;
+    public String downloadTo;
 
     public abstract T build();
 
@@ -211,6 +212,16 @@ public abstract class OpenAiClient {
         logStreamingResponses = false;
       }
       this.logStreamingResponses = logStreamingResponses;
+      return (B) this;
+    }
+
+    public B withDownload() {
+      downloadTo = System.getProperty("java.io.tmpdir");
+      return (B) this;
+    }
+
+    public B downloadTo(String downloadTo) {
+      this.downloadTo = downloadTo;
       return (B) this;
     }
   }
