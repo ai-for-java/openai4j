@@ -1,4 +1,4 @@
-package dev.ai4j.openai4j.image;
+package dev.ai4j.openai4j.shared;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,14 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-class ImageDownloaderTest {
+class FileDownloaderTest {
 
   @Test
   void shouldDownloadFileAndReturnFilePath() {
     String fileUrl =
       "https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png";
     String tempDir = System.getProperty("java.io.tmpdir");
-    String filePath = ImageDownloader.downloadFile(fileUrl, tempDir);
+    String filePath = FileDownloader.download(fileUrl, tempDir);
 
     assertThat(filePath).isNotNull();
     assertThat(filePath).startsWith(tempDir);
@@ -29,9 +29,7 @@ class ImageDownloaderTest {
   void shouldThrowExceptionOnInvalidUrl() {
     String invalidUrl = "invalid_url";
 
-    assertThatThrownBy(() ->
-        ImageDownloader.downloadFile(invalidUrl, "destination")
-      )
+    assertThatThrownBy(() -> FileDownloader.download(invalidUrl, "destination"))
       .isInstanceOf(RuntimeException.class)
       .hasCauseInstanceOf(IOException.class);
   }
@@ -44,7 +42,7 @@ class ImageDownloaderTest {
     Files.write(tempFile, content.getBytes());
 
     String fileUrl = tempFile.toUri().toString();
-    String filePath = ImageDownloader.downloadFile(fileUrl, tempDir);
+    String filePath = FileDownloader.download(fileUrl, tempDir);
 
     assertThat(filePath).isNotNull();
     assertThat(filePath).startsWith(tempDir);

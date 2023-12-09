@@ -26,7 +26,7 @@ public class ImageResponse {
 
   public static class ImageData {
 
-    private final String url;
+    private String url;
 
     private ImageData(String url) {
       this.url = url;
@@ -34,6 +34,10 @@ public class ImageResponse {
 
     public String url() {
       return url;
+    }
+
+    public void url(String url) {
+      this.url = url;
     }
   }
 

@@ -86,13 +86,19 @@ public class DefaultOpenAiClient extends OpenAiClient {
 
     this.okHttpClient = okHttpClientBuilder.build();
 
-    Retrofit retrofit = new Retrofit.Builder()
+    Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
       .baseUrl(serviceBuilder.baseUrl)
-      .client(okHttpClient)
-      .addConverterFactory(GsonConverterFactory.create(GSON))
-      .build();
+      .client(okHttpClient);
 
-    this.openAiApi = retrofit.create(OpenAiApi.class);
+    if (serviceBuilder.downloadTo != null) {
+      retrofitBuilder.addConverterFactory(
+        new DownloadConverterFactory(serviceBuilder.downloadTo)
+      );
+    }
+
+    retrofitBuilder.addConverterFactory(GsonConverterFactory.create(GSON));
+
+    this.openAiApi = retrofitBuilder.build().create(OpenAiApi.class);
   }
 
   public void shutdown() {
