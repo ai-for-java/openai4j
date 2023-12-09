@@ -1,6 +1,7 @@
 package dev.ai4j.openai4j.image;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ImageResponse {
 
@@ -39,6 +40,38 @@ public class ImageResponse {
     public void url(String url) {
       this.url = url;
     }
+
+    @Override
+    public boolean equals(Object another) {
+      if (this == another) return true;
+      if (another == null || getClass() != another.getClass()) return false;
+      return equalTo((ImageData) another);
+    }
+
+    private boolean equalTo(ImageData another) {
+      return Objects.equals(url, another.url);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(url);
+    }
+  }
+
+  @Override
+  public boolean equals(Object another) {
+    if (this == another) return true;
+    if (another == null || getClass() != another.getClass()) return false;
+    return equalTo((ImageResponse) another);
+  }
+
+  private boolean equalTo(ImageResponse another) {
+    return created == another.created && Objects.equals(data, another.data);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(created, data);
   }
 
   public static class Builder {
