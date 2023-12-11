@@ -8,7 +8,7 @@ import dev.ai4j.openai4j.OpenAiClient;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
-public class ImagesGenerationsTest {
+public class ImagesGenerationTest {
 
   @Test
   void generationShouldWork() {
@@ -26,7 +26,9 @@ public class ImagesGenerationsTest {
       .prompt("Beautiful house on country side")
       .build();
 
-    GenerateImagesResponse response = client.imagesGeneration(request).execute();
+    GenerateImagesResponse response = client
+      .imagesGeneration(request)
+      .execute();
 
     String remoteImage = response.data().get(0).url();
 
@@ -53,7 +55,9 @@ public class ImagesGenerationsTest {
       .prompt("Bird flying in the sky")
       .build();
 
-    GenerateImagesResponse response = client.imagesGeneration(request).execute();
+    GenerateImagesResponse response = client
+      .imagesGeneration(request)
+      .execute();
 
     String localImage = response.data().get(0).url();
 

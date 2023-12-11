@@ -1,19 +1,21 @@
 package dev.ai4j.openai4j;
 
 import dev.ai4j.openai4j.image.GenerateImagesResponse;
-import dev.ai4j.openai4j.shared.FileDownloader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 class DownloadConverterFactory extends Converter.Factory {
 
-  private final String downloadTo;
+  private final Path downloadTo;
 
-  DownloadConverterFactory(String downloadTo) {
+  DownloadConverterFactory(Path downloadTo) {
     this.downloadTo = downloadTo;
   }
 
@@ -42,9 +44,17 @@ class DownloadConverterFactory extends Converter.Factory {
 
       if (response instanceof GenerateImagesResponse) {
         ((GenerateImagesResponse) response).data()
-          .forEach(data ->
-            data.url(FileDownloader.download(data.url(), downloadTo))
-          );
+          .forEach(data -> {
+            try {
+              data.url(
+                FileDownloader
+                  .download(new URI(data.url()), downloadTo)
+                  .toString()
+              );
+            } catch (URISyntaxException e) {
+              throw new RuntimeException(e);
+            }
+          });
       }
 
       return response;

@@ -15,6 +15,8 @@ import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 
@@ -80,7 +82,7 @@ public abstract class OpenAiClient {
     public boolean logRequests;
     public boolean logResponses;
     public boolean logStreamingResponses;
-    public String downloadTo;
+    public Path downloadTo;
 
     public abstract T build();
 
@@ -216,11 +218,11 @@ public abstract class OpenAiClient {
     }
 
     public B withDownload() {
-      downloadTo = System.getProperty("java.io.tmpdir");
+      downloadTo = Paths.get(System.getProperty("java.io.tmpdir"));
       return (B) this;
     }
 
-    public B downloadTo(String downloadTo) {
+    public B downloadTo(Path downloadTo) {
       this.downloadTo = downloadTo;
       return (B) this;
     }
