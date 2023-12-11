@@ -26,7 +26,7 @@ public class ImagesGenerationsTest {
       .prompt("Beautiful house on country side")
       .build();
 
-    GenerateImagesResponse response = client.imagesGenerations(request).execute();
+    GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
     String remoteImage = response.data().get(0).url();
 
@@ -53,7 +53,7 @@ public class ImagesGenerationsTest {
       .prompt("Bird flying in the sky")
       .build();
 
-    GenerateImagesResponse response = client.imagesGenerations(request).execute();
+    GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
     String localImage = response.data().get(0).url();
 

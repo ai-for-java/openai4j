@@ -46,7 +46,7 @@ public abstract class OpenAiClient {
 
   public abstract SyncOrAsync<ModerationResult> moderation(String input);
 
-  public abstract SyncOrAsync<GenerateImagesResponse> imagesGenerations(
+  public abstract SyncOrAsync<GenerateImagesResponse> imagesGeneration(
     GenerateImagesRequest request
   );
 

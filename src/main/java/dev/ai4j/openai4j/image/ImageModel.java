@@ -2,7 +2,6 @@ package dev.ai4j.openai4j.image;
 
 /**
  * Represents an OpenAI DALL·E models to generate artistic images.
- * You can find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/create">here</a>.
  */
 public enum ImageModel {
   DALL_E_2("dall-e-2"), // anyone still needs that? :)

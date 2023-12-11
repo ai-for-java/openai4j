@@ -262,7 +262,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
   }
 
   @Override
-  public SyncOrAsync<GenerateImagesResponse> imagesGenerations(GenerateImagesRequest request) {
+  public SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request) {
     return new RequestExecutor<>(
       openAiApi.imagesGenerations(request, apiVersion),
       r -> r

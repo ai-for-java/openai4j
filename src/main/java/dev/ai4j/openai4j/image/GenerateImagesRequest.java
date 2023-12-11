@@ -4,6 +4,9 @@ import static dev.ai4j.openai4j.image.ImageModel.DALL_E_3;
 
 import java.util.Objects;
 
+/**
+ * Find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/create">here</a>.
+ */
 public class GenerateImagesRequest {
 
   private final String model;
