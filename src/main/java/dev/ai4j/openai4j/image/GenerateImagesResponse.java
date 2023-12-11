@@ -3,12 +3,12 @@ package dev.ai4j.openai4j.image;
 import java.util.List;
 import java.util.Objects;
 
-public class ImageResponse {
+public class GenerateImagesResponse {
 
   private final long created;
   private final List<ImageData> data;
 
-  private ImageResponse(Builder builder) {
+  private GenerateImagesResponse(Builder builder) {
     this.created = builder.created;
     this.data = builder.data;
   }
@@ -62,10 +62,10 @@ public class ImageResponse {
   public boolean equals(Object another) {
     if (this == another) return true;
     if (another == null || getClass() != another.getClass()) return false;
-    return equalTo((ImageResponse) another);
+    return equalTo((GenerateImagesResponse) another);
   }
 
-  private boolean equalTo(ImageResponse another) {
+  private boolean equalTo(GenerateImagesResponse another) {
     return created == another.created && Objects.equals(data, another.data);
   }
 
@@ -89,8 +89,8 @@ public class ImageResponse {
       return this;
     }
 
-    public ImageResponse build() {
-      return new ImageResponse(this);
+    public GenerateImagesResponse build() {
+      return new GenerateImagesResponse(this);
     }
   }
 }

@@ -4,7 +4,7 @@ import static dev.ai4j.openai4j.image.ImageModel.DALL_E_3;
 
 import java.util.Objects;
 
-public class ImageRequest {
+public class GenerateImagesRequest {
 
   private final String model;
   private final String prompt;
@@ -13,7 +13,7 @@ public class ImageRequest {
   private final String quality;
   private final String style;
 
-  private ImageRequest(Builder builder) {
+  private GenerateImagesRequest(Builder builder) {
     this.model = builder.model.toString();
     this.prompt = builder.prompt;
     this.n = builder.n;
@@ -25,10 +25,10 @@ public class ImageRequest {
   @Override
   public boolean equals(Object another) {
     if (this == another) return true;
-    return another instanceof ImageRequest && equalTo((ImageRequest) another);
+    return another instanceof GenerateImagesRequest && equalTo((GenerateImagesRequest) another);
   }
 
-  private boolean equalTo(ImageRequest another) {
+  private boolean equalTo(GenerateImagesRequest another) {
     return (
       n == another.n &&
       Objects.equals(model, another.model) &&
@@ -118,8 +118,8 @@ public class ImageRequest {
       return this;
     }
 
-    public ImageRequest build() {
-      return new ImageRequest(this);
+    public GenerateImagesRequest build() {
+      return new GenerateImagesRequest(this);
     }
   }
 }

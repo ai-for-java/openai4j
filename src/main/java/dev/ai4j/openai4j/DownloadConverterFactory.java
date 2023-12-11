@@ -1,6 +1,6 @@
 package dev.ai4j.openai4j;
 
-import dev.ai4j.openai4j.image.ImageResponse;
+import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.shared.FileDownloader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -40,8 +40,8 @@ class DownloadConverterFactory extends Converter.Factory {
     public T convert(ResponseBody value) throws IOException {
       T response = delegate.convert(value);
 
-      if (response instanceof ImageResponse) {
-        ((ImageResponse) response).data()
+      if (response instanceof GenerateImagesResponse) {
+        ((GenerateImagesResponse) response).data()
           .forEach(data ->
             data.url(FileDownloader.download(data.url(), downloadTo))
           );

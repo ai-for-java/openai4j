@@ -19,14 +19,14 @@ public class ImagesGenerationsTest {
       .logResponses()
       .build();
 
-    ImageRequest request = ImageRequest
+    GenerateImagesRequest request = GenerateImagesRequest
       .builder()
       .model(DALL_E_2) // so that you pay not much :)
       .size(DALL_E_SIZE_256_x_256)
       .prompt("Beautiful house on country side")
       .build();
 
-    ImageResponse response = client.imagesGenerations(request).execute();
+    GenerateImagesResponse response = client.imagesGenerations(request).execute();
 
     String remoteImage = response.data().get(0).url();
 
@@ -46,14 +46,14 @@ public class ImagesGenerationsTest {
       .withDownload()
       .build();
 
-    ImageRequest request = ImageRequest
+    GenerateImagesRequest request = GenerateImagesRequest
       .builder()
       .model(DALL_E_2) // so that you pay not much :)
       .size(DALL_E_SIZE_256_x_256)
       .prompt("Bird flying in the sky")
       .build();
 
-    ImageResponse response = client.imagesGenerations(request).execute();
+    GenerateImagesResponse response = client.imagesGenerations(request).execute();
 
     String localImage = response.data().get(0).url();
 

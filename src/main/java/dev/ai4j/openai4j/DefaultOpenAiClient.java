@@ -8,8 +8,8 @@ import dev.ai4j.openai4j.completion.CompletionRequest;
 import dev.ai4j.openai4j.completion.CompletionResponse;
 import dev.ai4j.openai4j.embedding.EmbeddingRequest;
 import dev.ai4j.openai4j.embedding.EmbeddingResponse;
-import dev.ai4j.openai4j.image.ImageRequest;
-import dev.ai4j.openai4j.image.ImageResponse;
+import dev.ai4j.openai4j.image.GenerateImagesRequest;
+import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
@@ -262,7 +262,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
   }
 
   @Override
-  public SyncOrAsync<ImageResponse> imagesGenerations(ImageRequest request) {
+  public SyncOrAsync<GenerateImagesResponse> imagesGenerations(GenerateImagesRequest request) {
     return new RequestExecutor<>(
       openAiApi.imagesGenerations(request, apiVersion),
       r -> r
