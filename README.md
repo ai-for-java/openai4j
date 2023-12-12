@@ -360,7 +360,7 @@ Customizable way:
       .openAiApiKey(System.getenv("OPENAI_API_KEY"))
       .logRequests()
       .logResponses()
-      .withDownload()
+      .withPersisting()
       .build();
 
     ImageRequest request = ImageRequest
@@ -368,6 +368,7 @@ Customizable way:
       .model(DALL_E_3)
       .size(DALL_E_SIZE_1792_x_1024)
       .quality(DALL_E_QUALITY_HD)
+      .responseFormat(DALL_E_RESPONSE_FORMAT_B64_JSON) // if you like to get the image within the response body
       .prompt("Cute red parrot flying in the sky")
       .build();
 
