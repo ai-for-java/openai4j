@@ -6,6 +6,7 @@ import static dev.ai4j.openai4j.image.ImageModel.DALL_E_RESPONSE_FORMAT_URL;
 import java.util.Objects;
 
 /**
+ * Represents the request from the OpenAI DALL·E API when generating images.
  * Find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/create">here</a>.
  */
 public class GenerateImagesRequest {

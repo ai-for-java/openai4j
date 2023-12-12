@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents the response from the OpenAI API when generating images.
- *
- * @param data A list of image data, each containing an image URL, Base64 encoded JSON response, and revised prompt
+ * Represents the response from the OpenAI DALL·E API when generating images.
+ * Find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/object">here</a>.
  */
 public class GenerateImagesResponse {
 
