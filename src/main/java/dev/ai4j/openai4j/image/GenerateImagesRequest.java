@@ -1,6 +1,7 @@
 package dev.ai4j.openai4j.image;
 
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_3;
+import static dev.ai4j.openai4j.image.ImageModel.DALL_E_RESPONSE_FORMAT_URL;
 
 import java.util.Objects;
 
@@ -15,6 +16,8 @@ public class GenerateImagesRequest {
   private final String size;
   private final String quality;
   private final String style;
+  private final String user;
+  private final String responseFormat;
 
   private GenerateImagesRequest(Builder builder) {
     this.model = builder.model.toString();
@@ -23,26 +26,10 @@ public class GenerateImagesRequest {
     this.size = builder.size;
     this.quality = builder.quality;
     this.style = builder.style;
+    this.user = builder.user;
+    this.responseFormat = builder.responseFormat;
   }
 
-  @Override
-  public boolean equals(Object another) {
-    if (this == another) return true;
-    return another instanceof GenerateImagesRequest && equalTo((GenerateImagesRequest) another);
-  }
-
-  private boolean equalTo(GenerateImagesRequest another) {
-    return (
-      n == another.n &&
-      Objects.equals(model, another.model) &&
-      Objects.equals(prompt, another.prompt) &&
-      Objects.equals(size, another.size) &&
-      Objects.equals(quality, another.quality) &&
-      Objects.equals(style, another.style)
-    );
-  }
-
-  @Override
   public int hashCode() {
     int h = 2381;
     h += (h << 5) + Objects.hashCode(model);
@@ -51,35 +38,36 @@ public class GenerateImagesRequest {
     h += (h << 5) + Objects.hashCode(size);
     h += (h << 5) + Objects.hashCode(quality);
     h += (h << 5) + Objects.hashCode(style);
+    h += (h << 5) + Objects.hashCode(user);
+    h += (h << 5) + Objects.hashCode(responseFormat);
     return h;
+  }
+
+  public String toString() {
+    return (
+      "GenerateImagesRequest{" +
+      "model=" +
+      model +
+      ", prompt=" +
+      prompt +
+      ", n=" +
+      n +
+      ", size=" +
+      size +
+      ", quality=" +
+      quality +
+      ", style=" +
+      style +
+      ", user=" +
+      user +
+      ", responseFormat=" +
+      responseFormat +
+      '}'
+    );
   }
 
   public static Builder builder() {
     return new Builder();
-  }
-
-  public String model() {
-    return model;
-  }
-
-  public String prompt() {
-    return prompt;
-  }
-
-  public int n() {
-    return n;
-  }
-
-  public String size() {
-    return size;
-  }
-
-  public String quality() {
-    return quality;
-  }
-
-  public String style() {
-    return style;
   }
 
   public static class Builder {
@@ -90,6 +78,8 @@ public class GenerateImagesRequest {
     private String size;
     private String quality;
     private String style;
+    private String user;
+    private String responseFormat = DALL_E_RESPONSE_FORMAT_URL;
 
     public Builder model(ImageModel model) {
       this.model = model;
@@ -118,6 +108,16 @@ public class GenerateImagesRequest {
 
     public Builder style(String style) {
       this.style = style;
+      return this;
+    }
+
+    public Builder user(String user) {
+      this.user = user;
+      return this;
+    }
+
+    public Builder responseFormat(String responseFormat) {
+      this.responseFormat = responseFormat;
       return this;
     }
 

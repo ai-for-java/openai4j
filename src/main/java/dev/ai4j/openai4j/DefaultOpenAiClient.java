@@ -90,9 +90,9 @@ public class DefaultOpenAiClient extends OpenAiClient {
       .baseUrl(serviceBuilder.baseUrl)
       .client(okHttpClient);
 
-    if (serviceBuilder.downloadTo != null) {
+    if (serviceBuilder.persistTo != null) {
       retrofitBuilder.addConverterFactory(
-        new DownloadConverterFactory(serviceBuilder.downloadTo)
+        new PersistorConverterFactory(serviceBuilder.persistTo)
       );
     }
 
@@ -262,7 +262,9 @@ public class DefaultOpenAiClient extends OpenAiClient {
   }
 
   @Override
-  public SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request) {
+  public SyncOrAsync<GenerateImagesResponse> imagesGeneration(
+    GenerateImagesRequest request
+  ) {
     return new RequestExecutor<>(
       openAiApi.imagesGenerations(request, apiVersion),
       r -> r

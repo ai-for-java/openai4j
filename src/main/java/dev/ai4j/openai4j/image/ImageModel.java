@@ -17,6 +17,9 @@ public enum ImageModel {
   public static final String DALL_E_STYLE_VIVID = "vivid";
   public static final String DALL_E_STYLE_NATURAL = "natural";
 
+  public static final String DALL_E_RESPONSE_FORMAT_URL = "url";
+  public static final String DALL_E_RESPONSE_FORMAT_B64_JSON = "b64_json";
+
   private final String value;
 
   ImageModel(String value) {

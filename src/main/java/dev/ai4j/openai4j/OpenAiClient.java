@@ -82,7 +82,7 @@ public abstract class OpenAiClient {
     public boolean logRequests;
     public boolean logResponses;
     public boolean logStreamingResponses;
-    public Path downloadTo;
+    public Path persistTo;
 
     public abstract T build();
 
@@ -217,13 +217,22 @@ public abstract class OpenAiClient {
       return (B) this;
     }
 
-    public B withDownload() {
-      downloadTo = Paths.get(System.getProperty("java.io.tmpdir"));
+    /**
+     * Generated response will be persisted under <code>java.io.tmpdir</code>. Used with images generation for the moment only.
+     * @return builder
+     */
+    public B withPersisting() {
+      persistTo = Paths.get(System.getProperty("java.io.tmpdir"));
       return (B) this;
     }
 
-    public B downloadTo(Path downloadTo) {
-      this.downloadTo = downloadTo;
+    /**
+     * Generated response will be persisted under provided path. Used with images generation for the moment only.
+     * @param persistTo path
+     * @return builder
+     */
+    public B persistTo(Path persistTo) {
+      this.persistTo = persistTo;
       return (B) this;
     }
   }

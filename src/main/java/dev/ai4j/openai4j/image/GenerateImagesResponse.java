@@ -3,22 +3,21 @@ package dev.ai4j.openai4j.image;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents the response from the OpenAI API when generating images.
+ *
+ * @param data A list of image data, each containing an image URL, Base64 encoded JSON response, and revised prompt
+ */
 public class GenerateImagesResponse {
 
-  private final long created;
   private final List<ImageData> data;
 
-  private GenerateImagesResponse(Builder builder) {
-    this.created = builder.created;
+  public GenerateImagesResponse(Builder builder) {
     this.data = builder.data;
   }
 
   public static Builder builder() {
     return new Builder();
-  }
-
-  public long created() {
-    return created;
   }
 
   public List<ImageData> data() {
@@ -28,13 +27,25 @@ public class GenerateImagesResponse {
   public static class ImageData {
 
     private String url;
+    private final String b64Json;
+    private final String revisedPrompt;
 
-    private ImageData(String url) {
+    public ImageData(String url, String b64Json, String revisedPrompt) {
       this.url = url;
+      this.b64Json = b64Json;
+      this.revisedPrompt = revisedPrompt;
     }
 
     public String url() {
       return url;
+    }
+
+    public String b64Json() {
+      return b64Json;
+    }
+
+    public String revisedPrompt() {
+      return revisedPrompt;
     }
 
     public void url(String url) {
@@ -45,44 +56,59 @@ public class GenerateImagesResponse {
     public boolean equals(Object another) {
       if (this == another) return true;
       if (another == null || getClass() != another.getClass()) return false;
-      return equalTo((ImageData) another);
-    }
-
-    private boolean equalTo(ImageData another) {
-      return Objects.equals(url, another.url);
+      ImageData anotherImageData = (ImageData) another;
+      return (
+        Objects.equals(url, anotherImageData.url) &&
+        Objects.equals(b64Json, anotherImageData.b64Json) &&
+        Objects.equals(revisedPrompt, anotherImageData.revisedPrompt)
+      );
     }
 
     @Override
     public int hashCode() {
-      return Objects.hash(url);
+      return Objects.hash(url, b64Json, revisedPrompt);
     }
+
+    @Override
+    public String toString() {
+      return (
+        "ImageData{" +
+        "url='" +
+        url +
+        '\'' +
+        ", b64Json='" +
+        b64Json +
+        '\'' +
+        ", revisedPrompt='" +
+        revisedPrompt +
+        '\'' +
+        '}'
+      );
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "GenerateImagesResponse{" + "data=" + data + '}';
   }
 
   @Override
   public boolean equals(Object another) {
     if (this == another) return true;
     if (another == null || getClass() != another.getClass()) return false;
-    return equalTo((GenerateImagesResponse) another);
-  }
-
-  private boolean equalTo(GenerateImagesResponse another) {
-    return created == another.created && Objects.equals(data, another.data);
+    GenerateImagesResponse anotherGenerateImagesResponse =
+      (GenerateImagesResponse) another;
+    return Objects.equals(data, anotherGenerateImagesResponse.data);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(created, data);
+    return Objects.hash(data);
   }
 
   public static class Builder {
 
-    private long created;
     private List<ImageData> data;
-
-    public Builder created(long created) {
-      this.created = created;
-      return this;
-    }
 
     public Builder data(List<ImageData> data) {
       this.data = data;

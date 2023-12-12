@@ -11,12 +11,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-class DownloadConverterFactory extends Converter.Factory {
+class PersistorConverterFactory extends Converter.Factory {
 
-  private final Path downloadTo;
+  private final Path persistTo;
 
-  DownloadConverterFactory(Path downloadTo) {
-    this.downloadTo = downloadTo;
+  PersistorConverterFactory(Path persistTo) {
+    this.persistTo = persistTo;
   }
 
   @Override
@@ -25,16 +25,16 @@ class DownloadConverterFactory extends Converter.Factory {
     Annotation[] annotations,
     Retrofit retrofit
   ) {
-    return new DownloadConverter<>(
+    return new PersistorConverter<>(
       retrofit.nextResponseBodyConverter(this, type, annotations)
     );
   }
 
-  private class DownloadConverter<T> implements Converter<ResponseBody, T> {
+  private class PersistorConverter<T> implements Converter<ResponseBody, T> {
 
     private final Converter<ResponseBody, T> delegate;
 
-    DownloadConverter(Converter<ResponseBody, T> delegate) {
+    PersistorConverter(Converter<ResponseBody, T> delegate) {
       this.delegate = delegate;
     }
 
@@ -47,11 +47,15 @@ class DownloadConverterFactory extends Converter.Factory {
           .forEach(data -> {
             try {
               data.url(
-                FileDownloader
-                  .download(new URI(data.url()), downloadTo)
-                  .toString()
+                data.url() != null
+                  ? FilePersistor
+                    .persistFromUri(new URI(data.url()), persistTo)
+                    .toString()
+                  : FilePersistor
+                    .persistFromBase64String(data.b64Json(), persistTo)
+                    .toString()
               );
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException | IOException e) {
               throw new RuntimeException(e);
             }
           });

@@ -1,6 +1,7 @@
 package dev.ai4j.openai4j.image;
 
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_2;
+import static dev.ai4j.openai4j.image.ImageModel.DALL_E_RESPONSE_FORMAT_B64_JSON;
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_SIZE_256_x_256;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +46,7 @@ public class ImagesGenerationTest {
       .openAiApiKey(System.getenv("OPENAI_API_KEY"))
       .logRequests()
       .logResponses()
-      .withDownload()
+      .withPersisting()
       .build();
 
     GenerateImagesRequest request = GenerateImagesRequest
@@ -53,6 +54,35 @@ public class ImagesGenerationTest {
       .model(DALL_E_2) // so that you pay not much :)
       .size(DALL_E_SIZE_256_x_256)
       .prompt("Bird flying in the sky")
+      .build();
+
+    GenerateImagesResponse response = client
+      .imagesGeneration(request)
+      .execute();
+
+    String localImage = response.data().get(0).url();
+
+    System.out.println("Your local image is here: " + localImage);
+
+    assertThat(new File(localImage)).exists();
+  }
+
+  @Test
+  void shouldPersistImageFromBase64Json() {
+    OpenAiClient client = OpenAiClient
+      .builder()
+      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+      .withPersisting()
+      .logRequests()
+      .logResponses()
+      .build();
+
+    GenerateImagesRequest request = GenerateImagesRequest
+      .builder()
+      .model(DALL_E_2) // so that you pay not much :)
+      .size(DALL_E_SIZE_256_x_256)
+      .responseFormat(DALL_E_RESPONSE_FORMAT_B64_JSON)
+      .prompt("Beautiful house on country side")
       .build();
 
     GenerateImagesResponse response = client
