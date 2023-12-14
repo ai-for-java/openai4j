@@ -1,5 +1,14 @@
 package dev.ai4j.openai4j;
 
+import static dev.ai4j.openai4j.Json.GSON;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -11,15 +20,8 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import java.io.IOException;
-import java.util.List;
-
-import static dev.ai4j.openai4j.Json.GSON;
 
 public class DefaultOpenAiClient extends OpenAiClient {
 
@@ -56,6 +58,10 @@ public class DefaultOpenAiClient extends OpenAiClient {
             okHttpClientBuilder.addInterceptor(new AuthorizationHeaderInjector(serviceBuilder.openAiApiKey));
         } else {
             okHttpClientBuilder.addInterceptor(new ApiKeyHeaderInjector(serviceBuilder.azureApiKey));
+        }
+
+        if (serviceBuilder.organizationId != null) {
+            okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(Collections.singletonMap("OpenAI-Organization", serviceBuilder.organizationId)));
         }
 
         if (serviceBuilder.proxy != null) {

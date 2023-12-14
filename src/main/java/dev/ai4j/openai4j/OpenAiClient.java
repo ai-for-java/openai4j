@@ -1,5 +1,10 @@
 package dev.ai4j.openai4j;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.time.Duration;
+import java.util.List;
+
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -11,11 +16,6 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
-
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.time.Duration;
-import java.util.List;
 
 public abstract class OpenAiClient {
 
@@ -50,6 +50,7 @@ public abstract class OpenAiClient {
     public abstract static class Builder<T extends OpenAiClient, B extends Builder<T, B>> {
 
         public String baseUrl = "https://api.openai.com/v1/";
+        public String organizationId;
         public String apiVersion;
         public String openAiApiKey;
         public String azureApiKey;
@@ -75,6 +76,16 @@ public abstract class OpenAiClient {
                 throw new IllegalArgumentException("baseUrl cannot be null or empty");
             }
             this.baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+            return (B) this;
+        }
+
+        /**
+         *
+         * @param organizationId The organizationId for OpenAI: https://platform.openai.com/docs/api-reference/organization-optional
+         * @return builder
+         */
+        public B organizationId(String organizationId) {
+            this.organizationId = organizationId;
             return (B) this;
         }
 
