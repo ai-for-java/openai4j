@@ -6,6 +6,8 @@ import dev.ai4j.openai4j.completion.CompletionRequest;
 import dev.ai4j.openai4j.completion.CompletionResponse;
 import dev.ai4j.openai4j.embedding.EmbeddingRequest;
 import dev.ai4j.openai4j.embedding.EmbeddingResponse;
+import dev.ai4j.openai4j.image.GenerateImagesRequest;
+import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
 import retrofit2.Call;
@@ -15,14 +17,16 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 interface OpenAiApi {
-
     @POST("completions")
     @Headers("Content-Type: application/json")
     Call<CompletionResponse> completions(@Body CompletionRequest request, @Query("api-version") String apiVersion);
 
     @POST("chat/completions")
     @Headers("Content-Type: application/json")
-    Call<ChatCompletionResponse> chatCompletions(@Body ChatCompletionRequest request, @Query("api-version") String apiVersion);
+    Call<ChatCompletionResponse> chatCompletions(
+        @Body ChatCompletionRequest request,
+        @Query("api-version") String apiVersion
+    );
 
     @POST("embeddings")
     @Headers("Content-Type: application/json")
@@ -31,4 +35,11 @@ interface OpenAiApi {
     @POST("moderations")
     @Headers("Content-Type: application/json")
     Call<ModerationResponse> moderations(@Body ModerationRequest request, @Query("api-version") String apiVersion);
+
+    @POST("images/generations")
+    @Headers({ "Content-Type: application/json" })
+    Call<GenerateImagesResponse> imagesGenerations(
+        @Body GenerateImagesRequest request,
+        @Query("api-version") String apiVersion
+    );
 }

@@ -332,6 +332,55 @@ client.moderation(request)
 	.execute();
 ```
 
+## Images Generations with DALL·E
+
+Simple way:
+
+```
+    OpenAiClient client = OpenAiClient
+      .builder()
+      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+      .build();
+
+    ImageRequest request = ImageRequest
+      .builder()
+      .prompt("Beautiful house on country side")
+      .build();
+
+    ImageResponse response = client.imagesGenerations(request).execute();
+
+    // remote image generated with model DALL·E 3 and resolution 1024x1024
+    String remoteImage = response.data().get(0).url();
+```
+
+Customizable way:
+
+```
+    OpenAiClient client = OpenAiClient
+      .builder()
+      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+      .logRequests()
+      .logResponses()
+      .withPersisting()
+      .build();
+
+    ImageRequest request = ImageRequest
+      .builder()
+      .model(DALL_E_3)
+      .size(DALL_E_SIZE_1792_x_1024)
+      .quality(DALL_E_QUALITY_HD)
+      .responseFormat(DALL_E_RESPONSE_FORMAT_B64_JSON) // if you like to get the image within the response body
+      .prompt("Cute red parrot flying in the sky")
+      .build();
+
+    ImageResponse response = client.imagesGenerations(request).execute();
+
+    // your generated image is here locally: 
+    String localImage = response.data().get(0).url();
+```
+
+### Asynchronously
+
 # Useful materials
 
 - How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
@@ -339,3 +388,4 @@ client.moderation(request)
 - How to build software powered by
   OpenAI/ChatGPT: https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/
 - Cookbook with examples of how to use OpenAI API: https://github.com/openai/openai-cookbook
+- ChatGPT DALL-E 3: Complete Guide (Generate Images with Text) https://www.akkio.com/post/chatgpt-dall-e-3
