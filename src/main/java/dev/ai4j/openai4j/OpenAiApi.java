@@ -17,38 +17,29 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 interface OpenAiApi {
-  @POST("completions")
-  @Headers("Content-Type: application/json")
-  Call<CompletionResponse> completions(
-    @Body CompletionRequest request,
-    @Query("api-version") String apiVersion
-  );
+    @POST("completions")
+    @Headers("Content-Type: application/json")
+    Call<CompletionResponse> completions(@Body CompletionRequest request, @Query("api-version") String apiVersion);
 
-  @POST("chat/completions")
-  @Headers("Content-Type: application/json")
-  Call<ChatCompletionResponse> chatCompletions(
-    @Body ChatCompletionRequest request,
-    @Query("api-version") String apiVersion
-  );
+    @POST("chat/completions")
+    @Headers("Content-Type: application/json")
+    Call<ChatCompletionResponse> chatCompletions(
+        @Body ChatCompletionRequest request,
+        @Query("api-version") String apiVersion
+    );
 
-  @POST("embeddings")
-  @Headers("Content-Type: application/json")
-  Call<EmbeddingResponse> embeddings(
-    @Body EmbeddingRequest request,
-    @Query("api-version") String apiVersion
-  );
+    @POST("embeddings")
+    @Headers("Content-Type: application/json")
+    Call<EmbeddingResponse> embeddings(@Body EmbeddingRequest request, @Query("api-version") String apiVersion);
 
-  @POST("moderations")
-  @Headers("Content-Type: application/json")
-  Call<ModerationResponse> moderations(
-    @Body ModerationRequest request,
-    @Query("api-version") String apiVersion
-  );
+    @POST("moderations")
+    @Headers("Content-Type: application/json")
+    Call<ModerationResponse> moderations(@Body ModerationRequest request, @Query("api-version") String apiVersion);
 
-  @POST("images/generations")
-  @Headers({ "Content-Type: application/json" })
-  Call<GenerateImagesResponse> imagesGenerations(
-    @Body GenerateImagesRequest request,
-    @Query("api-version") String apiVersion
-  );
+    @POST("images/generations")
+    @Headers({ "Content-Type: application/json" })
+    Call<GenerateImagesResponse> imagesGenerations(
+        @Body GenerateImagesRequest request,
+        @Query("api-version") String apiVersion
+    );
 }

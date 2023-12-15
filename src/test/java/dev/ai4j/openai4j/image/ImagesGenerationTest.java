@@ -11,88 +11,82 @@ import org.junit.jupiter.api.Test;
 
 public class ImagesGenerationTest {
 
-  @Test
-  void generationShouldWork() {
-    OpenAiClient client = OpenAiClient
-      .builder()
-      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-      .logRequests()
-      .logResponses()
-      .build();
+    @Test
+    void generationShouldWork() {
+        OpenAiClient client = OpenAiClient
+            .builder()
+            .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+            .logRequests()
+            .logResponses()
+            .build();
 
-    GenerateImagesRequest request = GenerateImagesRequest
-      .builder()
-      .model(DALL_E_2) // so that you pay not much :)
-      .size(DALL_E_SIZE_256_x_256)
-      .prompt("Beautiful house on country side")
-      .build();
+        GenerateImagesRequest request = GenerateImagesRequest
+            .builder()
+            .model(DALL_E_2) // so that you pay not much :)
+            .size(DALL_E_SIZE_256_x_256)
+            .prompt("Beautiful house on country side")
+            .build();
 
-    GenerateImagesResponse response = client
-      .imagesGeneration(request)
-      .execute();
+        GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-    String remoteImage = response.data().get(0).url();
+        String remoteImage = response.data().get(0).url();
 
-    System.out.println("Your remote image is here: " + remoteImage);
+        System.out.println("Your remote image is here: " + remoteImage);
 
-    assertThat(response.data()).hasSize(1);
-    assertThat(response.data().get(0).url()).isNotNull();
-  }
+        assertThat(response.data()).hasSize(1);
+        assertThat(response.data().get(0).url()).isNotNull();
+    }
 
-  @Test
-  void generationWithDownloadShouldWork() {
-    OpenAiClient client = OpenAiClient
-      .builder()
-      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-      .logRequests()
-      .logResponses()
-      .withPersisting()
-      .build();
+    @Test
+    void generationWithDownloadShouldWork() {
+        OpenAiClient client = OpenAiClient
+            .builder()
+            .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+            .logRequests()
+            .logResponses()
+            .withPersisting()
+            .build();
 
-    GenerateImagesRequest request = GenerateImagesRequest
-      .builder()
-      .model(DALL_E_2) // so that you pay not much :)
-      .size(DALL_E_SIZE_256_x_256)
-      .prompt("Bird flying in the sky")
-      .build();
+        GenerateImagesRequest request = GenerateImagesRequest
+            .builder()
+            .model(DALL_E_2) // so that you pay not much :)
+            .size(DALL_E_SIZE_256_x_256)
+            .prompt("Bird flying in the sky")
+            .build();
 
-    GenerateImagesResponse response = client
-      .imagesGeneration(request)
-      .execute();
+        GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-    String localImage = response.data().get(0).url();
+        String localImage = response.data().get(0).url();
 
-    System.out.println("Your local image is here: " + localImage);
+        System.out.println("Your local image is here: " + localImage);
 
-    assertThat(new File(localImage)).exists();
-  }
+        assertThat(new File(localImage)).exists();
+    }
 
-  @Test
-  void shouldPersistImageFromBase64Json() {
-    OpenAiClient client = OpenAiClient
-      .builder()
-      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
-      .withPersisting()
-      .logRequests()
-      .logResponses()
-      .build();
+    @Test
+    void shouldPersistImageFromBase64Json() {
+        OpenAiClient client = OpenAiClient
+            .builder()
+            .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+            .withPersisting()
+            .logRequests()
+            .logResponses()
+            .build();
 
-    GenerateImagesRequest request = GenerateImagesRequest
-      .builder()
-      .model(DALL_E_2) // so that you pay not much :)
-      .size(DALL_E_SIZE_256_x_256)
-      .responseFormat(DALL_E_RESPONSE_FORMAT_B64_JSON)
-      .prompt("Beautiful house on country side")
-      .build();
+        GenerateImagesRequest request = GenerateImagesRequest
+            .builder()
+            .model(DALL_E_2) // so that you pay not much :)
+            .size(DALL_E_SIZE_256_x_256)
+            .responseFormat(DALL_E_RESPONSE_FORMAT_B64_JSON)
+            .prompt("Beautiful house on country side")
+            .build();
 
-    GenerateImagesResponse response = client
-      .imagesGeneration(request)
-      .execute();
+        GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-    String localImage = response.data().get(0).url();
+        String localImage = response.data().get(0).url();
 
-    System.out.println("Your local image is here: " + localImage);
+        System.out.println("Your local image is here: " + localImage);
 
-    assertThat(new File(localImage)).exists();
-  }
+        assertThat(new File(localImage)).exists();
+    }
 }

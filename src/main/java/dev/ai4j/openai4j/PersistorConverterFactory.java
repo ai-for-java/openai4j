@@ -13,55 +13,45 @@ import retrofit2.Retrofit;
 
 class PersistorConverterFactory extends Converter.Factory {
 
-  private final Path persistTo;
+    private final Path persistTo;
 
-  PersistorConverterFactory(Path persistTo) {
-    this.persistTo = persistTo;
-  }
-
-  @Override
-  public Converter<ResponseBody, ?> responseBodyConverter(
-    Type type,
-    Annotation[] annotations,
-    Retrofit retrofit
-  ) {
-    return new PersistorConverter<>(
-      retrofit.nextResponseBodyConverter(this, type, annotations)
-    );
-  }
-
-  private class PersistorConverter<T> implements Converter<ResponseBody, T> {
-
-    private final Converter<ResponseBody, T> delegate;
-
-    PersistorConverter(Converter<ResponseBody, T> delegate) {
-      this.delegate = delegate;
+    PersistorConverterFactory(Path persistTo) {
+        this.persistTo = persistTo;
     }
 
     @Override
-    public T convert(ResponseBody value) throws IOException {
-      T response = delegate.convert(value);
-
-      if (response instanceof GenerateImagesResponse) {
-        ((GenerateImagesResponse) response).data()
-          .forEach(data -> {
-            try {
-              data.url(
-                data.url() != null
-                  ? FilePersistor
-                    .persistFromUri(new URI(data.url()), persistTo)
-                    .toString()
-                  : FilePersistor
-                    .persistFromBase64String(data.b64Json(), persistTo)
-                    .toString()
-              );
-            } catch (URISyntaxException | IOException e) {
-              throw new RuntimeException(e);
-            }
-          });
-      }
-
-      return response;
+    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+        return new PersistorConverter<>(retrofit.nextResponseBodyConverter(this, type, annotations));
     }
-  }
+
+    private class PersistorConverter<T> implements Converter<ResponseBody, T> {
+
+        private final Converter<ResponseBody, T> delegate;
+
+        PersistorConverter(Converter<ResponseBody, T> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public T convert(ResponseBody value) throws IOException {
+            T response = delegate.convert(value);
+
+            if (response instanceof GenerateImagesResponse) {
+                ((GenerateImagesResponse) response).data()
+                    .forEach(data -> {
+                        try {
+                            data.url(
+                                data.url() != null
+                                    ? FilePersistor.persistFromUri(new URI(data.url()), persistTo).toString()
+                                    : FilePersistor.persistFromBase64String(data.b64Json(), persistTo).toString()
+                            );
+                        } catch (URISyntaxException | IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+            }
+
+            return response;
+        }
+    }
 }
