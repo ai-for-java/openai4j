@@ -4,8 +4,6 @@ import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -42,10 +40,10 @@ class PersistorConverterFactory extends Converter.Factory {
                         try {
                             data.url(
                                 data.url() != null
-                                    ? FilePersistor.persistFromUri(new URI(data.url()), persistTo).toString()
-                                    : FilePersistor.persistFromBase64String(data.b64Json(), persistTo).toString()
+                                    ? FilePersistor.persistFromUri(data.url(), persistTo).toUri()
+                                    : FilePersistor.persistFromBase64String(data.b64Json(), persistTo).toUri()
                             );
-                        } catch (URISyntaxException | IOException e) {
+                        } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     });

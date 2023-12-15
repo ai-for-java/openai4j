@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.ai4j.openai4j.OpenAiClient;
 import java.io.File;
+import java.net.URI;
 import org.junit.jupiter.api.Test;
 
 public class ImagesGenerationTest {
@@ -29,7 +30,7 @@ public class ImagesGenerationTest {
 
         GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-        String remoteImage = response.data().get(0).url();
+        URI remoteImage = response.data().get(0).url();
 
         System.out.println("Your remote image is here: " + remoteImage);
 
@@ -56,7 +57,7 @@ public class ImagesGenerationTest {
 
         GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-        String localImage = response.data().get(0).url();
+        URI localImage = response.data().get(0).url();
 
         System.out.println("Your local image is here: " + localImage);
 
@@ -83,7 +84,7 @@ public class ImagesGenerationTest {
 
         GenerateImagesResponse response = client.imagesGeneration(request).execute();
 
-        String localImage = response.data().get(0).url();
+        URI localImage = response.data().get(0).url();
 
         System.out.println("Your local image is here: " + localImage);
 

@@ -1,5 +1,6 @@
 package dev.ai4j.openai4j.image;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,17 +26,17 @@ public class GenerateImagesResponse {
 
     public static class ImageData {
 
-        private String url;
+        private URI url;
         private final String b64Json;
         private final String revisedPrompt;
 
-        public ImageData(String url, String b64Json, String revisedPrompt) {
+        public ImageData(URI url, String b64Json, String revisedPrompt) {
             this.url = url;
             this.b64Json = b64Json;
             this.revisedPrompt = revisedPrompt;
         }
 
-        public String url() {
+        public URI url() {
             return url;
         }
 
@@ -47,7 +48,7 @@ public class GenerateImagesResponse {
             return revisedPrompt;
         }
 
-        public void url(String url) {
+        public void url(URI url) {
             this.url = url;
         }
 
