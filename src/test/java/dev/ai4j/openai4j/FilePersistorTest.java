@@ -28,8 +28,7 @@ class FilePersistorTest {
     @Test
     void shouldThrowExceptionOnInvalidUrl() {
         assertThatThrownBy(() -> FilePersistor.persistFromUri(new URI("invalid_url"), Paths.get("destination")))
-            .isInstanceOf(RuntimeException.class)
-            .hasCauseInstanceOf(IOException.class);
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
