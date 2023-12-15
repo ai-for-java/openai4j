@@ -201,6 +201,7 @@ public abstract class OpenAiClient {
 
         /**
          * Generated response will be persisted under <code>java.io.tmpdir</code>. Used with images generation for the moment only.
+         * The URL within <code>dev.ai4j.openai4j.image.GenerateImagesResponse</code> will contain the URL to local images then.
          *
          * @return builder
          */
@@ -211,6 +212,7 @@ public abstract class OpenAiClient {
 
         /**
          * Generated response will be persisted under provided path. Used with images generation for the moment only.
+         * The URL within <code>dev.ai4j.openai4j.image.GenerateImagesResponse</code> will contain the URL to local images then.
          *
          * @param persistTo path
          * @return builder
