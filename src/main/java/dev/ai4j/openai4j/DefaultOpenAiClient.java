@@ -1,25 +1,26 @@
 package dev.ai4j.openai4j;
 
+import static dev.ai4j.openai4j.Json.GSON;
+
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
 import dev.ai4j.openai4j.completion.CompletionResponse;
 import dev.ai4j.openai4j.embedding.EmbeddingRequest;
 import dev.ai4j.openai4j.embedding.EmbeddingResponse;
+import dev.ai4j.openai4j.image.GenerateImagesRequest;
+import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
+import java.io.IOException;
+import java.util.List;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import java.io.IOException;
-import java.util.List;
-
-import static dev.ai4j.openai4j.Json.GSON;
 
 public class DefaultOpenAiClient extends OpenAiClient {
 
@@ -36,15 +37,14 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     private DefaultOpenAiClient(Builder serviceBuilder) {
-
         this.baseUrl = serviceBuilder.baseUrl;
         this.apiVersion = serviceBuilder.apiVersion;
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
-                .callTimeout(serviceBuilder.callTimeout)
-                .connectTimeout(serviceBuilder.connectTimeout)
-                .readTimeout(serviceBuilder.readTimeout)
-                .writeTimeout(serviceBuilder.writeTimeout);
+            .callTimeout(serviceBuilder.callTimeout)
+            .connectTimeout(serviceBuilder.connectTimeout)
+            .readTimeout(serviceBuilder.readTimeout)
+            .writeTimeout(serviceBuilder.writeTimeout);
 
         if (serviceBuilder.openAiApiKey == null && serviceBuilder.azureApiKey == null) {
             throw new IllegalArgumentException("openAiApiKey OR azureApiKey must be defined");
@@ -72,17 +72,18 @@ public class DefaultOpenAiClient extends OpenAiClient {
 
         this.okHttpClient = okHttpClientBuilder.build();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(serviceBuilder.baseUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create(GSON))
-                .build();
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder().baseUrl(serviceBuilder.baseUrl).client(okHttpClient);
 
-        this.openAiApi = retrofit.create(OpenAiApi.class);
+        if (serviceBuilder.persistTo != null) {
+            retrofitBuilder.addConverterFactory(new PersistorConverterFactory(serviceBuilder.persistTo));
+        }
+
+        retrofitBuilder.addConverterFactory(GsonConverterFactory.create(GSON));
+
+        this.openAiApi = retrofitBuilder.build().create(OpenAiApi.class);
     }
 
     public void shutdown() {
-
         okHttpClient.dispatcher().executorService().shutdown();
 
         okHttpClient.connectionPool().evictAll();
@@ -110,122 +111,99 @@ public class DefaultOpenAiClient extends OpenAiClient {
 
     @Override
     public SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request) {
-
-        CompletionRequest syncRequest = CompletionRequest.builder()
-                .from(request)
-                .stream(null)
-                .build();
+        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.completions(syncRequest, apiVersion),
-                (r) -> r,
-                okHttpClient,
-                formatUrl("completions"),
-                () -> CompletionRequest.builder().from(request).stream(true).build(),
-                CompletionResponse.class,
-                (r) -> r,
-                logStreamingResponses
+            openAiApi.completions(syncRequest, apiVersion),
+            r -> r,
+            okHttpClient,
+            formatUrl("completions"),
+            () -> CompletionRequest.builder().from(request).stream(true).build(),
+            CompletionResponse.class,
+            r -> r,
+            logStreamingResponses
         );
     }
 
     @Override
     public SyncOrAsyncOrStreaming<String> completion(String prompt) {
+        CompletionRequest request = CompletionRequest.builder().prompt(prompt).build();
 
-        CompletionRequest request = CompletionRequest.builder()
-                .prompt(prompt)
-                .build();
-
-        CompletionRequest syncRequest = CompletionRequest.builder()
-                .from(request)
-                .stream(null)
-                .build();
+        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.completions(syncRequest, apiVersion),
-                CompletionResponse::text,
-                okHttpClient,
-                formatUrl("completions"),
-                () -> CompletionRequest.builder().from(request).stream(true).build(),
-                CompletionResponse.class,
-                CompletionResponse::text,
-                logStreamingResponses
+            openAiApi.completions(syncRequest, apiVersion),
+            CompletionResponse::text,
+            okHttpClient,
+            formatUrl("completions"),
+            () -> CompletionRequest.builder().from(request).stream(true).build(),
+            CompletionResponse.class,
+            CompletionResponse::text,
+            logStreamingResponses
         );
     }
 
     @Override
     public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request) {
-
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder()
-                .from(request)
-                .stream(null)
-                .build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(syncRequest, apiVersion),
-                (r) -> r,
-                okHttpClient,
-                formatUrl("chat/completions"),
-                () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
-                ChatCompletionResponse.class,
-                (r) -> r,
-                logStreamingResponses
+            openAiApi.chatCompletions(syncRequest, apiVersion),
+            r -> r,
+            okHttpClient,
+            formatUrl("chat/completions"),
+            () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
+            ChatCompletionResponse.class,
+            r -> r,
+            logStreamingResponses
         );
     }
 
     @Override
     public SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage) {
+        ChatCompletionRequest request = ChatCompletionRequest.builder().addUserMessage(userMessage).build();
 
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .addUserMessage(userMessage)
-                .build();
-
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder()
-                .from(request)
-                .stream(null)
-                .build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(syncRequest, apiVersion),
-                ChatCompletionResponse::content,
-                okHttpClient,
-                formatUrl("chat/completions"),
-                () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
-                ChatCompletionResponse.class,
-                (r) -> r.choices().get(0).delta().content(),
-                logStreamingResponses
+            openAiApi.chatCompletions(syncRequest, apiVersion),
+            ChatCompletionResponse::content,
+            okHttpClient,
+            formatUrl("chat/completions"),
+            () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
+            ChatCompletionResponse.class,
+            r -> r.choices().get(0).delta().content(),
+            logStreamingResponses
         );
     }
 
     @Override
     public SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request) {
-
-        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), (r) -> r);
+        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), r -> r);
     }
 
     @Override
     public SyncOrAsync<List<Float>> embedding(String input) {
-
-        EmbeddingRequest request = EmbeddingRequest.builder()
-                .input(input)
-                .build();
+        EmbeddingRequest request = EmbeddingRequest.builder().input(input).build();
 
         return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), EmbeddingResponse::embedding);
     }
 
     @Override
     public SyncOrAsync<ModerationResponse> moderation(ModerationRequest request) {
-
-        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), (r) -> r);
+        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), r -> r);
     }
 
     @Override
     public SyncOrAsync<ModerationResult> moderation(String input) {
+        ModerationRequest request = ModerationRequest.builder().input(input).build();
 
-        ModerationRequest request = ModerationRequest.builder()
-                .input(input)
-                .build();
+        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), r -> r.results().get(0));
+    }
 
-        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), (r) -> r.results().get(0));
+    @Override
+    public SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request) {
+        return new RequestExecutor<>(openAiApi.imagesGenerations(request, apiVersion), r -> r);
     }
 
     private String formatUrl(String endpoint) {

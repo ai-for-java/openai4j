@@ -6,14 +6,17 @@ import dev.ai4j.openai4j.completion.CompletionRequest;
 import dev.ai4j.openai4j.completion.CompletionResponse;
 import dev.ai4j.openai4j.embedding.EmbeddingRequest;
 import dev.ai4j.openai4j.embedding.EmbeddingResponse;
+import dev.ai4j.openai4j.image.GenerateImagesRequest;
+import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
-
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 
@@ -34,6 +37,8 @@ public abstract class OpenAiClient {
     public abstract SyncOrAsync<ModerationResponse> moderation(ModerationRequest request);
 
     public abstract SyncOrAsync<ModerationResult> moderation(String input);
+
+    public abstract SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request);
 
     public abstract void shutdown();
 
@@ -61,6 +66,7 @@ public abstract class OpenAiClient {
         public boolean logRequests;
         public boolean logResponses;
         public boolean logStreamingResponses;
+        public Path persistTo;
 
         public abstract T build();
 
@@ -94,7 +100,9 @@ public abstract class OpenAiClient {
          */
         public B openAiApiKey(String openAiApiKey) {
             if (openAiApiKey == null || openAiApiKey.trim().isEmpty()) {
-                throw new IllegalArgumentException("openAiApiKey cannot be null or empty. API keys can be generated here: https://platform.openai.com/account/api-keys");
+                throw new IllegalArgumentException(
+                    "openAiApiKey cannot be null or empty. API keys can be generated here: https://platform.openai.com/account/api-keys"
+                );
             }
             this.openAiApiKey = openAiApiKey;
             return (B) this;
@@ -188,6 +196,29 @@ public abstract class OpenAiClient {
                 logStreamingResponses = false;
             }
             this.logStreamingResponses = logStreamingResponses;
+            return (B) this;
+        }
+
+        /**
+         * Generated response will be persisted under <code>java.io.tmpdir</code>. Used with images generation for the moment only.
+         * The URL within <code>dev.ai4j.openai4j.image.GenerateImagesResponse</code> will contain the URL to local images then.
+         *
+         * @return builder
+         */
+        public B withPersisting() {
+            persistTo = Paths.get(System.getProperty("java.io.tmpdir"));
+            return (B) this;
+        }
+
+        /**
+         * Generated response will be persisted under provided path. Used with images generation for the moment only.
+         * The URL within <code>dev.ai4j.openai4j.image.GenerateImagesResponse</code> will contain the URL to local images then.
+         *
+         * @param persistTo path
+         * @return builder
+         */
+        public B persistTo(Path persistTo) {
+            this.persistTo = persistTo;
             return (B) this;
         }
     }
