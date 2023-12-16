@@ -26,3 +26,4 @@ jobs:
       run: mvn -B clean deploy -Psign -DskipTests
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
