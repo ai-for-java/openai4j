@@ -378,8 +378,6 @@ Customizable way:
     String localImage = response.data().get(0).url();
 ```
 
-### Asynchronously
-
 # Useful materials
 
 - How to get best results form AI: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
