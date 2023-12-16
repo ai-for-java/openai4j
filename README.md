@@ -65,6 +65,7 @@ String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiClient client = OpenAiClient.builder()
 	.openAiApiKey(apiKey)
+	.organizationId(orgId)
 	.callTimeout(ofSeconds(60))
 	.connectTimeout(ofSeconds(60))
 	.readTimeout(ofSeconds(60))
