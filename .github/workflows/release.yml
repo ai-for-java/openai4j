@@ -18,12 +18,15 @@ jobs:
         distribution: 'temurin'
         cache: maven
         server-id: ossrh
-        server-username: ${{ secrets.OSSRH_USERNAME }}
-        server-password: ${{ secrets.OSSRH_PASSWORD }}
+        server-username: OSSRH_USERNAME
+        server-password: OSSRH_PASSWORD
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+        gpg-passphrase: GPG_PASSPHRASE
 
     - name: release
       run: mvn -B clean deploy -Psign -DskipTests
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
