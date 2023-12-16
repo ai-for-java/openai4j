@@ -23,5 +23,6 @@ jobs:
     - name: release
       run: mvn -B clean deploy -Psign
       env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
