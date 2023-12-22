@@ -367,7 +367,17 @@ public final class ChatCompletionRequest {
         }
 
         public Builder responseFormat(ResponseFormatType responseFormatType) {
-            return responseFormat(new ResponseFormat(responseFormatType));
+            if (responseFormatType != null) {
+                responseFormat = new ResponseFormat(responseFormatType);
+            }
+            return this;
+        }
+
+        public Builder responseFormat(String responseFormatType) {
+            if (responseFormatType != null) {
+                responseFormat = new ResponseFormat(responseFormatType);
+            }
+            return this;
         }
 
         public Builder responseFormat(ResponseFormat responseFormat) {

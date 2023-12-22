@@ -4,13 +4,17 @@ import java.util.Objects;
 
 public class ResponseFormat {
 
-    private final ResponseFormatType type;
+    private final Object type;
 
     public ResponseFormat(ResponseFormatType type) {
         this.type = type;
     }
 
-    public ResponseFormatType type() {
+    public ResponseFormat(String type) {
+        this.type = type;
+    }
+
+    public Object type() {
         return type;
     }
 

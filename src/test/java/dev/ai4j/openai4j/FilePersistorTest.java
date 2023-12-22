@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
@@ -32,16 +31,15 @@ class FilePersistorTest {
     }
 
     @Test
-    public void shouldDownloadFileWithCorrectContent() throws IOException {
-        String content = "Test content";
-        Path tempFile = Files.createTempFile("testfile", ".txt");
-        Files.write(tempFile, content.getBytes());
+    public void shouldDownloadFileWithCorrectContent() {
 
-        Path filePath = FilePersistor.persistFromUri(tempFile.toUri(), TEMP_DIR);
+        URI uri = URI.create("https://raw.githubusercontent.com/langchain4j/langchain4j/main/langchain4j/src/test/resources/test-file-utf8.txt");
+
+        Path filePath = FilePersistor.persistFromUri(uri, TEMP_DIR);
 
         assertThat(filePath).isNotNull();
         assertThat(filePath).startsWith(TEMP_DIR);
-        assertThat(filePath).exists().hasContent(content);
+        assertThat(filePath).exists().hasContent("test\ncontent\n");
     }
 
     @Test
