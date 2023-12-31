@@ -69,10 +69,11 @@ public class DefaultOpenAiClient extends OpenAiClient {
         }
 
         if (serviceBuilder.logRequests) {
-            okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor());
+            okHttpClientBuilder.addInterceptor(new RequestLoggingInterceptor(serviceBuilder.logLevel));
         }
+
         if (serviceBuilder.logResponses) {
-            okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor());
+            okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor(serviceBuilder.logLevel));
         }
         this.logStreamingResponses = serviceBuilder.logStreamingResponses;
 

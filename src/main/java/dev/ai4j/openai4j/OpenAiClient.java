@@ -67,6 +67,7 @@ public abstract class OpenAiClient {
         public Proxy proxy;
         public boolean logRequests;
         public boolean logResponses;
+        public LogLevel logLevel;
         public boolean logStreamingResponses;
         public Path persistTo;
 
@@ -184,6 +185,14 @@ public abstract class OpenAiClient {
                 logRequests = false;
             }
             this.logRequests = logRequests;
+            return (B) this;
+        }
+
+        public B logLevel(LogLevel logLevel) {
+            if (logLevel == null) {
+                logLevel = LogLevel.DEBUG;
+            }
+            this.logLevel = logLevel;
             return (B) this;
         }
 
