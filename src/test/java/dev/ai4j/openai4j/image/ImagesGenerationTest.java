@@ -50,7 +50,7 @@ public class ImagesGenerationTest {
 
         GenerateImagesRequest request = GenerateImagesRequest
             .builder()
-            .model(DALL_E_2) // so that you pay not much :)
+            .model("dall-e-2") // so that you pay not much :)
             .size(DALL_E_SIZE_256_x_256)
             .prompt("Bird flying in the sky")
             .build();

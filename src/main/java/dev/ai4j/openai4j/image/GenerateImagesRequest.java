@@ -73,7 +73,7 @@ public class GenerateImagesRequest {
 
     public static class Builder {
 
-        private ImageModel model = DALL_E_3;
+        private String model = DALL_E_3.toString();
         private String prompt;
         private int n = 1;
         private String size;
@@ -82,8 +82,13 @@ public class GenerateImagesRequest {
         private String user;
         private String responseFormat = DALL_E_RESPONSE_FORMAT_URL;
 
-        public Builder model(ImageModel model) {
+        public Builder model(String model) {
             this.model = model;
+            return this;
+        }
+
+        public Builder model(ImageModel model) {
+            this.model = model.toString();
             return this;
         }
 
