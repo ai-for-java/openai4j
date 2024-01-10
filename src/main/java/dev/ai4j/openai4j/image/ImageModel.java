@@ -4,7 +4,8 @@ package dev.ai4j.openai4j.image;
  * Represents an OpenAI DALL·E models to generate artistic images.
  */
 public enum ImageModel {
-    DALL_E_2("dall-e-2"), // anyone still needs that? :)
+
+    DALL_E_2("dall-e-2"),
     DALL_E_3("dall-e-3");
 
     public static final String DALL_E_SIZE_256_x_256 = "256x256"; // for 2 only
