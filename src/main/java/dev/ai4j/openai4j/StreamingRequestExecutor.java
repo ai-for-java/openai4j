@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static dev.ai4j.openai4j.ResponseLoggingInterceptor.log;
 import static dev.ai4j.openai4j.Utils.toException;
 
 class StreamingRequestExecutor<Request, Response, ResponseContent> {
@@ -27,6 +26,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
     private final Class<Response> responseClass;
     private final Function<Response, ResponseContent> streamEventContentExtractor;
     private final boolean logStreamingResponses;
+    private final ResponseLoggingInterceptor responseLogger = new ResponseLoggingInterceptor();
 
     StreamingRequestExecutor(
             OkHttpClient okHttpClient,
@@ -151,7 +151,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 }
 
                 if (logStreamingResponses) {
-                    log(response);
+                    responseLogger.log(response);
                 }
             }
 
@@ -202,7 +202,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
                 if (logStreamingResponses) {
                     log.debug("onFailure()", t);
-                    log(response);
+                    responseLogger.log(response);
                 }
 
                 if (t != null) {

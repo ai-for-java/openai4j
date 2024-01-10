@@ -14,9 +14,17 @@ class ResponseLoggingInterceptor implements Interceptor {
 
     private static final Logger log = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
 
+    private LogLevel logLevel = LogLevel.DEBUG;
+
+    public ResponseLoggingInterceptor() {
+    }
+
+    public ResponseLoggingInterceptor(LogLevel logLevel) {
+        this.logLevel = logLevel;
+    }
+
     @Override
     public Response intercept(Chain chain) throws IOException {
-
         Request request = chain.request();
         Response response = chain.proceed(request);
 
@@ -25,20 +33,66 @@ class ResponseLoggingInterceptor implements Interceptor {
         return response;
     }
 
-    static void log(Response response) {
+    void log(Response response) {
+        String message = "Response:\n- status code: {}\n- headers: {}\n- body: {}";
+
         try {
-            log.debug(
-                    "Response:\n- status code: {}\n- headers: {}\n- body: {}",
-                    response.code(),
-                    inOneLine(response.headers()),
-                    getBody(response)
-            );
+            switch (logLevel) {
+                case INFO:
+                    logInfo(response, message);
+                    break;
+                case WARN:
+                    logWarn(response, message);
+                    break;
+                case ERROR:
+                    logError(response, message);
+                    break;
+                default:
+                    logDebug(response, message);
+            }
+
         } catch (IOException e) {
             log.warn("Failed to log response", e);
         }
     }
 
-    private static String getBody(Response response) throws IOException {
+    private void logError(Response response, String message) throws IOException {
+        log.error(
+                message,
+                response.code(),
+                inOneLine(response.headers()),
+                getBody(response)
+        );
+    }
+
+    private void logWarn(Response response, String message) throws IOException {
+        log.warn(
+                message,
+                response.code(),
+                inOneLine(response.headers()),
+                getBody(response)
+        );
+    }
+
+    private void logInfo(Response response, String message) throws IOException {
+        log.info(
+                message,
+                response.code(),
+                inOneLine(response.headers()),
+                getBody(response)
+        );
+    }
+
+    private void logDebug(Response response, String message) throws IOException {
+        log.debug(
+                message,
+                response.code(),
+                inOneLine(response.headers()),
+                getBody(response)
+        );
+    }
+
+    private String getBody(Response response) throws IOException {
         if (isEventStream(response)) {
             return "[skipping response body due to streaming]";
         } else {
@@ -46,7 +100,7 @@ class ResponseLoggingInterceptor implements Interceptor {
         }
     }
 
-    private static boolean isEventStream(Response response) {
+    private boolean isEventStream(Response response) {
         String contentType = response.header("content-type");
         return contentType != null && contentType.contains("event-stream");
     }
