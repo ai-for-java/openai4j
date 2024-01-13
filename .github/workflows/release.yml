@@ -24,7 +24,7 @@ jobs:
         gpg-passphrase: GPG_PASSPHRASE
 
     - name: release
-      run: mvn -B clean deploy -Psign -DskipTests
+      run: mvn -B clean deploy -Psign
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
