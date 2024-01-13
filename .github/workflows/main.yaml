@@ -25,4 +25,5 @@ jobs:
       - name: Build with JDK ${{ matrix.java_version }}
         run: mvn -B clean test ${{ matrix.included_modules }}
         env:
+          OPENAI_BASE_URL: 'http://langchain4j.dev:8082/v1'
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

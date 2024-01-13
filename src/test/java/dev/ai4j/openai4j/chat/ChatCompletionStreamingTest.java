@@ -28,6 +28,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     private final OpenAiClient client = OpenAiClient.builder()
+            .baseUrl(System.getenv("OPENAI_BASE_URL"))
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()

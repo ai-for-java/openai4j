@@ -17,6 +17,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
     private static final String PROMPT = "write exactly the following 2 words: 'hello world'";
 
     private final OpenAiClient client = OpenAiClient.builder()
+            .baseUrl(System.getenv("OPENAI_BASE_URL"))
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()

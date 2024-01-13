@@ -64,6 +64,7 @@ Customizable way:
 String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiClient client = OpenAiClient.builder()
+    .baseUrl(baseUrl)
 	.openAiApiKey(apiKey)
 	.organizationId(orgId)
 	.callTimeout(ofSeconds(60))
