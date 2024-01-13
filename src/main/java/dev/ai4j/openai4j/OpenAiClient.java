@@ -21,6 +21,8 @@ import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
 
+import static dev.ai4j.openai4j.LogLevel.DEBUG;
+
 public abstract class OpenAiClient {
 
     public abstract SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request);
@@ -67,7 +69,7 @@ public abstract class OpenAiClient {
         public Proxy proxy;
         public boolean logRequests;
         public boolean logResponses;
-        public LogLevel logLevel;
+        public LogLevel logLevel = DEBUG;
         public boolean logStreamingResponses;
         public Path persistTo;
 
@@ -190,7 +192,7 @@ public abstract class OpenAiClient {
 
         public B logLevel(LogLevel logLevel) {
             if (logLevel == null) {
-                logLevel = LogLevel.DEBUG;
+                logLevel = DEBUG;
             }
             this.logLevel = logLevel;
             return (B) this;
