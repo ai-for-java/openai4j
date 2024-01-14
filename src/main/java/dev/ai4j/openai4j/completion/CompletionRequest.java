@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static dev.ai4j.openai4j.completion.CompletionModel.TEXT_DAVINCI_003;
+import static dev.ai4j.openai4j.completion.CompletionModel.GPT_3_5_TURBO_INSTRUCT;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
@@ -186,7 +186,7 @@ public final class CompletionRequest {
 
     public static final class Builder {
 
-        private String model = TEXT_DAVINCI_003.toString();
+        private String model = GPT_3_5_TURBO_INSTRUCT.toString();
         private String prompt;
         private String suffix;
         private Integer maxTokens;

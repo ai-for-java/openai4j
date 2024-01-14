@@ -15,6 +15,7 @@ public class ModerationAsyncTest extends RateLimitAwareTest {
     private static final String INPUT = "hello";
 
     private final OpenAiClient client = OpenAiClient.builder()
+            .baseUrl(System.getenv("OPENAI_BASE_URL"))
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()

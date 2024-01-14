@@ -2,7 +2,7 @@ package dev.ai4j.openai4j.completion;
 
 public enum CompletionModel {
 
-    TEXT_DAVINCI_003("text-davinci-003");
+    GPT_3_5_TURBO_INSTRUCT("gpt-3.5-turbo-instruct");
 
     private final String value;
 

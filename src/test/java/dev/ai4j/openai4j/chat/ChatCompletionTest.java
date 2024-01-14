@@ -35,6 +35,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     static final Tool WEATHER_TOOL = Tool.from(WEATHER_FUNCTION);
 
     private final OpenAiClient client = OpenAiClient.builder()
+            .baseUrl(System.getenv("OPENAI_BASE_URL"))
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()

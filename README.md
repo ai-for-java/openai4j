@@ -64,6 +64,7 @@ Customizable way:
 String apiKey = System.getenv("OPENAI_API_KEY");
 
 OpenAiClient client = OpenAiClient.builder()
+	.baseUrl(baseUrl)
 	.openAiApiKey(apiKey)
 	.organizationId(orgId)
 	.callTimeout(ofSeconds(60))
@@ -91,7 +92,7 @@ Customizable way:
 
 ```
 CompletionRequest request = CompletionRequest.builder()
-	.model(TEXT_DAVINCI_003)
+	.model(GPT_3_5_TURBO_INSTRUCT)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
 	...
@@ -115,7 +116,7 @@ Customizable way:
 
 ```
 CompletionRequest request = CompletionRequest.builder()
-	.model(TEXT_DAVINCI_003)
+	.model(GPT_3_5_TURBO_INSTRUCT)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
 	...
@@ -143,7 +144,7 @@ Customizable way:
 
 ```
 CompletionRequest request = CompletionRequest.builder()
-	.model(TEXT_DAVINCI_003)
+	.model(GPT_3_5_TURBO_INSTRUCT)
 	.prompt("Write a poem about ChatGPT")
 	.temperature(0.9)
 	...
