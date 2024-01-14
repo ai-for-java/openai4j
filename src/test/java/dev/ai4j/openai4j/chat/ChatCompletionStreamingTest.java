@@ -755,6 +755,14 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @Test
     void testCancelStreamingAfterStreamingStarted() throws Exception {
 
+        OpenAiClient client = OpenAiClient.builder()
+                // without caching
+                .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+                .logRequests()
+                .logResponses()
+                .logStreamingResponses()
+                .build();
+
         AtomicBoolean streamingStarted = new AtomicBoolean(false);
         AtomicBoolean streamingCancelled = new AtomicBoolean(false);
         AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
