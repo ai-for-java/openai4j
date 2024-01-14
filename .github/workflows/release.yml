@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
 
     runs-on: ubuntu-latest
 
@@ -26,6 +26,7 @@ jobs:
     - name: release
       run: mvn -B clean deploy -Psign
       env:
+        OPENAI_BASE_URL: 'http://langchain4j.dev:8082/v1'
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
