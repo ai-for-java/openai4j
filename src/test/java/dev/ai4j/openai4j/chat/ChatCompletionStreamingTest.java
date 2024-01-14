@@ -770,27 +770,36 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
                 .onPartialResponse(partialResponse -> {
                     streamingStarted.set(true);
+                    System.out.println("[[streaming started]]");
                     if (streamingCancelled.get()) {
                         cancellationSucceeded.set(false);
+                        System.out.println("[[cancellation failed]]");
                     }
                 })
-                .onComplete(() -> cancellationSucceeded.set(false))
-                .onError(e -> cancellationSucceeded.set(false))
+                .onComplete(() -> {
+                    cancellationSucceeded.set(false);
+                    System.out.println("[[cancellation failed]]");
+                })
+                .onError(e -> {
+                    cancellationSucceeded.set(false);
+                    System.out.println("[[cancellation failed]]");
+                })
                 .execute();
 
         while (!streamingStarted.get()) {
-            Thread.sleep(200);
+            Thread.sleep(10);
         }
 
         newSingleThreadExecutor().execute(() -> {
             responseHandle.cancel();
             streamingCancelled.set(true);
+            System.out.println("[[streaming cancelled]]");
         });
 
         while (!streamingCancelled.get()) {
-            Thread.sleep(200);
+            Thread.sleep(10);
         }
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         assertThat(cancellationSucceeded).isTrue();
     }
@@ -801,9 +810,18 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
 
         ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
-                .onPartialResponse(partialResponse -> cancellationSucceeded.set(false))
-                .onComplete(() -> cancellationSucceeded.set(false))
-                .onError(e -> cancellationSucceeded.set(false))
+                .onPartialResponse(partialResponse -> {
+                    cancellationSucceeded.set(false);
+                    System.out.println("[[cancellation failed]]");
+                })
+                .onComplete(() -> {
+                    cancellationSucceeded.set(false);
+                    System.out.println("[[cancellation failed]]");
+                })
+                .onError(e -> {
+                    cancellationSucceeded.set(false);
+                    System.out.println("[[cancellation failed]]");
+                })
                 .execute();
 
         AtomicBoolean streamingCancelled = new AtomicBoolean(false);
@@ -811,12 +829,13 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         newSingleThreadExecutor().execute(() -> {
             responseHandle.cancel();
             streamingCancelled.set(true);
+            System.out.println("[[streaming cancelled]]");
         });
 
         while (!streamingCancelled.get()) {
-            Thread.sleep(200);
+            Thread.sleep(10);
         }
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         assertThat(cancellationSucceeded).isTrue();
     }
