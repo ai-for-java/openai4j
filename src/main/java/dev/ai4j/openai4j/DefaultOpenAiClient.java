@@ -2,6 +2,10 @@ package dev.ai4j.openai4j;
 
 import static dev.ai4j.openai4j.Json.GSON;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +20,6 @@ import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import dev.ai4j.openai4j.moderation.ModerationRequest;
 import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -48,16 +49,24 @@ public class DefaultOpenAiClient extends OpenAiClient {
             .readTimeout(serviceBuilder.readTimeout)
             .writeTimeout(serviceBuilder.writeTimeout);
 
-        if (serviceBuilder.openAiApiKey == null && serviceBuilder.azureApiKey == null) {
-            throw new IllegalArgumentException("openAiApiKey OR azureApiKey must be defined");
+        if (serviceBuilder.enableRequests) {
+            // Only need to do the openAi & azure api key checks if we want to make live requests
+            if (serviceBuilder.openAiApiKey == null && serviceBuilder.azureApiKey == null) {
+                throw new IllegalArgumentException("openAiApiKey OR azureApiKey must be defined");
+            }
+            if (serviceBuilder.openAiApiKey != null && serviceBuilder.azureApiKey != null) {
+                throw new IllegalArgumentException("openAiApiKey AND azureApiKey cannot both be defined at the same time");
+            }
+
+            if (serviceBuilder.openAiApiKey != null) {
+                okHttpClientBuilder.addInterceptor(new AuthorizationHeaderInjector(serviceBuilder.openAiApiKey));
+            } else {
+                okHttpClientBuilder.addInterceptor(new ApiKeyHeaderInjector(serviceBuilder.azureApiKey));
+            }
         }
-        if (serviceBuilder.openAiApiKey != null && serviceBuilder.azureApiKey != null) {
-            throw new IllegalArgumentException("openAiApiKey AND azureApiKey cannot both be defined at the same time");
-        }
-        if (serviceBuilder.openAiApiKey != null) {
-            okHttpClientBuilder.addInterceptor(new AuthorizationHeaderInjector(serviceBuilder.openAiApiKey));
-        } else {
-            okHttpClientBuilder.addInterceptor(new ApiKeyHeaderInjector(serviceBuilder.azureApiKey));
+        else {
+            // Make sure this is the 1st interceptor so it runs before any of the others
+            okHttpClientBuilder.interceptors().add(0, new RequestDisablerInterceptor());
         }
 
         if (serviceBuilder.organizationId != null) {
@@ -75,6 +84,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
         if (serviceBuilder.logResponses) {
             okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor(serviceBuilder.logLevel));
         }
+
         this.logStreamingResponses = serviceBuilder.logStreamingResponses;
 
         this.okHttpClient = okHttpClientBuilder.build();

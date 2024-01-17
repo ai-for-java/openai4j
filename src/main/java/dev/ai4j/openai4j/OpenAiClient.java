@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j;
 
+import static dev.ai4j.openai4j.LogLevel.DEBUG;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.file.Path;
@@ -20,8 +22,6 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
-
-import static dev.ai4j.openai4j.LogLevel.DEBUG;
 
 public abstract class OpenAiClient {
 
@@ -72,6 +72,7 @@ public abstract class OpenAiClient {
         public LogLevel logLevel = DEBUG;
         public boolean logStreamingResponses;
         public Path persistTo;
+        public boolean enableRequests = true;
 
         public abstract T build();
 
@@ -187,6 +188,24 @@ public abstract class OpenAiClient {
                 logRequests = false;
             }
             this.logRequests = logRequests;
+            return (B) this;
+        }
+
+        public B disableRequests() {
+            return enableRequests(false);
+        }
+
+        /**
+         * Whether or not to enable live communication over the wire
+         * @param enableRequests {@code true} to enable communication over the wire. {@code false} otherwise.
+         *                            {@code false} results in an exception being thrown instead of making a request.
+         * @return builder
+         */
+        public B enableRequests(Boolean enableRequests) {
+            if (enableRequests == null) {
+                enableRequests = true;
+            }
+            this.enableRequests = enableRequests;
             return (B) this;
         }
 

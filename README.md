@@ -78,6 +78,21 @@ OpenAiClient client = OpenAiClient.builder()
 	.build();
 ```
 
+## Disabling a client from making live calls
+
+There may be instances where you want to disable the client from making "real" live calls as these calls can cost money. You can configure the builder using
+
+```java
+OpenAiClient client = OpenAiClient.builder()
+    .disableRequests()
+    // Other customizations
+    .build();
+```
+
+For synchronous operations this will cause the `execute()` method to throw an `OpenAiHttpException`.
+
+For asynchronous/streaming operations this will cause the `execute()` method to call the `onError` callback with an `OpenAiHttpException`.
+
 ## Completions
 
 ### Synchronously
