@@ -3,6 +3,8 @@ package dev.ai4j.openai4j.moderation;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,10 +40,12 @@ public class ModerationAsyncTest extends RateLimitAwareTest {
         assertAllFields(response);
     }
 
-    @Test
-    void testCustomizableApi() throws Exception {
+    @ParameterizedTest
+    @EnumSource(ModerationModel.class)
+    void testCustomizableApi(ModerationModel model) throws Exception {
 
         ModerationRequest request = ModerationRequest.builder()
+                .model(model)
                 .input(INPUT)
                 .build();
 
