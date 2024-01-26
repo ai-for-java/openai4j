@@ -53,6 +53,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
@@ -89,6 +90,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
@@ -146,6 +148,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including functions
@@ -197,6 +200,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
@@ -254,6 +258,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
@@ -305,7 +310,15 @@ class ChatCompletionTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {
+            // "GPT_3_5_TURBO", // still points to the old model
+            "GPT_3_5_TURBO_1106",
+            // "GPT_3_5_TURBO_0125", // don't have access to it yet
+
+            "GPT_4_TURBO_PREVIEW",
+            "GPT_4_1106_PREVIEW",
+            "GPT_4_0125_PREVIEW"
+    })
     void testParallelTools(ChatCompletionModel model) {
 
         // given
@@ -393,7 +406,15 @@ class ChatCompletionTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {
+            // "GPT_3_5_TURBO", // still points to the old model
+            "GPT_3_5_TURBO_1106",
+            // "GPT_3_5_TURBO_0125", // don't have access to it yet
+
+            "GPT_4_TURBO_PREVIEW",
+            "GPT_4_1106_PREVIEW",
+            "GPT_4_0125_PREVIEW"
+    })
     void testJsonResponseFormat(ChatCompletionModel model) {
 
         // given
@@ -433,6 +454,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613" // I don't have access to these models
     })
     void testUserMessageWithStringContent(ChatCompletionModel model) {
