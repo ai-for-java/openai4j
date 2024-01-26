@@ -11,11 +11,13 @@ public final class EmbeddingRequest {
 
     private final String model;
     private final List<String> input;
+    private final Integer dimensions;
     private final String user;
 
     private EmbeddingRequest(Builder builder) {
         this.model = builder.model;
         this.input = builder.input;
+        this.dimensions = builder.dimensions;
         this.user = builder.user;
     }
 
@@ -25,6 +27,10 @@ public final class EmbeddingRequest {
 
     public List<String> input() {
         return input;
+    }
+
+    public Integer dimensions() {
+        return dimensions;
     }
 
     public String user() {
@@ -41,6 +47,7 @@ public final class EmbeddingRequest {
     private boolean equalTo(EmbeddingRequest another) {
         return Objects.equals(model, another.model)
                 && Objects.equals(input, another.input)
+                && Objects.equals(dimensions, another.dimensions)
                 && Objects.equals(user, another.user);
     }
 
@@ -49,6 +56,7 @@ public final class EmbeddingRequest {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(model);
         h += (h << 5) + Objects.hashCode(input);
+        h += (h << 5) + Objects.hashCode(dimensions);
         h += (h << 5) + Objects.hashCode(user);
         return h;
     }
@@ -58,6 +66,7 @@ public final class EmbeddingRequest {
         return "EmbeddingRequest{"
                 + "model=" + model
                 + ", input=" + input
+                + ", dimensions=" + dimensions
                 + ", user=" + user
                 + "}";
     }
@@ -70,6 +79,7 @@ public final class EmbeddingRequest {
 
         private String model = TEXT_EMBEDDING_ADA_002.toString();
         private List<String> input;
+        private Integer dimensions;
         private String user;
 
         private Builder() {
@@ -92,6 +102,11 @@ public final class EmbeddingRequest {
             if (input != null) {
                 this.input = unmodifiableList(input);
             }
+            return this;
+        }
+
+        public Builder dimensions(Integer dimensions) {
+            this.dimensions = dimensions;
             return this;
         }
 
