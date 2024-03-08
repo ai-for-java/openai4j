@@ -200,6 +200,12 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                     return;
                 }
 
+                // TODO remove this when migrating from okhttp
+                if (t instanceof IllegalArgumentException && "byteCount < 0: -1".equals(t.getMessage())) {
+                    streamingCompletionCallback.run();
+                    return;
+                }
+
                 if (logStreamingResponses) {
                     log.debug("onFailure()", t);
                     responseLogger.log(response);
