@@ -67,6 +67,7 @@ public abstract class OpenAiClient {
         public Duration readTimeout = Duration.ofSeconds(60);
         public Duration writeTimeout = Duration.ofSeconds(60);
         public Proxy proxy;
+        public String userAgent;
         public boolean logRequests;
         public boolean logResponses;
         public LogLevel logLevel = DEBUG;
@@ -175,6 +176,11 @@ public abstract class OpenAiClient {
 
         public B proxy(Proxy proxy) {
             this.proxy = proxy;
+            return (B) this;
+        }
+
+        public B userAgent(String userAgent) {
+            this.userAgent = userAgent;
             return (B) this;
         }
 
