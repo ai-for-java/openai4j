@@ -2,6 +2,8 @@ package dev.ai4j.openai4j;
 
 import static dev.ai4j.openai4j.Json.GSON;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,8 @@ public class DefaultOpenAiClient extends OpenAiClient {
         this.baseUrl = serviceBuilder.baseUrl;
         this.apiVersion = serviceBuilder.apiVersion;
 
+        Map<String, String> headers = new HashMap<>();
+
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
             .callTimeout(serviceBuilder.callTimeout)
             .connectTimeout(serviceBuilder.connectTimeout)
@@ -61,7 +65,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
         }
 
         if (serviceBuilder.organizationId != null) {
-            okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(Collections.singletonMap("OpenAI-Organization", serviceBuilder.organizationId)));
+            headers.put("OpenAI-Organization", serviceBuilder.organizationId);
         }
 
         if (serviceBuilder.proxy != null) {
@@ -69,7 +73,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
         }
 
         if (serviceBuilder.userAgent != null) {
-            okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(Collections.singletonMap("User-Agent", serviceBuilder.userAgent)));
+            headers.put("User-Agent", serviceBuilder.userAgent);
         }
 
         if (serviceBuilder.logRequests) {
@@ -80,6 +84,11 @@ public class DefaultOpenAiClient extends OpenAiClient {
             okHttpClientBuilder.addInterceptor(new ResponseLoggingInterceptor(serviceBuilder.logLevel));
         }
         this.logStreamingResponses = serviceBuilder.logStreamingResponses;
+
+        if (serviceBuilder.customHeaders != null) {
+            headers.putAll(serviceBuilder.customHeaders);
+            okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(headers));
+        }
 
         this.okHttpClient = okHttpClientBuilder.build();
 
