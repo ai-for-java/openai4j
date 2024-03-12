@@ -254,7 +254,7 @@ public abstract class OpenAiClient {
         }
 
         /**
-         * Additional headers to be added to the HTTP request.
+         * Custom headers to be added to each HTTP request.
          *
          * @param additionalHeaders map of headers
          * @return builder
