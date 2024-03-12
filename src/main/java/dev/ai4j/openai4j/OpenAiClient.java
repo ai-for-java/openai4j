@@ -260,7 +260,7 @@ public abstract class OpenAiClient {
          * @return builder
          */
         public B customHeaders(Map<String, String> customHeaders) {
-            this.additionalHeaders = additionalHeaders;
+            this.customHeaders = customHeaders;
             return (B) this;
         }
     }
