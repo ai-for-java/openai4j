@@ -35,7 +35,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     private final OkHttpClient okHttpClient;
     private final OpenAiApi openAiApi;
     private final boolean logStreamingResponses;
-    private final String userAgent;
 
     public DefaultOpenAiClient(String apiKey) {
         this(new Builder().openAiApiKey(apiKey));
@@ -44,7 +43,6 @@ public class DefaultOpenAiClient extends OpenAiClient {
     private DefaultOpenAiClient(Builder serviceBuilder) {
         this.baseUrl = serviceBuilder.baseUrl;
         this.apiVersion = serviceBuilder.apiVersion;
-        this.userAgent = serviceBuilder.userAgent;
 
         Map<String, String> headers = new HashMap<>();
 
