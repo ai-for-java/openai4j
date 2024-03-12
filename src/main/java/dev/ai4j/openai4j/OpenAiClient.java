@@ -259,7 +259,7 @@ public abstract class OpenAiClient {
          * @param additionalHeaders map of headers
          * @return builder
          */
-        public B additionalHeaders(Map<String, String> additionalHeaders) {
+        public B customHeaders(Map<String, String> customHeaders) {
             this.additionalHeaders = additionalHeaders;
             return (B) this;
         }
