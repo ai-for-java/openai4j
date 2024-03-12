@@ -20,6 +20,7 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
+import java.util.Map;
 
 import static dev.ai4j.openai4j.LogLevel.DEBUG;
 
@@ -73,6 +74,7 @@ public abstract class OpenAiClient {
         public LogLevel logLevel = DEBUG;
         public boolean logStreamingResponses;
         public Path persistTo;
+        public Map<String, String> additionalHeaders;
 
         public abstract T build();
 
@@ -248,6 +250,17 @@ public abstract class OpenAiClient {
          */
         public B persistTo(Path persistTo) {
             this.persistTo = persistTo;
+            return (B) this;
+        }
+
+        /**
+         * Additional headers to be added to the HTTP request.
+         *
+         * @param additionalHeaders map of headers
+         * @return builder
+         */
+        public B additionalHeaders(Map<String, String> additionalHeaders) {
+            this.additionalHeaders = additionalHeaders;
             return (B) this;
         }
     }
