@@ -74,7 +74,7 @@ public abstract class OpenAiClient {
         public LogLevel logLevel = DEBUG;
         public boolean logStreamingResponses;
         public Path persistTo;
-        public Map<String, String> additionalHeaders;
+        public Map<String, String> customHeaders;
 
         public abstract T build();
 
