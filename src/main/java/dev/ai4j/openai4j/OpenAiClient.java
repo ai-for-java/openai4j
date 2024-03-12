@@ -256,7 +256,7 @@ public abstract class OpenAiClient {
         /**
          * Custom headers to be added to each HTTP request.
          *
-         * @param additionalHeaders map of headers
+         * @param customHeaders a map of headers
          * @return builder
          */
         public B customHeaders(Map<String, String> customHeaders) {
