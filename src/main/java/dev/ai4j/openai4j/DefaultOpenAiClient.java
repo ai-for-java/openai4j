@@ -87,7 +87,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
         }
         this.logStreamingResponses = serviceBuilder.logStreamingResponses;
 
-        if (serviceBuilder.additionalHeaders != null) {
+        if (serviceBuilder.customHeaders != null) {
             headers.putAll(serviceBuilder.customHeaders);
             okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(headers));
         }
