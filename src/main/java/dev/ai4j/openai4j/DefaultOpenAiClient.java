@@ -70,6 +70,8 @@ public class DefaultOpenAiClient extends OpenAiClient {
         }
         if (serviceBuilder.customHeaders != null) {
             headers.putAll(serviceBuilder.customHeaders);
+        }
+        if (!headers.isEmpty()) {
             okHttpClientBuilder.addInterceptor(new GenericHeaderInjector(headers));
         }
 
