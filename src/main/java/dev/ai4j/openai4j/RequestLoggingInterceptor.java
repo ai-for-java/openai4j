@@ -5,7 +5,6 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.Buffer;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,10 +122,14 @@ class RequestLoggingInterceptor implements Interceptor {
             return key;
         }
 
-        if (key.startsWith(BEARER)) {
-            return BEARER + " " + mask(key.substring(BEARER.length() + 1));
-        } else {
-            return mask(key);
+        try {
+            if (key.startsWith(BEARER)) {
+                return BEARER + " " + mask(key.substring(BEARER.length() + 1));
+            } else {
+                return mask(key);
+            }
+        } catch (Exception e) {
+            return "Failed to mask the API key.";
         }
     }
 
