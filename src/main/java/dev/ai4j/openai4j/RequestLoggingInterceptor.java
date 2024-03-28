@@ -5,22 +5,26 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.Buffer;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.StreamSupport.stream;
 
 class RequestLoggingInterceptor implements Interceptor {
 
     private static final Logger log = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
-    private LogLevel logLevel = LogLevel.DEBUG;
 
-    private static final Pattern BEARER_PATTERN = Pattern.compile("(Bearer\\s*sk-)(\\w{2})(\\w+)(\\w{2})");
+    private static final Set<String> COMMON_SECRET_HEADERS =
+            new HashSet<>(asList("authorization", "x-api-key", "x-auth-token"));
+    private static final String BEARER = "Bearer";
+    private LogLevel logLevel = LogLevel.DEBUG;
 
     public RequestLoggingInterceptor() {
     }
@@ -103,45 +107,34 @@ class RequestLoggingInterceptor implements Interceptor {
     static String inOneLine(Headers headers) {
 
         return stream(headers.spliterator(), false)
-                .map(header -> {
-                    String headerKey = header.component1();
-                    String headerValue = header.component2();
-                    if (headerKey.equals("Authorization")) {
-                        headerValue = maskAuthorizationHeaderValue(headerValue);
-                    } else if (headerKey.equals("api-key")) {
-                        headerValue = maskApiKeyHeaderValue(headerValue);
-                    }
-                    return String.format("[%s: %s]", headerKey, headerValue);
-                })
+                .map(header -> format(header.component1(), header.component2()))
                 .collect(joining(", "));
     }
 
-    private static String maskAuthorizationHeaderValue(String authorizationHeaderValue) {
-        try {
-            Matcher matcher = BEARER_PATTERN.matcher(authorizationHeaderValue);
+    static String format(String headerKey, String headerValue) {
+        if (COMMON_SECRET_HEADERS.contains(headerKey.toLowerCase())) {
+            headerValue = maskSecretKey(headerValue);
+        }
+        return String.format("[%s: %s]", headerKey, headerValue);
+    }
 
-            StringBuffer sb = new StringBuffer();
-            while (matcher.find()) {
-                matcher.appendReplacement(sb, matcher.group(1) + matcher.group(2) + "..." + matcher.group(4));
-            }
-            matcher.appendTail(sb);
+    static String maskSecretKey(String key) {
+        if (key == null || key.trim().isEmpty()) {
+            return key;
+        }
 
-            return sb.toString();
-        } catch (Exception e) {
-            return "Failed to mask the API key.";
+        if (key.startsWith(BEARER)) {
+            return BEARER + " " + mask(key.substring(BEARER.length() + 1));
+        } else {
+            return mask(key);
         }
     }
 
-    private static String maskApiKeyHeaderValue(String apiKeyHeaderValue) {
-        try {
-            if (apiKeyHeaderValue.length() <= 4) {
-                return apiKeyHeaderValue;
-            }
-            return apiKeyHeaderValue.substring(0, 2)
-                    + "..."
-                    + apiKeyHeaderValue.substring(apiKeyHeaderValue.length() - 2);
-        } catch (Exception e) {
-            return "Failed to mask the API key.";
+    private static String mask(String key) {
+        if (key.length() >= 7) {
+            return key.substring(0, 5) + "..." + key.substring(key.length() - 2);
+        } else {
+            return "...";
         }
     }
 
