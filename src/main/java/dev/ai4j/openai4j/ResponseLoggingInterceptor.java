@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import static dev.ai4j.openai4j.RequestLoggingInterceptor.inOneLine;
 
-class ResponseLoggingInterceptor implements Interceptor {
+public class ResponseLoggingInterceptor implements Interceptor {
 
     private static final Logger log = LoggerFactory.getLogger(ResponseLoggingInterceptor.class);
 

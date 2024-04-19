@@ -16,7 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.StreamSupport.stream;
 
-class RequestLoggingInterceptor implements Interceptor {
+public class RequestLoggingInterceptor implements Interceptor {
 
     private static final Logger log = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
 

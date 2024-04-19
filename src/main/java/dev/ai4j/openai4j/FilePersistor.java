@@ -11,7 +11,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.UUID;
 
-class FilePersistor {
+public class FilePersistor {
 
     static Path persistFromUri(URI uri, Path destinationFolder) {
         try {

@@ -44,6 +44,38 @@ public class GenerateImagesRequest {
         return h;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public String getPrompt() {
+        return prompt;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getQuality() {
+        return quality;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getResponseFormat() {
+        return responseFormat;
+    }
+
     public String toString() {
         return (
             "GenerateImagesRequest{" +

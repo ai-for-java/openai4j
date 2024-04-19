@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import static dev.ai4j.openai4j.Utils.toException;
 
-class AsyncRequestExecutor<Response, ResponseContent> {
+public class AsyncRequestExecutor<Response, ResponseContent> {
 
     private final Call<Response> call;
     private final Function<Response, ResponseContent> responseContentExtractor;

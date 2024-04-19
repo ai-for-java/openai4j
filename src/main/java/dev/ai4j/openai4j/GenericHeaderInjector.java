@@ -9,7 +9,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
 
-class GenericHeaderInjector implements Interceptor {
+public class GenericHeaderInjector implements Interceptor {
     private final Map<String, String> headers = new HashMap<>();
 
     GenericHeaderInjector(Map<String, String> headers) {

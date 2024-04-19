@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import static dev.ai4j.openai4j.Utils.toException;
 
-class SyncRequestExecutor<Response, ResponseContent> {
+public class SyncRequestExecutor<Response, ResponseContent> {
 
     private final Call<Response> call;
     private final Function<Response, ResponseContent> responseContentExtractor;

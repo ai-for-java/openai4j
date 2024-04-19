@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import static dev.ai4j.openai4j.Utils.toException;
 
-class StreamingRequestExecutor<Request, Response, ResponseContent> {
+public class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
     private static final Logger log = LoggerFactory.getLogger(StreamingRequestExecutor.class);
 

@@ -2,7 +2,7 @@ package dev.ai4j.openai4j;
 
 import java.io.IOException;
 
-class Utils {
+public class Utils {
 
     static RuntimeException toException(retrofit2.Response<?> response) throws IOException {
         return new OpenAiHttpException(response.code(), response.errorBody().string());

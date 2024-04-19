@@ -9,7 +9,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-class PersistorConverterFactory extends Converter.Factory {
+public class PersistorConverterFactory extends Converter.Factory {
 
     private final Path persistTo;
 

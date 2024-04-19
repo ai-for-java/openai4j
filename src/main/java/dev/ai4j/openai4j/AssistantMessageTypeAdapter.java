@@ -13,7 +13,7 @@ import dev.ai4j.openai4j.chat.ToolCall;
 import java.io.IOException;
 import java.util.List;
 
-class AssistantMessageTypeAdapter extends TypeAdapter<AssistantMessage> {
+public class AssistantMessageTypeAdapter extends TypeAdapter<AssistantMessage> {
 
     static final TypeAdapterFactory ASSISTANT_MESSAGE_TYPE_ADAPTER_FACTORY = new TypeAdapterFactory() {
 
