@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j;
 
+import dev.ai4j.openai4j.audio.GenerateSpeechRequest;
+import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -41,5 +43,12 @@ interface OpenAiApi {
     Call<GenerateImagesResponse> imagesGenerations(
         @Body GenerateImagesRequest request,
         @Query("api-version") String apiVersion
+    );
+
+    @POST("audio/speech")
+    @Headers({ "Content-Type: application/json" })
+    Call<GenerateSpeechResponse> speechGenerations(
+            @Body GenerateSpeechRequest request,
+            @Query("api-version") String apiVersion
     );
 }

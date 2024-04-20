@@ -29,9 +29,12 @@ class FilePersistor {
 
     public static Path persistFromBase64String(String base64EncodedString, Path destinationFolder) throws IOException {
         byte[] decodedBytes = Base64.getDecoder().decode(base64EncodedString);
-        Path destinationFile = destinationFolder.resolve(randomFileName());
+        return persistFromByteArray(decodedBytes, destinationFolder);
+    }
 
-        Files.write(destinationFile, decodedBytes, StandardOpenOption.CREATE);
+    public static Path persistFromByteArray(byte[] bytes, Path destinationFolder) throws IOException {
+        Path destinationFile = destinationFolder.resolve(randomFileName());
+        Files.write(destinationFile, bytes, StandardOpenOption.CREATE);
 
         return destinationFile;
     }

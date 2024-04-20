@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 
+import dev.ai4j.openai4j.audio.GenerateSpeechRequest;
+import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -43,6 +45,8 @@ public abstract class OpenAiClient {
     public abstract SyncOrAsync<ModerationResult> moderation(String input);
 
     public abstract SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request);
+
+    public abstract SyncOrAsync<GenerateSpeechResponse> speechGeneration(GenerateSpeechRequest request);
 
     public abstract void shutdown();
 
