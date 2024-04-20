@@ -19,6 +19,8 @@ This is an unofficial Java client library that helps to connect your Java applic
     - [synchronous](https://github.com/ai-for-java/openai4j#synchronously-3)
     - [asynchronous](https://github.com/ai-for-java/openai4j#asynchronously-3)
 - [Functions](https://github.com/ai-for-java/openai4j/blob/main/src/test/java/dev/ai4j/openai4j/chat/ChatCompletionTest.java)
+- [Audio](https://platform.openai.com/docs/api-reference/audio)
+    - [Speech](https://platform.openai.com/docs/api-reference/audio/createSpeech)
 
 ## Coming soon:
 
@@ -378,6 +380,57 @@ Customizable way:
 
     // your generated image is here locally: 
     String localImage = response.data().get(0).url();
+```
+
+
+## Audio Generations
+### Create speech
+
+Simple way:
+
+```
+    OpenAiClient client = OpenAiClient
+      .builder()
+      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+      .build();
+
+    SpeechRequest request = SpeechRequest
+      .builder()
+      .model(TTS_1)
+      .input("The quick brown fox jumped over the lazy dog.")
+      .voice(SpeechModel.Voice.ALLOY)            
+      .build();
+
+    SpeechResponse response = client.speechGenerations(request).execute();
+
+    // Byte array audio speech generated
+    String speechData = response.data();
+```
+
+Customizable way:
+
+```
+    OpenAiClient client = OpenAiClient
+      .builder()
+      .openAiApiKey(System.getenv("OPENAI_API_KEY"))
+      .logRequests()
+      .logResponses()
+      .withPersisting()
+      .build();
+
+    SpeechRequest request = SpeechRequest
+      .builder()
+      .model(TTS_1)
+      .input("The quick brown fox jumped over the lazy dog.")
+      .voice(SpeechModel.Voice.ALLOY)            
+      .responseFormat(SpeechModel.ResponseFormat.WAV)
+      .speed(2)
+      .build();
+
+    AudioResponse response = client.speechGenerations(request).execute();
+
+    // your generated audio speech is here locally: 
+    String speechUrl = response.url();
 ```
 
 # Useful materials
