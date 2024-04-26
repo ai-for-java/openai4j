@@ -128,11 +128,12 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    public SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request) {
+    public SyncOrAsyncOrStreaming<CompletionResponse> completion(OpenAiClientContext context,
+        CompletionRequest request) {
         CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.completions(syncRequest, apiVersion),
+                openAiApi.completions(context.headers(), syncRequest, apiVersion),
                 r -> r,
                 okHttpClient,
                 formatUrl("completions"),
@@ -144,13 +145,13 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    public SyncOrAsyncOrStreaming<String> completion(String prompt) {
+    public SyncOrAsyncOrStreaming<String> completion(OpenAiClientContext context, String prompt) {
         CompletionRequest request = CompletionRequest.builder().prompt(prompt).build();
 
         CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.completions(syncRequest, apiVersion),
+                openAiApi.completions(context.headers(), syncRequest, apiVersion),
                 CompletionResponse::text,
                 okHttpClient,
                 formatUrl("completions"),
@@ -162,11 +163,12 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request) {
+    public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(OpenAiClientContext context,
+        ChatCompletionRequest request) {
         ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(syncRequest, apiVersion),
+                openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
                 r -> r,
                 okHttpClient,
                 formatUrl("chat/completions"),
@@ -178,13 +180,13 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    public SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage) {
+    public SyncOrAsyncOrStreaming<String> chatCompletion(OpenAiClientContext context, String userMessage) {
         ChatCompletionRequest request = ChatCompletionRequest.builder().addUserMessage(userMessage).build();
 
         ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
 
         return new RequestExecutor<>(
-                openAiApi.chatCompletions(syncRequest, apiVersion),
+                openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
                 ChatCompletionResponse::content,
                 okHttpClient,
                 formatUrl("chat/completions"),
@@ -196,32 +198,38 @@ public class DefaultOpenAiClient extends OpenAiClient {
     }
 
     @Override
-    public SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request) {
-        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), r -> r);
+    public SyncOrAsync<EmbeddingResponse> embedding(OpenAiClientContext context, EmbeddingRequest request) {
+        return new RequestExecutor<>(openAiApi.embeddings(context.headers(), request, apiVersion), r -> r);
     }
 
     @Override
-    public SyncOrAsync<List<Float>> embedding(String input) {
+    public SyncOrAsync<List<Float>> embedding(OpenAiClientContext context, String input) {
         EmbeddingRequest request = EmbeddingRequest.builder().input(input).build();
 
-        return new RequestExecutor<>(openAiApi.embeddings(request, apiVersion), EmbeddingResponse::embedding);
+        return new RequestExecutor<>(openAiApi.embeddings(context.headers(), request, apiVersion),
+            EmbeddingResponse::embedding);
     }
 
     @Override
-    public SyncOrAsync<ModerationResponse> moderation(ModerationRequest request) {
-        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), r -> r);
+    public SyncOrAsync<ModerationResponse> moderation(OpenAiClientContext context,
+        ModerationRequest request) {
+        return new RequestExecutor<>(openAiApi.moderations(context.headers(), request, apiVersion),
+            r -> r);
     }
 
     @Override
-    public SyncOrAsync<ModerationResult> moderation(String input) {
+    public SyncOrAsync<ModerationResult> moderation(OpenAiClientContext context, String input) {
         ModerationRequest request = ModerationRequest.builder().input(input).build();
 
-        return new RequestExecutor<>(openAiApi.moderations(request, apiVersion), r -> r.results().get(0));
+        return new RequestExecutor<>(openAiApi.moderations(context.headers(), request, apiVersion),
+            r -> r.results().get(0));
     }
 
     @Override
-    public SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request) {
-        return new RequestExecutor<>(openAiApi.imagesGenerations(request, apiVersion), r -> r);
+    public SyncOrAsync<GenerateImagesResponse> imagesGeneration(OpenAiClientContext context,
+        GenerateImagesRequest request) {
+        return new RequestExecutor<>(openAiApi.imagesGenerations(context.headers(), request, apiVersion),
+            r -> r);
     }
 
     private String formatUrl(String endpoint) {
