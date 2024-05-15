@@ -18,11 +18,17 @@ public enum ChatCompletionModel {
     GPT_4_1106_PREVIEW("gpt-4-1106-preview"),
     GPT_4_0125_PREVIEW("gpt-4-0125-preview"),
 
+    GPT_4_TURBO("gpt-4-turbo"), // alias
+    GPT_4_TURBO_2024_04_09("gpt-4-turbo-2024-04-09"),
+
     GPT_4_32K("gpt-4-32k"), // alias
     GPT_4_32K_0314("gpt-4-32k-0314"),
     GPT_4_32K_0613("gpt-4-32k-0613"),
 
-    GPT_4_VISION_PREVIEW("gpt-4-vision-preview");
+    GPT_4_VISION_PREVIEW("gpt-4-vision-preview"),
+
+    GPT_4o("gpt-4o"), // alias
+    GPT_4o_2024_05_13("gpt-4o-2024-05-13");
 
     private final String value;
 
