@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.Map;
 
-import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4_VISION_PREVIEW;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argument;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argumentsAsMap;
 import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
@@ -55,7 +54,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testCustomizableApi(ChatCompletionModel model) {
 
@@ -93,7 +91,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
     })
     void testTools(ChatCompletionModel model) {
 
@@ -151,7 +148,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including functions
     })
     void testFunctions(ChatCompletionModel model) {
 
@@ -203,7 +199,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
     })
     void testToolChoice(ChatCompletionModel model) {
 
@@ -261,7 +256,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
     })
     void testFunctionChoice(ChatCompletionModel model) {
 
@@ -440,7 +434,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model(GPT_4_VISION_PREVIEW)
+                .model(ChatCompletionModel.GPT_4O)
                 .messages(UserMessage.from("What is in this image?", imageUrl))
                 .maxTokens(100)
                 .build();

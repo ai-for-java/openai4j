@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4_VISION_PREVIEW;
+import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O;
 import static dev.ai4j.openai4j.chat.ChatCompletionTest.*;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argument;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argumentsAsMap;
@@ -58,7 +58,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testCustomizableApi(ChatCompletionModel model) throws Exception {
 
@@ -107,7 +106,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
     })
     void testTools(ChatCompletionModel model) throws Exception {
 
@@ -225,7 +223,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
     })
     void testFunctions(ChatCompletionModel model) throws Exception {
 
@@ -323,7 +320,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             "GPT_4_TURBO_PREVIEW", // keeps returning "felsius" as temp unit
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
     })
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
@@ -441,7 +437,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // does not support many things now, including tools
     })
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
@@ -732,7 +727,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model(GPT_4_VISION_PREVIEW)
+                .model(GPT_4O)
                 .messages(UserMessage.from("What is in this image?", imageUrl))
                 .maxTokens(100)
                 .build();
