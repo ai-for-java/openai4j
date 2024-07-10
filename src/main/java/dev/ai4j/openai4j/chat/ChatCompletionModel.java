@@ -20,6 +20,8 @@ public enum ChatCompletionModel {
     GPT_4_32K_0314("gpt-4-32k-0314"),
     GPT_4_32K_0613("gpt-4-32k-0613"),
 
+    @Deprecated
+    GPT_4_VISION_PREVIEW("gpt-4-vision-preview"),
     GPT_4O("gpt-4o"),
     GPT_4O_2024_05_13("gpt-4o-2024-05-13");
 
