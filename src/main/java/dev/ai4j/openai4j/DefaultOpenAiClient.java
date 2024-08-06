@@ -1,5 +1,7 @@
 package dev.ai4j.openai4j;
 
+import dev.ai4j.openai4j.audio.GenerateSpeechRequest;
+import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -95,6 +97,8 @@ public class DefaultOpenAiClient extends OpenAiClient {
         if (serviceBuilder.persistTo != null) {
             retrofitBuilder.addConverterFactory(new PersistorConverterFactory(serviceBuilder.persistTo));
         }
+
+        retrofitBuilder.addConverterFactory(new BytesConverterFactory());
 
         retrofitBuilder.addConverterFactory(GsonConverterFactory.create(GSON));
 
@@ -230,6 +234,11 @@ public class DefaultOpenAiClient extends OpenAiClient {
         GenerateImagesRequest request) {
         return new RequestExecutor<>(openAiApi.imagesGenerations(context.headers(), request, apiVersion),
             r -> r);
+    }
+
+    @Override
+    public SyncOrAsync<GenerateSpeechResponse> speechGeneration(GenerateSpeechRequest request) {
+        return new RequestExecutor<>(openAiApi.speechGenerations(request, apiVersion), r -> r);
     }
 
     private String formatUrl(String endpoint) {

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
@@ -51,5 +52,17 @@ class FilePersistorTest {
         assertThat(filePath).isNotNull();
         assertThat(filePath).startsWith(TEMP_DIR);
         assertThat(filePath).exists().hasContent("Hello world!");
+    }
+
+    @Test
+    void shouldPersistFromByteArray() throws IOException {
+        byte[] simpleByteArray = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // Sample byte array
+
+        Path filePath = FilePersistor.persistFromByteArray(simpleByteArray, TEMP_DIR);
+
+        assertThat(filePath).isNotNull();
+        assertThat(filePath).startsWith(TEMP_DIR);
+        assertThat(Files.exists(filePath)).isTrue();
+        assertThat(Files.readAllBytes(filePath)).isEqualTo(simpleByteArray);
     }
 }
