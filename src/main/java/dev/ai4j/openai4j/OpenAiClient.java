@@ -1,11 +1,6 @@
 package dev.ai4j.openai4j;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.List;
+import static dev.ai4j.openai4j.LogLevel.DEBUG;
 
 import dev.ai4j.openai4j.audio.GenerateSpeechRequest;
 import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
@@ -22,29 +17,101 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import static dev.ai4j.openai4j.LogLevel.DEBUG;
 
 public abstract class OpenAiClient {
 
-    public abstract SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request);
+    public SyncOrAsyncOrStreaming<CompletionResponse> completion(CompletionRequest request) {
+        return completion(new OpenAiClientContext(), request);
+    }
 
-    public abstract SyncOrAsyncOrStreaming<String> completion(String prompt);
+    public SyncOrAsyncOrStreaming<CompletionResponse> completion(
+        OpenAiClientContext clientContext, CompletionRequest request) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request);
+    public SyncOrAsyncOrStreaming<String> completion(String prompt) {
+        return completion(new OpenAiClientContext(), prompt);
+    }
 
-    public abstract SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage);
+    public SyncOrAsyncOrStreaming<String> completion(OpenAiClientContext clientContext,
+        String prompt) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request);
+    public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(
+        ChatCompletionRequest request) {
+        return chatCompletion(new OpenAiClientContext(), request);
+    }
 
-    public abstract SyncOrAsync<List<Float>> embedding(String input);
+    public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(
+        OpenAiClientContext clientContext,
+        ChatCompletionRequest request) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract SyncOrAsync<ModerationResponse> moderation(ModerationRequest request);
+    public SyncOrAsyncOrStreaming<String> chatCompletion(String userMessage) {
+        return chatCompletion(new OpenAiClientContext(), userMessage);
+    }
 
-    public abstract SyncOrAsync<ModerationResult> moderation(String input);
+    public SyncOrAsyncOrStreaming<String> chatCompletion(
+        OpenAiClientContext clientContext,
+        String userMessage) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request);
+    public SyncOrAsync<EmbeddingResponse> embedding(EmbeddingRequest request) {
+        return embedding(new OpenAiClientContext(), request);
+    }
+
+    public SyncOrAsync<EmbeddingResponse> embedding(OpenAiClientContext clientContext,
+        EmbeddingRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    public SyncOrAsync<List<Float>> embedding(String input) {
+        return embedding(new OpenAiClientContext(), input);
+    }
+
+    public SyncOrAsync<List<Float>> embedding(OpenAiClientContext clientContext,
+        String input) {
+        throw new UnsupportedOperationException();
+    }
+
+    public SyncOrAsync<ModerationResponse> moderation(ModerationRequest request) {
+        return moderation(new OpenAiClientContext(), request);
+    }
+
+    public SyncOrAsync<ModerationResponse> moderation(OpenAiClientContext clientContext,
+        ModerationRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    public SyncOrAsync<ModerationResult> moderation(String input) {
+        return moderation(new OpenAiClientContext(), input);
+    }
+
+    public SyncOrAsync<ModerationResult> moderation(OpenAiClientContext clientContext,
+        String input) {
+        throw new UnsupportedOperationException();
+    }
+
+    public SyncOrAsync<GenerateImagesResponse> imagesGeneration(GenerateImagesRequest request) {
+        return imagesGeneration(new OpenAiClientContext(), request);
+    }
+
+    public SyncOrAsync<GenerateImagesResponse> imagesGeneration(
+        OpenAiClientContext clientContext,
+        GenerateImagesRequest request) {
+        throw new UnsupportedOperationException();
+    }
 
     public abstract SyncOrAsync<GenerateSpeechResponse> speechGeneration(GenerateSpeechRequest request);
 
@@ -57,6 +124,28 @@ public abstract class OpenAiClient {
         }
         // fallback to the default
         return DefaultOpenAiClient.builder();
+    }
+
+    public static class OpenAiClientContext {
+        private final Map<String, String> headers = new HashMap<>();
+
+        public OpenAiClientContext addHeaders(Map<String, String> headers) {
+            this.headers.putAll(headers);
+            return this;
+        }
+
+        public OpenAiClientContext addHeader(String key, String value) {
+            headers.put(key, value);
+            return this;
+        }
+
+        public Map<String, String> headers() {
+            return headers;
+        }
+
+        public static OpenAiClientContext create() {
+            return new OpenAiClientContext();
+        }
     }
 
     @SuppressWarnings("unchecked")
