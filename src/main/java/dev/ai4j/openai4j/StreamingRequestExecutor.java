@@ -167,7 +167,6 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 }
 
                 if ("[DONE]".equals(data)) {
-                    streamingCompletionCallback.run();
                     return;
                 }
 
@@ -192,6 +191,8 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
                 if (logStreamingResponses) {
                     log.debug("onClosed()");
                 }
+
+                streamingCompletionCallback.run();
             }
 
             @Override
@@ -208,7 +209,9 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
                 if (logStreamingResponses) {
                     log.debug("onFailure()", t);
-                    responseLogger.log(response);
+                    if (response != null) {
+                        responseLogger.log(response);
+                    }
                 }
 
                 if (t != null) {

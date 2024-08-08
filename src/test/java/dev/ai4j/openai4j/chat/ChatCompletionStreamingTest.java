@@ -6,10 +6,13 @@ import dev.ai4j.openai4j.ResponseHandle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O;
 import static dev.ai4j.openai4j.chat.ChatCompletionTest.*;
@@ -22,10 +25,13 @@ import static java.util.Collections.singletonMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatCompletionStreamingTest.class);
 
     private final OpenAiClient client = OpenAiClient.builder()
             .baseUrl(System.getenv("OPENAI_BASE_URL"))
@@ -106,7 +112,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testTools(ChatCompletionModel model) throws Exception {
@@ -224,7 +229,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testFunctions(ChatCompletionModel model) throws Exception {
@@ -322,7 +326,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_TURBO_PREVIEW", // keeps returning "felsius" as temp unit
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testToolChoice(ChatCompletionModel model) throws Exception {
@@ -440,7 +443,6 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW"
     })
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
@@ -769,45 +771,31 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .logStreamingResponses()
                 .build();
 
-        AtomicBoolean streamingStarted = new AtomicBoolean(false);
-        AtomicBoolean streamingCancelled = new AtomicBoolean(false);
-        AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
+        final AtomicBoolean streamingCancelled = new AtomicBoolean(false);
+        final AtomicReference<ResponseHandle> atomicReference = new AtomicReference<>();
+        final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
         ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
                 .onPartialResponse(partialResponse -> {
-                    streamingStarted.set(true);
-                    System.out.println("[[streaming started]]");
-                    if (streamingCancelled.get()) {
-                        cancellationSucceeded.set(false);
-                        System.out.println("[[cancellation failed]]");
+                    if (! streamingCancelled.getAndSet(true)) {
+                        log.info("onPartialResponse thread {}", Thread.currentThread());
+
+                        CompletableFuture.runAsync(() -> {
+                            log.info("cancelling thread {}", Thread.currentThread());
+                            atomicReference.get().cancel();
+                            completableFuture.complete(null);
+                        });
                     }
                 })
-                .onComplete(() -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
-                .onError(e -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
+                .onComplete(() -> fail("Response completed"))
+                .onError(e -> fail("Response errored"))
                 .execute();
 
-        while (!streamingStarted.get()) {
-            Thread.sleep(10);
-        }
+        log.info("Test thread {}", Thread.currentThread());
+        atomicReference.set(responseHandle);
+        completableFuture.get();
 
-        newSingleThreadExecutor().execute(() -> {
-            responseHandle.cancel();
-            streamingCancelled.set(true);
-            System.out.println("[[streaming cancelled]]");
-        });
-
-        while (!streamingCancelled.get()) {
-            Thread.sleep(10);
-        }
-        Thread.sleep(2000);
-
-        assertThat(cancellationSucceeded).isTrue();
+        assertThat(streamingCancelled).isTrue();
     }
 
     @Test
