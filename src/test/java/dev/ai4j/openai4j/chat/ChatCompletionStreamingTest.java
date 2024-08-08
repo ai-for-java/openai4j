@@ -23,7 +23,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
@@ -535,7 +534,12 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4_0314", // Does not support tools/functions,
+            "GPT_4", "GPT_4_0613", // Does not support parallel tools
+            "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
+    })
     void testParallelTools(ChatCompletionModel model) throws Exception {
 
         // given
@@ -692,7 +696,11 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4_VISION_PREVIEW", // Does not support many things now, including response_format
+            "GPT_4", "GPT_4_0314", "GPT_4_0613", // Does not support response_format
+    })
     void testJsonResponseFormat(ChatCompletionModel model) throws Exception {
 
         // given
@@ -729,7 +737,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testGpt4Vision() throws Exception {
 
         // given
-        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Felis_silvestris_silvestris_small_gradual_decrease_of_quality.png";
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_4O)
@@ -755,7 +763,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         String response = future.get(30, SECONDS);
 
         // then
-        assertThat(response).containsIgnoringCase("green");
+        assertThat(response).containsIgnoringCase("cat");
     }
 
     @Test

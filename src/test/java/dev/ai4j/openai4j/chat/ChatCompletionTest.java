@@ -6,14 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O_MINI;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argument;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argumentsAsMap;
-import static dev.ai4j.openai4j.chat.JsonSchemaProperty.*;
-import static dev.ai4j.openai4j.chat.ResponseFormatType.JSON_OBJECT;
-import static dev.ai4j.openai4j.chat.ResponseFormatType.TEXT;
+import static dev.ai4j.openai4j.chat.ResponseFormatType.*;
 import static dev.ai4j.openai4j.chat.ToolType.FUNCTION;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
@@ -28,8 +29,17 @@ class ChatCompletionTest extends RateLimitAwareTest {
     static final Function WEATHER_FUNCTION = Function.builder()
             .name(WEATHER_TOOL_NAME)
             .description("Get the current weather in a given location")
-            .addParameter("location", STRING, description("The city and state, e.g. San Francisco, CA"))
-            .addOptionalParameter("unit", STRING, enums(Unit.class))
+            .parameters(JsonObjectSchema.builder()
+                    .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                        put("location", JsonStringSchema.builder()
+                                .description("The city and state, e.g. San Francisco, CA")
+                                .build());
+                        put("unit", JsonEnumSchema.builder()
+                                .enumValues(Unit.class)
+                                .build());
+                    }})
+                    .required(asList("location", "unit"))
+                    .build())
             .build();
     static final Tool WEATHER_TOOL = Tool.from(WEATHER_FUNCTION);
 
@@ -52,7 +62,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
@@ -89,7 +98,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
@@ -147,7 +155,133 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4_0314", // Does not support tools/functions
+            "GPT_4_VISION_PREVIEW" // Does not support many things, including tools
+    })
+    void testStrictTools(ChatCompletionModel model) {
+
+        // given
+        boolean strict = true;
+        boolean additionalProperties = false; // must be set explicitly to false when strict=true
+
+        Function weatherFunction = Function.builder()
+                .strict(strict)
+                .name(WEATHER_TOOL_NAME)
+                .description("Get the current weather in a given location")
+                .parameters(JsonObjectSchema.builder()
+                        .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("location", JsonObjectSchema.builder()
+                                    .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                                        put("city", JsonStringSchema.builder()
+                                                .description("The city, e.g. San Francisco")
+                                                .build());
+                                        put("country", JsonStringSchema.builder()
+                                                .description("The country, e.g. USA")
+                                                .build());
+                                    }})
+                                    .additionalProperties(additionalProperties)
+                                    .required(asList("city", "country")) // all properties must be required when strict=true
+                                    .build());
+                            put("unit", JsonEnumSchema.builder()
+                                    .enumValues(Unit.class)
+                                    .build());
+                        }})
+                        .additionalProperties(additionalProperties)
+                        .required(asList("location", "unit")) // all properties must be required when strict=true
+                        .build())
+                .build();
+
+        UserMessage userMessage = UserMessage.from("What is the temperature in Madrid in Celsius?");
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(model)
+                .messages(userMessage)
+                .tools(Tool.from(weatherFunction))
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        AssistantMessage assistantMessage = response.choices().get(0).message();
+        assertThat(assistantMessage.content()).isNull();
+        assertThat(assistantMessage.functionCall()).isNull();
+        assertThat(assistantMessage.toolCalls()).isNotNull().hasSize(1);
+
+        ToolCall toolCall = assistantMessage.toolCalls().get(0);
+        assertThat(toolCall.id()).isNotBlank();
+        assertThat(toolCall.type()).isEqualTo(FUNCTION);
+        assertThat(toolCall.function()).isNotNull();
+
+        FunctionCall functionCall = toolCall.function();
+        assertThat(functionCall.name()).isEqualTo(WEATHER_TOOL_NAME);
+        assertThat(functionCall.arguments()).isNotBlank();
+
+        Map<String, Object> arguments = argumentsAsMap(functionCall.arguments());
+        assertThat(arguments).hasSize(2);
+
+        Map<String, String> location = argument("location", functionCall);
+        String city = location.get("city");
+        assertThat(city).isEqualTo("Madrid");
+        assertThat(location.get("country")).isEqualTo("Spain");
+
+        String unit = argument("unit", functionCall);
+        assertThat(unit).isEqualTo("CELSIUS");
+
+        // given
+        String currentWeather = currentWeather(city, unit);
+        ToolMessage toolMessage = ToolMessage.from(toolCall.id(), currentWeather);
+
+        ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
+                .model(model)
+                .messages(userMessage, assistantMessage, toolMessage)
+                .build();
+
+        // when
+        ChatCompletionResponse secondResponse = client.chatCompletion(secondRequest).execute();
+
+        // then
+        assertThat(secondResponse.content()).contains("22");
+    }
+
+    @Test
+    void testToolWithoutParameters() {
+
+        // given
+        Function function = Function.builder()
+                .name("current_time")
+                .build();
+
+        UserMessage userMessage = UserMessage.from("What is the time now?");
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4O_MINI)
+                .messages(userMessage)
+                .tools(Tool.from(function))
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        AssistantMessage assistantMessage = response.choices().get(0).message();
+        assertThat(assistantMessage.content()).isNull();
+        assertThat(assistantMessage.functionCall()).isNull();
+        assertThat(assistantMessage.toolCalls()).isNotNull().hasSize(1);
+
+        ToolCall toolCall = assistantMessage.toolCalls().get(0);
+        assertThat(toolCall.id()).isNotBlank();
+        assertThat(toolCall.type()).isEqualTo(FUNCTION);
+        assertThat(toolCall.function()).isNotNull();
+
+        FunctionCall functionCall = toolCall.function();
+        assertThat(functionCall.name()).isEqualTo("current_time");
+        assertThat(functionCall.arguments()).isEqualTo("{}");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
@@ -199,7 +333,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
@@ -257,7 +390,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
@@ -309,15 +441,11 @@ class ChatCompletionTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {
-            // "GPT_3_5_TURBO", // still points to the old model
-            "GPT_3_5_TURBO_1106",
-            // "GPT_3_5_TURBO_0125", // don't have access to it yet
-
-            "GPT_4_TURBO_PREVIEW",
-            "GPT_4_1106_PREVIEW",
-            "GPT_4_0125_PREVIEW",
-            "GPT_4O"
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4_0314", // Does not support tools/functions,
+            "GPT_4", "GPT_4_0613", // Does not support parallel tools
+            "GPT_4_VISION_PREVIEW" // Does not support many things now, including tools
     })
     void testParallelTools(ChatCompletionModel model) {
 
@@ -328,6 +456,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .model(model)
                 .messages(userMessage)
                 .tools(WEATHER_TOOL)
+                .parallelToolCalls(true)
                 .build();
 
         // when
@@ -406,14 +535,10 @@ class ChatCompletionTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {
-            // "GPT_3_5_TURBO", // still points to the old model
-            "GPT_3_5_TURBO_1106",
-            // "GPT_3_5_TURBO_0125", // don't have access to it yet
-
-            "GPT_4_TURBO_PREVIEW",
-            "GPT_4_1106_PREVIEW",
-            "GPT_4_0125_PREVIEW"
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4_VISION_PREVIEW", // Does not support many things now, including response_format
+            "GPT_4", "GPT_4_0314", "GPT_4_0613", // Does not support response_format
     })
     void testJsonResponseFormat(ChatCompletionModel model) {
 
@@ -433,11 +558,64 @@ class ChatCompletionTest extends RateLimitAwareTest {
         assertThat(response.content()).isEqualToIgnoringWhitespace("{\"name\":\"Klaus\",\"surname\":\"Heisler\"}");
     }
 
+    @ParameterizedTest
+    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {
+            "GPT_4O_2024_08_06", "GPT_4O_MINI", "GPT_4O_MINI_2024_07_18"
+    })
+    void testStrictJsonResponseFormat(ChatCompletionModel model) {
+
+        // given
+        boolean strict = true;
+
+        JsonSchema jsonSchema = JsonSchema.builder()
+                .name("person")
+                .schema(JsonObjectSchema.builder()
+                        .description("a person")
+                        .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("name", JsonObjectSchema.builder()
+                                    .description("name of a person")
+                                    .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                                        put("first_name", JsonStringSchema.builder()
+                                                .description("first name of a person")
+                                                .build());
+                                        put("last_name", JsonStringSchema.builder()
+                                                .description("last name of a person")
+                                                .build());
+                                    }})
+                                    .required(asList("first_name", "last_name"))
+                                    .additionalProperties(false)
+                                    .build());
+                            put("age", JsonIntegerSchema.builder()
+                                    .description("age of a person")
+                                    .build());
+                        }})
+                        .required(asList("name", "age"))
+                        .additionalProperties(false)
+                        .build())
+                .strict(strict)
+                .build();
+
+        ResponseFormat responseFormat = new ResponseFormat(JSON_SCHEMA, jsonSchema);
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(model)
+                .addUserMessage("Klaus Heisler is 37 years old")
+                .responseFormat(responseFormat)
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        assertThat(response.content()).isEqualToIgnoringWhitespace(
+                "{\"name\":{\"first_name\":\"Klaus\",\"last_name\":\"Heisler\"},\"age\":37}");
+    }
+
     @Test
     void testGpt4Vision() {
 
         // given
-        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Felis_silvestris_silvestris_small_gradual_decrease_of_quality.png";
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(ChatCompletionModel.GPT_4O)
@@ -449,7 +627,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         ChatCompletionResponse response = client.chatCompletion(request).execute();
 
         // then
-        assertThat(response.content()).containsIgnoringCase("green");
+        assertThat(response.content()).containsIgnoringCase("cat");
     }
 
     @ParameterizedTest
