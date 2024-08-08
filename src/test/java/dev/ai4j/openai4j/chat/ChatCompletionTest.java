@@ -91,7 +91,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testTools(ChatCompletionModel model) {
@@ -149,7 +148,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testFunctions(ChatCompletionModel model) {
@@ -201,7 +199,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testToolChoice(ChatCompletionModel model) {
@@ -259,7 +256,6 @@ class ChatCompletionTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
             "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testFunctionChoice(ChatCompletionModel model) {
