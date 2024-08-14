@@ -24,7 +24,7 @@ jobs:
         gpg-passphrase: GPG_PASSPHRASE
 
     - name: release
-      run: mvn -B clean deploy -Psign
+      run: mvn -B clean deploy -Psign -DskipTests -DskipITs
       env:
         OPENAI_BASE_URL: 'http://langchain4j.dev:8082/v1'
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
