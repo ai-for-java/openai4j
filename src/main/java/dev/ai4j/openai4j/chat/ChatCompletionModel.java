@@ -14,8 +14,6 @@ public enum ChatCompletionModel {
     GPT_3_5_TURBO_0125("gpt-3.5-turbo-0125"),
 
     GPT_4("gpt-4"), // alias
-    @Deprecated
-    GPT_4_0314("gpt-4-0314"),
     GPT_4_0613("gpt-4-0613"),
 
     GPT_4_TURBO("gpt-4-turbo"), // alias
@@ -26,10 +24,7 @@ public enum ChatCompletionModel {
 
     GPT_4_32K("gpt-4-32k"), // alias
     GPT_4_32K_0314("gpt-4-32k-0314"),
-    GPT_4_32K_0613("gpt-4-32k-0613"),
-
-    @Deprecated
-    GPT_4_VISION_PREVIEW("gpt-4-vision-preview");
+    GPT_4_32K_0613("gpt-4-32k-0613");
 
     private final String value;
 
