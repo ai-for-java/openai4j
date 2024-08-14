@@ -1,18 +1,18 @@
 package dev.ai4j.openai4j.chat;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class Function {
 
     private final String name;
     private final String description;
-    private final Parameters parameters;
+    private final Boolean strict;
+    private final JsonObjectSchema parameters;
 
     private Function(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
+        this.strict = builder.strict;
         this.parameters = builder.parameters;
     }
 
@@ -24,7 +24,11 @@ public class Function {
         return description;
     }
 
-    public Parameters parameters() {
+    public Boolean strict() {
+        return strict;
+    }
+
+    public JsonObjectSchema parameters() {
         return parameters;
     }
 
@@ -38,6 +42,7 @@ public class Function {
     private boolean equalTo(Function another) {
         return Objects.equals(name, another.name)
                 && Objects.equals(description, another.description)
+                && Objects.equals(strict, another.strict)
                 && Objects.equals(parameters, another.parameters);
     }
 
@@ -46,6 +51,7 @@ public class Function {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(name);
         h += (h << 5) + Objects.hashCode(description);
+        h += (h << 5) + Objects.hashCode(strict);
         h += (h << 5) + Objects.hashCode(parameters);
         return h;
     }
@@ -55,6 +61,7 @@ public class Function {
         return "Function{"
                 + "name=" + name
                 + ", description=" + description
+                + ", strict=" + strict
                 + ", parameters=" + parameters
                 + "}";
     }
@@ -67,7 +74,8 @@ public class Function {
 
         private String name;
         private String description;
-        private Parameters parameters;
+        private Boolean strict;
+        private JsonObjectSchema parameters = JsonObjectSchema.builder().build();
 
         private Builder() {
         }
@@ -82,28 +90,13 @@ public class Function {
             return this;
         }
 
-        public Builder parameters(Parameters parameters) {
+        public Builder strict(Boolean strict) {
+            this.strict = strict;
+            return this;
+        }
+
+        public Builder parameters(JsonObjectSchema parameters) {
             this.parameters = parameters;
-            return this;
-        }
-
-        public Builder addParameter(String name, JsonSchemaProperty... jsonSchemaProperties) {
-            addOptionalParameter(name, jsonSchemaProperties);
-            this.parameters.required().add(name);
-            return this;
-        }
-
-        public Builder addOptionalParameter(String name, JsonSchemaProperty... jsonSchemaProperties) {
-            if (this.parameters == null) {
-                this.parameters = Parameters.builder().build();
-            }
-
-            Map<String, Object> jsonSchemaPropertiesMap = new HashMap<>();
-            for (JsonSchemaProperty jsonSchemaProperty : jsonSchemaProperties) {
-                jsonSchemaPropertiesMap.put(jsonSchemaProperty.key(), jsonSchemaProperty.value());
-            }
-
-            this.parameters.properties().put(name, jsonSchemaPropertiesMap);
             return this;
         }
 

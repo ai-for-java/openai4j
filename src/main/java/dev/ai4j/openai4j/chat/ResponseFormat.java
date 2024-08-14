@@ -5,17 +5,19 @@ import java.util.Objects;
 public class ResponseFormat {
 
     private final Object type;
+    private final JsonSchema jsonSchema;
 
-    public ResponseFormat(ResponseFormatType type) {
+    public ResponseFormat(Object type, JsonSchema jsonSchema) {
         this.type = type;
-    }
-
-    public ResponseFormat(String type) {
-        this.type = type;
+        this.jsonSchema = jsonSchema;
     }
 
     public Object type() {
         return type;
+    }
+
+    public JsonSchema jsonSchema() {
+        return jsonSchema;
     }
 
     @Override
@@ -26,13 +28,15 @@ public class ResponseFormat {
     }
 
     private boolean equalTo(ResponseFormat another) {
-        return Objects.equals(type, another.type);
+        return Objects.equals(type, another.type)
+                && Objects.equals(jsonSchema, another.jsonSchema);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(type);
+        h += (h << 5) + Objects.hashCode(jsonSchema);
         return h;
     }
 
@@ -40,6 +44,7 @@ public class ResponseFormat {
     public String toString() {
         return "ResponseFormat{" +
                 "type=" + type +
+                ", jsonSchema=" + jsonSchema +
                 "}";
     }
 }

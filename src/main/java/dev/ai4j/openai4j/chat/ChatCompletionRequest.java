@@ -28,6 +28,7 @@ public final class ChatCompletionRequest {
     private final Integer seed;
     private final List<Tool> tools;
     private final Object toolChoice;
+    private final Boolean parallelToolCalls;
     @Deprecated
     private final List<Function> functions;
     @Deprecated
@@ -50,6 +51,7 @@ public final class ChatCompletionRequest {
         this.seed = builder.seed;
         this.tools = builder.tools;
         this.toolChoice = builder.toolChoice;
+        this.parallelToolCalls = builder.parallelToolCalls;
         this.functions = builder.functions;
         this.functionCall = builder.functionCall;
     }
@@ -118,6 +120,10 @@ public final class ChatCompletionRequest {
         return toolChoice;
     }
 
+    public Boolean parallelToolCalls() {
+        return parallelToolCalls;
+    }
+
     @Deprecated
     public List<Function> functions() {
         return functions;
@@ -152,6 +158,7 @@ public final class ChatCompletionRequest {
                 && Objects.equals(seed, another.seed)
                 && Objects.equals(tools, another.tools)
                 && Objects.equals(toolChoice, another.toolChoice)
+                && Objects.equals(parallelToolCalls, another.parallelToolCalls)
                 && Objects.equals(functions, another.functions)
                 && Objects.equals(functionCall, another.functionCall);
     }
@@ -175,6 +182,7 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(seed);
         h += (h << 5) + Objects.hashCode(tools);
         h += (h << 5) + Objects.hashCode(toolChoice);
+        h += (h << 5) + Objects.hashCode(parallelToolCalls);
         h += (h << 5) + Objects.hashCode(functions);
         h += (h << 5) + Objects.hashCode(functionCall);
         return h;
@@ -199,6 +207,7 @@ public final class ChatCompletionRequest {
                 + ", seed=" + seed
                 + ", tools=" + tools
                 + ", toolChoice=" + toolChoice
+                + ", parallelToolCalls=" + parallelToolCalls
                 + ", functions=" + functions
                 + ", functionCall=" + functionCall
                 + "}";
@@ -226,6 +235,7 @@ public final class ChatCompletionRequest {
         private Integer seed;
         private List<Tool> tools;
         private Object toolChoice;
+        private Boolean parallelToolCalls;
         @Deprecated
         private List<Function> functions;
         @Deprecated
@@ -251,6 +261,7 @@ public final class ChatCompletionRequest {
             seed(instance.seed);
             tools(instance.tools);
             toolChoice(instance.toolChoice);
+            parallelToolCalls(instance.parallelToolCalls);
             functions(instance.functions);
             functionCall(instance.functionCall);
             return this;
@@ -368,14 +379,14 @@ public final class ChatCompletionRequest {
 
         public Builder responseFormat(ResponseFormatType responseFormatType) {
             if (responseFormatType != null) {
-                responseFormat = new ResponseFormat(responseFormatType);
+                responseFormat = new ResponseFormat(responseFormatType, null);
             }
             return this;
         }
 
         public Builder responseFormat(String responseFormatType) {
             if (responseFormatType != null) {
-                responseFormat = new ResponseFormat(responseFormatType);
+                responseFormat = new ResponseFormat(responseFormatType, null);
             }
             return this;
         }
@@ -412,6 +423,11 @@ public final class ChatCompletionRequest {
 
         public Builder toolChoice(Object toolChoice) {
             this.toolChoice = toolChoice;
+            return this;
+        }
+
+        public Builder parallelToolCalls(Boolean parallelToolCalls) {
+            this.parallelToolCalls = parallelToolCalls;
             return this;
         }
 

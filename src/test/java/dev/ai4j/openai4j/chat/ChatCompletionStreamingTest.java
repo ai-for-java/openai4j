@@ -23,7 +23,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
@@ -56,9 +55,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testCustomizableApi(ChatCompletionModel model) throws Exception {
 
@@ -104,10 +101,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testTools(ChatCompletionModel model) throws Exception {
 
@@ -222,10 +216,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testFunctions(ChatCompletionModel model) throws Exception {
 
@@ -319,11 +310,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
-            "GPT_4_TURBO_PREVIEW", // keeps returning "felsius" as temp unit
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW" // Does not support many things now, including logit_bias and response_format
     })
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
@@ -438,10 +425,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
-            "GPT_3_5_TURBO_0125", // don't have access to it yet
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4_0314", // Does not support tools/functions
-            "GPT_4_VISION_PREVIEW"
     })
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
@@ -535,7 +519,10 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4", "GPT_4_0613", // Does not support parallel tools
+    })
     void testParallelTools(ChatCompletionModel model) throws Exception {
 
         // given
@@ -692,7 +679,10 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ChatCompletionModel.class, mode = INCLUDE, names = {"GPT_3_5_TURBO_1106", "GPT_4_1106_PREVIEW"})
+    @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
+            "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4", "GPT_4_0613" // Does not support response_format
+    })
     void testJsonResponseFormat(ChatCompletionModel model) throws Exception {
 
         // given
@@ -729,7 +719,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testGpt4Vision() throws Exception {
 
         // given
-        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg";
+        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/e/e9/Felis_silvestris_silvestris_small_gradual_decrease_of_quality.png";
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_4O)
@@ -755,7 +745,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         String response = future.get(30, SECONDS);
 
         // then
-        assertThat(response).containsIgnoringCase("green");
+        assertThat(response).containsIgnoringCase("cat");
     }
 
     @Test

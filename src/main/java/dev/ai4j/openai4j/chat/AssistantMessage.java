@@ -13,6 +13,7 @@ public final class AssistantMessage implements Message {
     private final String content;
     private final String name;
     private final List<ToolCall> toolCalls;
+    private final Boolean refusal;
     @Deprecated
     private final FunctionCall functionCall;
 
@@ -20,6 +21,7 @@ public final class AssistantMessage implements Message {
         this.content = builder.content;
         this.name = builder.name;
         this.toolCalls = builder.toolCalls;
+        this.refusal = builder.refusal;
         this.functionCall = builder.functionCall;
     }
 
@@ -39,6 +41,10 @@ public final class AssistantMessage implements Message {
         return toolCalls;
     }
 
+    public Boolean refusal() {
+        return refusal;
+    }
+
     @Deprecated
     public FunctionCall functionCall() {
         return functionCall;
@@ -56,6 +62,7 @@ public final class AssistantMessage implements Message {
                 && Objects.equals(content, another.content)
                 && Objects.equals(name, another.name)
                 && Objects.equals(toolCalls, another.toolCalls)
+                && Objects.equals(refusal, another.refusal)
                 && Objects.equals(functionCall, another.functionCall);
     }
 
@@ -66,6 +73,7 @@ public final class AssistantMessage implements Message {
         h += (h << 5) + Objects.hashCode(content);
         h += (h << 5) + Objects.hashCode(name);
         h += (h << 5) + Objects.hashCode(toolCalls);
+        h += (h << 5) + Objects.hashCode(refusal);
         h += (h << 5) + Objects.hashCode(functionCall);
         return h;
     }
@@ -77,6 +85,7 @@ public final class AssistantMessage implements Message {
                 + ", content=" + content
                 + ", name=" + name
                 + ", toolCalls=" + toolCalls
+                + ", refusal=" + refusal
                 + ", functionCall=" + functionCall
                 + "}";
     }
@@ -96,6 +105,7 @@ public final class AssistantMessage implements Message {
         private String content;
         private String name;
         private List<ToolCall> toolCalls;
+        private Boolean refusal;
         @Deprecated
         private FunctionCall functionCall;
 
@@ -120,6 +130,11 @@ public final class AssistantMessage implements Message {
             if (toolCalls != null) {
                 this.toolCalls = unmodifiableList(toolCalls);
             }
+            return this;
+        }
+
+        public Builder refusal(Boolean refusal) {
+            this.refusal = refusal;
             return this;
         }
 
