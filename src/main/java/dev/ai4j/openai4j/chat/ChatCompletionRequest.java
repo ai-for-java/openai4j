@@ -18,6 +18,7 @@ public final class ChatCompletionRequest {
     private final Double topP;
     private final Integer n;
     private final Boolean stream;
+    private final StreamOptions streamOptions;
     private final List<String> stop;
     private final Integer maxTokens;
     private final Double presencePenalty;
@@ -41,6 +42,7 @@ public final class ChatCompletionRequest {
         this.topP = builder.topP;
         this.n = builder.n;
         this.stream = builder.stream;
+        this.streamOptions = builder.streamOptions;
         this.stop = builder.stop;
         this.maxTokens = builder.maxTokens;
         this.presencePenalty = builder.presencePenalty;
@@ -78,6 +80,10 @@ public final class ChatCompletionRequest {
 
     public Boolean stream() {
         return stream;
+    }
+
+    public StreamOptions streamOptions() {
+        return streamOptions;
     }
 
     public List<String> stop() {
@@ -148,6 +154,7 @@ public final class ChatCompletionRequest {
                 && Objects.equals(topP, another.topP)
                 && Objects.equals(n, another.n)
                 && Objects.equals(stream, another.stream)
+                && Objects.equals(streamOptions, another.streamOptions)
                 && Objects.equals(stop, another.stop)
                 && Objects.equals(maxTokens, another.maxTokens)
                 && Objects.equals(presencePenalty, another.presencePenalty)
@@ -172,6 +179,7 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(topP);
         h += (h << 5) + Objects.hashCode(n);
         h += (h << 5) + Objects.hashCode(stream);
+        h += (h << 5) + Objects.hashCode(streamOptions);
         h += (h << 5) + Objects.hashCode(stop);
         h += (h << 5) + Objects.hashCode(maxTokens);
         h += (h << 5) + Objects.hashCode(presencePenalty);
@@ -197,6 +205,7 @@ public final class ChatCompletionRequest {
                 + ", topP=" + topP
                 + ", n=" + n
                 + ", stream=" + stream
+                + ", streamOptions=" + streamOptions
                 + ", stop=" + stop
                 + ", maxTokens=" + maxTokens
                 + ", presencePenalty=" + presencePenalty
@@ -225,6 +234,7 @@ public final class ChatCompletionRequest {
         private Double topP;
         private Integer n;
         private Boolean stream;
+        private StreamOptions streamOptions;
         private List<String> stop;
         private Integer maxTokens;
         private Double presencePenalty;
@@ -251,6 +261,7 @@ public final class ChatCompletionRequest {
             topP(instance.topP);
             n(instance.n);
             stream(instance.stream);
+            streamOptions(instance.streamOptions);
             stop(instance.stop);
             maxTokens(instance.maxTokens);
             presencePenalty(instance.presencePenalty);
@@ -336,6 +347,11 @@ public final class ChatCompletionRequest {
 
         public Builder stream(Boolean stream) {
             this.stream = stream;
+            return this;
+        }
+
+        public Builder streamOptions(StreamOptions streamOptions) {
+            this.streamOptions = streamOptions;
             return this;
         }
 

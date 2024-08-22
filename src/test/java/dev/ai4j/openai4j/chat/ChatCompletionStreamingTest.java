@@ -3,6 +3,7 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import dev.ai4j.openai4j.ResponseHandle;
+import dev.ai4j.openai4j.shared.Usage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -10,6 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O;
 import static dev.ai4j.openai4j.chat.ChatCompletionTest.*;
@@ -68,6 +70,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .topP(0.1)
                 .n(1)
                 .stream(false) // intentionally setting to false in order to test that it is ignored
+                .streamOptions(new StreamOptions(true))
                 .stop("one", "two")
                 .maxTokens(3)
                 .presencePenalty(0.0)
@@ -81,12 +84,19 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         // when
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
+        AtomicReference<Usage> usageReference = new AtomicReference<>();
 
         client.chatCompletion(request)
                 .onPartialResponse(partialResponse -> {
-                    String content = partialResponse.choices().get(0).delta().content();
-                    if (content != null) {
-                        responseBuilder.append(content);
+                    for (ChatCompletionChoice choice : partialResponse.choices()) {
+                        String content = choice.delta().content();
+                        if (content != null) {
+                            responseBuilder.append(content);
+                        }
+                    }
+                    Usage usage = partialResponse.usage();
+                    if (usage != null) {
+                        usageReference.set(usage);
                     }
                 })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
@@ -97,6 +107,11 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
         // then
         assertThat(response).containsIgnoringCase("hello world");
+
+        Usage usage = usageReference.get();
+        assertThat(usage.promptTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokens()).isGreaterThan(0);
+        assertThat(usage.totalTokens()).isEqualTo(usage.promptTokens() + usage.completionTokens());
     }
 
     @ParameterizedTest
