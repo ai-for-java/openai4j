@@ -4,7 +4,7 @@
 
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.18.0</version>
+    <version>0.19.0</version>
 
     <name>Java Client for OpenAI (ChatGPT)</name>
     <description>Java Client for OpenAI (ChatGPT)</description>
