@@ -1,18 +1,33 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
+@JsonDeserialize(builder = ResponseFormat.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ResponseFormat {
 
-    private final Object type;
+    @JsonProperty
+    private final ResponseFormatType type;
+    @JsonProperty
     private final JsonSchema jsonSchema;
 
-    public ResponseFormat(Object type, JsonSchema jsonSchema) {
-        this.type = type;
-        this.jsonSchema = jsonSchema;
+    @JsonCreator
+    public ResponseFormat(Builder builder) {
+        this.type = builder.type;
+        this.jsonSchema = builder.jsonSchema;
     }
 
-    public Object type() {
+    public ResponseFormatType type() {
         return type;
     }
 
@@ -46,5 +61,32 @@ public class ResponseFormat {
                 "type=" + type +
                 ", jsonSchema=" + jsonSchema +
                 "}";
+    }
+
+    public static ResponseFormat.Builder builder() {
+        return new ResponseFormat.Builder();
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class Builder {
+
+        private ResponseFormatType type;
+        private JsonSchema jsonSchema;
+
+        public ResponseFormat.Builder type(ResponseFormatType type) {
+            this.type = type;
+            return this;
+        }
+
+        public ResponseFormat.Builder jsonSchema(JsonSchema jsonSchema) {
+            this.jsonSchema = jsonSchema;
+            return this;
+        }
+
+        public ResponseFormat build() {
+            return new ResponseFormat(this);
+        }
     }
 }

@@ -1,5 +1,13 @@
 package dev.ai4j.openai4j.completion;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -8,23 +16,42 @@ import static dev.ai4j.openai4j.completion.CompletionModel.GPT_3_5_TURBO_INSTRUC
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
+@JsonDeserialize(builder = CompletionRequest.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class CompletionRequest {
 
+    @JsonProperty
     private final String model;
+    @JsonProperty
     private final String prompt;
+    @JsonProperty
     private final String suffix;
+    @JsonProperty
     private final Integer maxTokens;
+    @JsonProperty
     private final Double temperature;
+    @JsonProperty
     private final Double topP;
+    @JsonProperty
     private final Integer n;
+    @JsonProperty
     private final Boolean stream;
+    @JsonProperty
     private final Integer logprobs;
+    @JsonProperty
     private final Boolean echo;
+    @JsonProperty
     private final List<String> stop;
+    @JsonProperty
     private final Double presencePenalty;
+    @JsonProperty
     private final Double frequencyPenalty;
+    @JsonProperty
     private final Integer bestOf;
+    @JsonProperty
     private final Map<String, Integer> logitBias;
+    @JsonProperty
     private final String user;
 
     private CompletionRequest(Builder builder) {
@@ -184,6 +211,9 @@ public final class CompletionRequest {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String model = GPT_3_5_TURBO_INSTRUCT.toString();

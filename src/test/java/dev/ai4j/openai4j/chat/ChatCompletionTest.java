@@ -581,7 +581,10 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .strict(strict)
                 .build();
 
-        ResponseFormat responseFormat = new ResponseFormat(JSON_SCHEMA, jsonSchema);
+        ResponseFormat responseFormat = ResponseFormat.builder()
+                .type(JSON_SCHEMA)
+                .jsonSchema(jsonSchema)
+                .build();
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)

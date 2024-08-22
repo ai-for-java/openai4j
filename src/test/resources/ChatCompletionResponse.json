@@ -1,0 +1,34 @@
+{
+  "id": "chatcmpl-A0Xrul5c1eG3NdRfoHvmQS5f1qymN",
+  "object": "chat.completion",
+  "created": 1724693554,
+  "model": "gpt-4o-2024-05-13",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_ezsB42qA2ag598BT3maL8Arv",
+            "type": "function",
+            "function": {
+              "name": "get_current_weather",
+              "arguments": "{\"location\":\"Boston, MA\",\"unit\":\"FAHRENHEIT\"}"
+            }
+          }
+        ],
+        "refusal": null
+      },
+      "logprobs": null,
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 83,
+    "completion_tokens": 25,
+    "total_tokens": 108
+  },
+  "system_fingerprint": "fp_3aa7262c27"
+}

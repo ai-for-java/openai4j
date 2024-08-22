@@ -4,7 +4,7 @@
 
     <groupId>dev.ai4j</groupId>
     <artifactId>openai4j</artifactId>
-    <version>0.19.0</version>
+    <version>0.20.0</version>
 
     <name>Java Client for OpenAI (ChatGPT)</name>
     <description>Java Client for OpenAI (ChatGPT)</description>
@@ -57,20 +57,14 @@
 
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
-            <artifactId>converter-gson</artifactId>
+            <artifactId>converter-jackson</artifactId>
             <version>${retrofit.version}</version>
-            <exclusions>
-                <!-- Due to CVE-2022-25647 and CVE-2020-15250 vulnerabilities -->
-                <exclusion>
-                    <groupId>com.google.code.gson</groupId>
-                    <artifactId>gson</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.2</version>
         </dependency>
 
         <dependency>

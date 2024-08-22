@@ -1,6 +1,14 @@
 package dev.ai4j.openai4j.completion;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,11 +17,18 @@ import java.util.Objects;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
+@JsonDeserialize(builder = Logprobs.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class Logprobs {
 
+    @JsonProperty
     private final List<String> tokens;
+    @JsonProperty
     private final List<Double> tokenLogprobs;
+    @JsonProperty
     private final List<Map<String, Double>> topLogprobs;
+    @JsonProperty
     private final List<Integer> textOffset;
 
     private Logprobs(Builder builder) {
@@ -77,6 +92,9 @@ public final class Logprobs {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private List<String> tokens;

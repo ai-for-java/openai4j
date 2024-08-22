@@ -1,13 +1,25 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
 import static dev.ai4j.openai4j.chat.Role.TOOL;
 
+@JsonDeserialize(builder = ToolMessage.Builder.class)
 public final class ToolMessage implements Message {
 
+    @JsonProperty
     private final Role role = TOOL;
+    @JsonProperty
     private final String toolCallId;
+    @JsonProperty
     private final String content;
 
     private ToolMessage(Builder builder) {
@@ -69,6 +81,9 @@ public final class ToolMessage implements Message {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String toolCallId;

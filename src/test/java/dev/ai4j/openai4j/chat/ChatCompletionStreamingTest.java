@@ -70,7 +70,9 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .topP(0.1)
                 .n(1)
                 .stream(false) // intentionally setting to false in order to test that it is ignored
-                .streamOptions(new StreamOptions(true))
+                .streamOptions(StreamOptions.builder()
+                        .includeUsage(true)
+                        .build())
                 .stop("one", "two")
                 .maxTokens(3)
                 .presencePenalty(0.0)

@@ -1,13 +1,25 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
+@JsonDeserialize(builder = StreamOptions.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class StreamOptions {
 
+    @JsonProperty
     private final Boolean includeUsage;
 
-    public StreamOptions(Boolean includeUsage) {
-        this.includeUsage = includeUsage;
+    public StreamOptions(Builder builder) {
+        this.includeUsage = builder.includeUsage;
     }
 
     public Boolean includeUsage() {
@@ -37,5 +49,26 @@ public final class StreamOptions {
         return "StreamOptions{" +
                 "includeUsage=" + includeUsage +
                 "}";
+    }
+
+    public static StreamOptions.Builder builder() {
+        return new StreamOptions.Builder();
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class Builder {
+
+        private Boolean includeUsage;
+
+        public StreamOptions.Builder includeUsage(Boolean includeUsage) {
+            this.includeUsage = includeUsage;
+            return this;
+        }
+
+        public StreamOptions build() {
+            return new StreamOptions(this);
+        }
     }
 }

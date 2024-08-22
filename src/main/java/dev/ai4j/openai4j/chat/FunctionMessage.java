@@ -1,14 +1,28 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
 import static dev.ai4j.openai4j.chat.Role.FUNCTION;
 
+@JsonDeserialize(builder = FunctionMessage.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Deprecated
 public final class FunctionMessage implements Message {
 
+    @JsonProperty
     private final Role role = FUNCTION;
+    @JsonProperty
     private final String name;
+    @JsonProperty
     private final String content;
 
     private FunctionMessage(Builder builder) {
@@ -72,6 +86,9 @@ public final class FunctionMessage implements Message {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String name;

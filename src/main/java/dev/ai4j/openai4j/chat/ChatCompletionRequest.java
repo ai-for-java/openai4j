@@ -1,5 +1,14 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,28 +19,51 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
+@JsonDeserialize(builder = ChatCompletionRequest.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class ChatCompletionRequest {
 
+    @JsonProperty
     private final String model;
+    @JsonProperty
     private final List<Message> messages;
+    @JsonProperty
     private final Double temperature;
+    @JsonProperty
     private final Double topP;
+    @JsonProperty
     private final Integer n;
+    @JsonProperty
     private final Boolean stream;
+    @JsonProperty
     private final StreamOptions streamOptions;
+    @JsonProperty
     private final List<String> stop;
+    @JsonProperty
     private final Integer maxTokens;
+    @JsonProperty
     private final Double presencePenalty;
+    @JsonProperty
     private final Double frequencyPenalty;
+    @JsonProperty
     private final Map<String, Integer> logitBias;
+    @JsonProperty
     private final String user;
+    @JsonProperty
     private final ResponseFormat responseFormat;
+    @JsonProperty
     private final Integer seed;
+    @JsonProperty
     private final List<Tool> tools;
+    @JsonProperty
     private final Object toolChoice;
+    @JsonProperty
     private final Boolean parallelToolCalls;
+    @JsonProperty
     @Deprecated
     private final List<Function> functions;
+    @JsonProperty
     @Deprecated
     private final FunctionCall functionCall;
 
@@ -226,6 +258,9 @@ public final class ChatCompletionRequest {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String model = GPT_3_5_TURBO.toString();
@@ -287,6 +322,7 @@ public final class ChatCompletionRequest {
             return this;
         }
 
+        @JsonSetter
         public Builder messages(List<Message> messages) {
             if (messages != null) {
                 this.messages = unmodifiableList(messages);
@@ -355,6 +391,7 @@ public final class ChatCompletionRequest {
             return this;
         }
 
+        @JsonSetter
         public Builder stop(List<String> stop) {
             if (stop != null) {
                 this.stop = unmodifiableList(stop);
@@ -395,18 +432,14 @@ public final class ChatCompletionRequest {
 
         public Builder responseFormat(ResponseFormatType responseFormatType) {
             if (responseFormatType != null) {
-                responseFormat = new ResponseFormat(responseFormatType, null);
+                responseFormat = ResponseFormat.builder()
+                        .type(responseFormatType)
+                        .build();
             }
             return this;
         }
 
-        public Builder responseFormat(String responseFormatType) {
-            if (responseFormatType != null) {
-                responseFormat = new ResponseFormat(responseFormatType, null);
-            }
-            return this;
-        }
-
+        @JsonSetter
         public Builder responseFormat(ResponseFormat responseFormat) {
             this.responseFormat = responseFormat;
             return this;
@@ -417,6 +450,7 @@ public final class ChatCompletionRequest {
             return this;
         }
 
+        @JsonSetter
         public Builder tools(List<Tool> tools) {
             if (tools != null) {
                 this.tools = unmodifiableList(tools);
@@ -452,6 +486,7 @@ public final class ChatCompletionRequest {
             return functions(asList(functions));
         }
 
+        @JsonSetter
         @Deprecated
         public Builder functions(List<Function> functions) {
             if (functions != null) {

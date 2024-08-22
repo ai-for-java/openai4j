@@ -1,16 +1,29 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
 import static dev.ai4j.openai4j.chat.ToolType.FUNCTION;
 
+@JsonDeserialize(builder = ToolChoice.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ToolChoice {
 
+    @JsonProperty
     private final ToolType type = FUNCTION;
+    @JsonProperty
     private final Function function;
 
-    public ToolChoice(String functionName) {
-        this.function = Function.builder().name(functionName).build();
+    private ToolChoice(Builder builder) {
+        function = builder.function;
     }
 
     @Override
@@ -42,6 +55,28 @@ public class ToolChoice {
     }
 
     public static ToolChoice from(String functionName) {
-        return new ToolChoice(functionName);
+        return new Builder()
+                .function(Function.builder()
+                        .name(functionName).build())
+                .build();
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static final class Builder {
+        private Function function;
+
+        private Builder() {
+        }
+
+        public ToolChoice.Builder function(Function function) {
+            this.function = function;
+            return this;
+        }
+
+        public ToolChoice build() {
+            return new ToolChoice(this);
+        }
     }
 }
