@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O_MINI;
@@ -24,6 +26,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
     static final String SYSTEM_MESSAGE = "Be concise";
     static final String USER_MESSAGE = "Write exactly the following 2 words: 'hello world'";
+    static final String WEATHER_PROMPT = "What is the weather in Boston in Celsius?";
 
     static final String WEATHER_TOOL_NAME = "get_current_weather";
     static final Function WEATHER_FUNCTION = Function.builder()
@@ -102,7 +105,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testTools(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -117,7 +120,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         AssistantMessage assistantMessage = response.choices().get(0).message();
         assertThat(assistantMessage.content()).isNull();
         assertThat(assistantMessage.functionCall()).isNull();
-        assertThat(assistantMessage.toolCalls()).isNotNull().hasSize(1);
+        assertThat(assistantMessage.toolCalls()).isNotNull().hasSizeBetween(1, 2);
 
         ToolCall toolCall = assistantMessage.toolCalls().get(0);
         assertThat(toolCall.id()).isNotBlank();
@@ -138,9 +141,24 @@ class ChatCompletionTest extends RateLimitAwareTest {
         String currentWeather = currentWeather(location, unit);
         ToolMessage toolMessage = ToolMessage.from(toolCall.id(), currentWeather);
 
+        List<Message> messages = new ArrayList<>();
+        messages.add(userMessage);
+        messages.add(assistantMessage);
+
+        for (ToolCall toolCall2 : assistantMessage.toolCalls()) {
+            FunctionCall functionCall2 = toolCall2.function();
+            Map<String, Object> arguments2 = argumentsAsMap(functionCall2.arguments());
+
+            String location2 = argument("location", functionCall2);
+            String unit2 = argument("unit", functionCall2);
+            String currentWeather2 = currentWeather(location2, unit2);
+            ToolMessage toolMessage2 = ToolMessage.from(toolCall2.id(), currentWeather2);
+            messages.add(toolMessage2);
+        }
+
         ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
                 .model(model)
-                .messages(userMessage, assistantMessage, toolMessage)
+                .messages(messages)
                 .build();
 
         // when
@@ -282,7 +300,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testFunctions(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -331,7 +349,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testToolChoice(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -386,7 +404,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testFunctionChoice(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)

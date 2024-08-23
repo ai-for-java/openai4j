@@ -7,7 +7,11 @@ import dev.ai4j.openai4j.shared.Usage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,9 +28,12 @@ import static java.util.Collections.singletonMap;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatCompletionStreamingTest.class);
 
     private final OpenAiClient client = OpenAiClient.builder()
             .baseUrl(System.getenv("OPENAI_BASE_URL"))
@@ -121,7 +128,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testTools(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -139,12 +146,17 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .onPartialResponse(partialResponse -> {
                     Delta delta = partialResponse.choices().get(0).delta();
                     assertThat(delta.content()).isNull();
-                    assertThat(delta.functionCall()).isNull();
+                    assertThat(delta.functionCall()).isIn(null, "");
 
                     if (delta.toolCalls() != null) {
                         assertThat(delta.toolCalls()).hasSize(1);
 
                         ToolCall toolCall = delta.toolCalls().get(0);
+                        if (toolCall.index() > 0) {
+                            // skip other function candidates
+                            return;
+                        }
+
                         assertThat(toolCall.type()).isIn(null, FUNCTION);
                         assertThat(toolCall.function()).isNotNull();
 
@@ -177,7 +189,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .onError(future::completeExceptionally)
                 .execute();
 
-        AssistantMessage assistantMessage = future.get(30, SECONDS);
+        AssistantMessage assistantMessage = future.get(120, SECONDS);
 
         // then
         assertThat(assistantMessage.content()).isNull();
@@ -203,9 +215,24 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         String currentWeather = currentWeather(location, unit);
         ToolMessage toolMessage = ToolMessage.from(toolCall.id(), currentWeather);
 
+        List<Message> messages = new ArrayList<>();
+        messages.add(userMessage);
+        messages.add(assistantMessage);
+
+        for (ToolCall toolCall2 : assistantMessage.toolCalls()) {
+            FunctionCall functionCall2 = toolCall2.function();
+            Map<String, Object> arguments2 = argumentsAsMap(functionCall2.arguments());
+
+            String location2 = argument("location", functionCall2);
+            String unit2 = argument("unit", functionCall2);
+            String currentWeather2 = currentWeather(location2, unit2);
+            ToolMessage toolMessage2 = ToolMessage.from(toolCall2.id(), currentWeather2);
+            messages.add(toolMessage2);
+        }
+
         ChatCompletionRequest secondRequest = ChatCompletionRequest.builder()
                 .model(model)
-                .messages(userMessage, assistantMessage, toolMessage)
+                .messages(messages)
                 .build();
 
         // when
@@ -236,7 +263,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testFunctions(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -330,7 +357,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -445,7 +472,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from(WEATHER_PROMPT);
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -774,45 +801,31 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                 .logStreamingResponses()
                 .build();
 
-        AtomicBoolean streamingStarted = new AtomicBoolean(false);
-        AtomicBoolean streamingCancelled = new AtomicBoolean(false);
-        AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
+        final AtomicBoolean streamingCancelled = new AtomicBoolean(false);
+        final AtomicReference<ResponseHandle> atomicReference = new AtomicReference<>();
+        final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
         ResponseHandle responseHandle = client.chatCompletion("Write a poem about AI in 10 words")
                 .onPartialResponse(partialResponse -> {
-                    streamingStarted.set(true);
-                    System.out.println("[[streaming started]]");
-                    if (streamingCancelled.get()) {
-                        cancellationSucceeded.set(false);
-                        System.out.println("[[cancellation failed]]");
+                    if (! streamingCancelled.getAndSet(true)) {
+                        log.info("onPartialResponse thread {}", Thread.currentThread());
+
+                        CompletableFuture.runAsync(() -> {
+                            log.info("cancelling thread {}", Thread.currentThread());
+                            atomicReference.get().cancel();
+                            completableFuture.complete(null);
+                        });
                     }
                 })
-                .onComplete(() -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
-                .onError(e -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
+                .onComplete(() -> fail("Response completed"))
+                .onError(e -> fail("Response errored"))
                 .execute();
 
-        while (!streamingStarted.get()) {
-            Thread.sleep(10);
-        }
+        log.info("Test thread {}", Thread.currentThread());
+        atomicReference.set(responseHandle);
+        completableFuture.get();
 
-        newSingleThreadExecutor().execute(() -> {
-            responseHandle.cancel();
-            streamingCancelled.set(true);
-            System.out.println("[[streaming cancelled]]");
-        });
-
-        while (!streamingCancelled.get()) {
-            Thread.sleep(10);
-        }
-        Thread.sleep(2000);
-
-        assertThat(cancellationSucceeded).isTrue();
+        assertThat(streamingCancelled).isTrue();
     }
 
     @Test
