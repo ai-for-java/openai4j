@@ -306,6 +306,24 @@
     "allPublicFields": true
   },
   {
+    "name": "dev.ai4j.openai4j.audio.GenerateSpeechRequest",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "dev.ai4j.openai4j.audio.GenerateSpeechResponse",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
     "name": "dev.ai4j.openai4j.moderation.Categories",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,

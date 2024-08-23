@@ -1,5 +1,6 @@
 package dev.ai4j.openai4j;
 
+import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
 import dev.ai4j.openai4j.image.GenerateImagesResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -47,6 +48,17 @@ class PersistorConverterFactory extends Converter.Factory {
                             throw new RuntimeException(e);
                         }
                     });
+            }
+
+            if (response instanceof GenerateSpeechResponse) {
+                try {
+                    GenerateSpeechResponse generateSpeechResponse = (GenerateSpeechResponse) response;
+                    generateSpeechResponse.url(
+                            FilePersistor.persistFromByteArray(generateSpeechResponse.data(), persistTo).toUri()
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             return response;

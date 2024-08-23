@@ -2,6 +2,8 @@ package dev.ai4j.openai4j;
 
 import static dev.ai4j.openai4j.LogLevel.DEBUG;
 
+import dev.ai4j.openai4j.audio.GenerateSpeechRequest;
+import dev.ai4j.openai4j.audio.GenerateSpeechResponse;
 import dev.ai4j.openai4j.chat.ChatCompletionRequest;
 import dev.ai4j.openai4j.chat.ChatCompletionResponse;
 import dev.ai4j.openai4j.completion.CompletionRequest;
@@ -110,6 +112,8 @@ public abstract class OpenAiClient {
         GenerateImagesRequest request) {
         throw new UnsupportedOperationException();
     }
+
+    public abstract SyncOrAsync<GenerateSpeechResponse> speechGeneration(GenerateSpeechRequest request);
 
     public abstract void shutdown();
 
