@@ -13,6 +13,8 @@ import java.util.Objects;
 import static dev.ai4j.openai4j.chat.Role.SYSTEM;
 
 @JsonDeserialize(builder = SystemMessage.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class SystemMessage implements Message {
 
     @JsonProperty

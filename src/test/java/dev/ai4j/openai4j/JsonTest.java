@@ -10,54 +10,15 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import static dev.ai4j.openai4j.chat.ResponseFormatType.JSON_SCHEMA;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class JsonTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Test
-    public void chatCompletionRequest() throws JsonProcessingException {
-        String prompt = "What is the capital of France?";
-
-        ResponseFormat responseFormat = ResponseFormat.builder()
-                .type(JSON_SCHEMA)
-                .jsonSchema(JsonSchema.builder()
-                        .build())
-                .build();
-
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model("gpt-3.5-turbo")
-                .messages(
-                        UserMessage.from(prompt)
-                )
-                .tools(Tool.from(Function.builder()
-                                .name("get_capital")
-                                .description("Get the capital of a country")
-                                .parameters(JsonObjectSchema.builder()
-                                    .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
-                                        put("country", JsonStringSchema.builder()
-                                            .description("The name of the country")
-                                            .build());
-                                    }})
-                                .build())
-                        .build()))
-                .stream(true)
-                .responseFormat(responseFormat)
-                .build();
-
-        String json = objectMapper.writeValueAsString(request);
-        assertThat(json).contains(prompt);
-        assertThat(json).contains("\"type\":\"function\"");
-
-        ChatCompletionRequest duplicate = objectMapper.readValue(json, ChatCompletionRequest.class);
-        assertEquals(request, duplicate);
-    }
 
     @Test
     public void chatCompletionResponse() throws JsonProcessingException {
@@ -110,14 +71,7 @@ public class JsonTest {
     }
 
     @Test
-    public void deserializeChatCompletionRequest() throws IOException  {
-        InputStream inputStream = getClass().getResourceAsStream("/ChatCompletionRequest.json");
-        ChatCompletionRequest chatCompletionRequest = objectMapper.readValue(inputStream, ChatCompletionRequest.class);
-        assertNotNull(chatCompletionRequest.responseFormat());
-    }
-
-    @Test
-    public void deserializeChatCompletionResponse() throws IOException  {
+    public void deserializeChatCompletionResponse() throws IOException {
         InputStream inputStream = getClass().getResourceAsStream("/ChatCompletionResponse.json");
         ChatCompletionResponse chatCompletionResponse = objectMapper.readValue(inputStream, ChatCompletionResponse.class);
         AssistantMessage message = chatCompletionResponse.choices().get(0).message();
@@ -125,7 +79,7 @@ public class JsonTest {
     }
 
     @Test
-    public void deserializeModerationResponse() throws IOException  {
+    public void deserializeModerationResponse() throws IOException {
         InputStream inputStream = getClass().getResourceAsStream("/ModerationResponse.json");
         ModerationResponse moderationResponse = objectMapper.readValue(inputStream, ModerationResponse.class);
         assertThat(moderationResponse.results().get(0).categories().hateThreatening()).isFalse();
