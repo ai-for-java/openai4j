@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.*;
 
 @JsonDeserialize(builder = JsonObjectSchema.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class JsonObjectSchema extends JsonSchemaElement {
 
     @JsonProperty

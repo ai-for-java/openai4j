@@ -16,6 +16,8 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 @JsonDeserialize(builder = JsonEnumSchema.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class JsonEnumSchema extends JsonSchemaElement {
 
     @JsonProperty

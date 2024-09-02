@@ -18,6 +18,8 @@ import static dev.ai4j.openai4j.chat.Role.USER;
 import static java.util.Collections.unmodifiableList;
 
 @JsonDeserialize(builder = UserMessage.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class UserMessage implements Message {
 
     @JsonProperty
