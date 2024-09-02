@@ -1,5 +1,13 @@
 package dev.ai4j.openai4j.image;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -8,8 +16,12 @@ import java.util.Objects;
  * Represents the response from the OpenAI DALL·E API when generating images.
  * Find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/object">here</a>.
  */
+@JsonDeserialize(builder = GenerateImagesResponse.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GenerateImagesResponse {
 
+    @JsonProperty
     private final List<ImageData> data;
 
     public GenerateImagesResponse(Builder builder) {
@@ -22,69 +34,6 @@ public class GenerateImagesResponse {
 
     public List<ImageData> data() {
         return data;
-    }
-
-    public static class ImageData {
-
-        private URI url;
-        private final String b64Json;
-        private final String revisedPrompt;
-
-        public ImageData(URI url, String b64Json, String revisedPrompt) {
-            this.url = url;
-            this.b64Json = b64Json;
-            this.revisedPrompt = revisedPrompt;
-        }
-
-        public URI url() {
-            return url;
-        }
-
-        public String b64Json() {
-            return b64Json;
-        }
-
-        public String revisedPrompt() {
-            return revisedPrompt;
-        }
-
-        public void url(URI url) {
-            this.url = url;
-        }
-
-        @Override
-        public boolean equals(Object another) {
-            if (this == another) return true;
-            if (another == null || getClass() != another.getClass()) return false;
-            ImageData anotherImageData = (ImageData) another;
-            return (
-                Objects.equals(url, anotherImageData.url) &&
-                Objects.equals(b64Json, anotherImageData.b64Json) &&
-                Objects.equals(revisedPrompt, anotherImageData.revisedPrompt)
-            );
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(url, b64Json, revisedPrompt);
-        }
-
-        @Override
-        public String toString() {
-            return (
-                "ImageData{" +
-                "url='" +
-                url +
-                '\'' +
-                ", b64Json='" +
-                b64Json +
-                '\'' +
-                ", revisedPrompt='" +
-                revisedPrompt +
-                '\'' +
-                '}'
-            );
-        }
     }
 
     @Override
@@ -105,6 +54,9 @@ public class GenerateImagesResponse {
         return Objects.hash(data);
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Builder {
 
         private List<ImageData> data;

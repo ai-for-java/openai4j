@@ -1,5 +1,13 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -9,10 +17,14 @@ import static dev.ai4j.openai4j.chat.ContentType.TEXT;
 import static dev.ai4j.openai4j.chat.Role.USER;
 import static java.util.Collections.unmodifiableList;
 
+@JsonDeserialize(builder = UserMessage.Builder.class)
 public final class UserMessage implements Message {
 
+    @JsonProperty
     private final Role role = USER;
+    @JsonProperty
     private final Object content;
+    @JsonProperty
     private final String name;
 
     private UserMessage(Builder builder) {
@@ -80,6 +92,9 @@ public final class UserMessage implements Message {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String stringContent; // keeping it for compatibility with other OpenAI-like APIs

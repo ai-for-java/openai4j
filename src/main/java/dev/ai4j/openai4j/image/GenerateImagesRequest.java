@@ -1,5 +1,13 @@
 package dev.ai4j.openai4j.image;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_3;
 import static dev.ai4j.openai4j.image.ImageModel.DALL_E_RESPONSE_FORMAT_URL;
 
@@ -9,15 +17,26 @@ import java.util.Objects;
  * Represents the request from the OpenAI DALL·E API when generating images.
  * Find description of parameters <a href="https://platform.openai.com/docs/api-reference/images/create">here</a>.
  */
+@JsonDeserialize(builder = GenerateImagesRequest.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GenerateImagesRequest {
 
+    @JsonProperty
     private final String model;
+    @JsonProperty
     private final String prompt;
+    @JsonProperty
     private final int n;
+    @JsonProperty
     private final String size;
+    @JsonProperty
     private final String quality;
+    @JsonProperty
     private final String style;
+    @JsonProperty
     private final String user;
+    @JsonProperty
     private final String responseFormat;
 
     private GenerateImagesRequest(Builder builder) {
@@ -71,6 +90,9 @@ public class GenerateImagesRequest {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Builder {
 
         private String model = DALL_E_3.toString();

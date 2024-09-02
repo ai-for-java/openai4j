@@ -1,6 +1,12 @@
 package dev.ai4j.openai4j.chat;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +15,12 @@ import java.util.Objects;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
+@JsonDeserialize(builder = JsonEnumSchema.Builder.class)
 public class JsonEnumSchema extends JsonSchemaElement {
 
+    @JsonProperty
     private final String description;
-    @SerializedName("enum")
+    @JsonProperty("enum")
     private final List<String> enumValues;
 
     public JsonEnumSchema(Builder builder) {
@@ -53,6 +61,9 @@ public class JsonEnumSchema extends JsonSchemaElement {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Builder {
 
         private String description;

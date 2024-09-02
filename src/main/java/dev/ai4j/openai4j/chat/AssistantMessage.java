@@ -1,5 +1,15 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -7,13 +17,22 @@ import static dev.ai4j.openai4j.chat.Role.ASSISTANT;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
+@JsonDeserialize(builder = AssistantMessage.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class AssistantMessage implements Message {
 
+    @JsonProperty
     private final Role role = ASSISTANT;
+    @JsonProperty
     private final String content;
+    @JsonProperty
     private final String name;
+    @JsonProperty
     private final List<ToolCall> toolCalls;
+    @JsonProperty
     private final Boolean refusal;
+    @JsonProperty
     @Deprecated
     private final FunctionCall functionCall;
 
@@ -100,6 +119,9 @@ public final class AssistantMessage implements Message {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private String content;
@@ -126,6 +148,7 @@ public final class AssistantMessage implements Message {
             return toolCalls(asList(toolCalls));
         }
 
+        @JsonSetter
         public Builder toolCalls(List<ToolCall> toolCalls) {
             if (toolCalls != null) {
                 this.toolCalls = unmodifiableList(toolCalls);

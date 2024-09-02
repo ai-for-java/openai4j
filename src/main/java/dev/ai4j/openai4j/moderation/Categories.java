@@ -1,27 +1,40 @@
 package dev.ai4j.openai4j.moderation;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.Objects;
 
+@JsonDeserialize(builder = Categories.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class Categories {
 
+    @JsonProperty
     private final Boolean hate;
 
-    @SerializedName("hate/threatening")
+    @JsonProperty("hate/threatening")
     private final Boolean hateThreatening;
 
-    @SerializedName("self-harm")
+    @JsonProperty("self-harm")
     private final Boolean selfHarm;
 
+    @JsonProperty
     private final Boolean sexual;
 
-    @SerializedName("sexual/minors")
+    @JsonProperty("sexual/minors")
     private final Boolean sexualMinors;
 
+    @JsonProperty
     private final Boolean violence;
 
-    @SerializedName("violence/graphic")
+    @JsonProperty("violence/graphic")
     private final Boolean violenceGraphic;
 
     private Categories(Builder builder) {
@@ -109,6 +122,9 @@ public final class Categories {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
         private Boolean hate;
@@ -127,11 +143,13 @@ public final class Categories {
             return this;
         }
 
+        @JsonSetter("hate/threatening")
         public Builder hateThreatening(Boolean hateThreatening) {
             this.hateThreatening = hateThreatening;
             return this;
         }
 
+        @JsonSetter("self-harm")
         public Builder selfHarm(Boolean selfHarm) {
             this.selfHarm = selfHarm;
             return this;
@@ -142,6 +160,7 @@ public final class Categories {
             return this;
         }
 
+        @JsonSetter("sexual/minors")
         public Builder sexualMinors(Boolean sexualMinors) {
             this.sexualMinors = sexualMinors;
             return this;
@@ -152,6 +171,7 @@ public final class Categories {
             return this;
         }
 
+        @JsonSetter("violence/graphic")
         public Builder violenceGraphic(Boolean violenceGraphic) {
             this.violenceGraphic = violenceGraphic;
             return this;

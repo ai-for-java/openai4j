@@ -16,14 +16,12 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static dev.ai4j.openai4j.Json.GSON;
 
 public class DefaultOpenAiClient extends OpenAiClient {
 
@@ -96,7 +94,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
             retrofitBuilder.addConverterFactory(new PersistorConverterFactory(serviceBuilder.persistTo));
         }
 
-        retrofitBuilder.addConverterFactory(GsonConverterFactory.create(GSON));
+        retrofitBuilder.addConverterFactory(JacksonConverterFactory.create(Json.OBJECT_MAPPER));
 
         this.openAiApi = retrofitBuilder.build().create(OpenAiApi.class);
     }

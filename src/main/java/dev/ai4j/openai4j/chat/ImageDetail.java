@@ -1,6 +1,13 @@
 package dev.ai4j.openai4j.chat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ImageDetail {
 
-    LOW, HIGH, AUTO
+    @JsonProperty("low")
+    LOW,
+    @JsonProperty("high")
+    HIGH,
+    @JsonProperty("auto")
+    AUTO
 }

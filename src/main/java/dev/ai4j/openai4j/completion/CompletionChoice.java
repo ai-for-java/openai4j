@@ -1,12 +1,27 @@
 package dev.ai4j.openai4j.completion;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
 import java.util.Objects;
 
+@JsonDeserialize(builder = CompletionChoice.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class CompletionChoice {
 
+    @JsonProperty
     private final String text;
+    @JsonProperty
     private final Integer index;
+    @JsonProperty
     private final Logprobs logprobs;
+    @JsonProperty
     private final String finishReason;
 
     private CompletionChoice(Builder builder) {
@@ -70,11 +85,18 @@ public final class CompletionChoice {
         return new Builder();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
+        @JsonProperty
         private String text;
+        @JsonProperty
         private Integer index;
+        @JsonProperty
         private Logprobs logprobs;
+        @JsonProperty
         private String finishReason;
 
         private Builder() {
