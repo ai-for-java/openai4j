@@ -1,15 +1,22 @@
 package dev.ai4j.openai4j.chat;
 
+import dev.ai4j.openai4j.DefaultOpenAiClient;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import dev.ai4j.openai4j.ResponseHandle;
 import dev.ai4j.openai4j.shared.Usage;
+import okhttp3.Dispatcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,13 +35,28 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 
 class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
+    private static final Logger log = LoggerFactory.getLogger(ChatCompletionStreamingTest.class);
     private final OpenAiClient client = OpenAiClient.builder()
             .baseUrl(System.getenv("OPENAI_BASE_URL"))
             .openAiApiKey(System.getenv("OPENAI_API_KEY"))
             .logRequests()
             .logResponses()
             .logStreamingResponses()
+            .dispatcher(getCustomDispatcher())
             .build();
+
+    private Dispatcher getCustomDispatcher() {
+        return new Dispatcher(
+            new ThreadPoolExecutor(0, 100, 60, TimeUnit.SECONDS,
+                new SynchronousQueue<>(),
+                runnable -> {
+                    Thread thread = new Thread(runnable, "CustomDispatcher");
+                    log.debug("CustomDispatcher thread created, id={}", thread.getId());
+                    return thread;
+                }
+            )
+        );
+    }
 
     @Test
     void testSimpleApi() throws Exception {
@@ -45,7 +67,10 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
 
         client.chatCompletion(USER_MESSAGE)
                 .onPartialResponse(responseBuilder::append)
-                .onComplete(() -> future.complete(responseBuilder.toString()))
+                .onComplete(() -> {
+                    log.debug("Current thread id={}", Thread.currentThread().getId());
+                    future.complete(responseBuilder.toString());
+                })
                 .onError(future::completeExceptionally)
                 .execute();
 

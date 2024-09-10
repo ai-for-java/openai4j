@@ -47,6 +47,10 @@ public class DefaultOpenAiClient extends OpenAiClient {
                 .readTimeout(serviceBuilder.readTimeout)
                 .writeTimeout(serviceBuilder.writeTimeout);
 
+        if (serviceBuilder.dispatcher != null) {
+            okHttpClientBuilder.dispatcher(serviceBuilder.dispatcher);
+        }
+
         if (serviceBuilder.openAiApiKey == null && serviceBuilder.azureApiKey == null) {
             throw new IllegalArgumentException("openAiApiKey OR azureApiKey must be defined");
         }
