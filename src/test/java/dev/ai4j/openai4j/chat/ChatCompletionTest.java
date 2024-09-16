@@ -2,6 +2,7 @@ package dev.ai4j.openai4j.chat;
 
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
+import dev.ai4j.openai4j.shared.Usage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -76,7 +77,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .n(1)
                 .stream(false)
                 .stop("one", "two")
-                .maxTokens(3)
+                .maxCompletionTokens(3)
                 .presencePenalty(0.0)
                 .frequencyPenalty(0.0)
                 .logitBias(singletonMap("50256", -100))
@@ -93,6 +94,12 @@ class ChatCompletionTest extends RateLimitAwareTest {
         assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
 
         assertThat(response.content()).containsIgnoringCase("hello world");
+
+        Usage usage = response.usage();
+        assertThat(usage.promptTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokensDetails().reasoningTokens()).isEqualTo(0);
+        assertThat(usage.totalTokens()).isGreaterThan(usage.promptTokens() + usage.completionTokens());
     }
 
     @ParameterizedTest
@@ -609,7 +616,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(ChatCompletionModel.GPT_4O)
                 .messages(UserMessage.from("What is in this image?", imageUrl))
-                .maxTokens(100)
+                .maxCompletionTokens(100)
                 .build();
 
         // when

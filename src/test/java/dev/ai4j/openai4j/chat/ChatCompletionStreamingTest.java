@@ -74,7 +74,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
                         .includeUsage(true)
                         .build())
                 .stop("one", "two")
-                .maxTokens(3)
+                .maxCompletionTokens(3)
                 .presencePenalty(0.0)
                 .frequencyPenalty(0.0)
                 .logitBias(singletonMap("50256", -100))
@@ -113,6 +113,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         Usage usage = usageReference.get();
         assertThat(usage.promptTokens()).isGreaterThan(0);
         assertThat(usage.completionTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokensDetails().reasoningTokens()).isEqualTo(0);
         assertThat(usage.totalTokens()).isEqualTo(usage.promptTokens() + usage.completionTokens());
     }
 
@@ -741,7 +742,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_4O)
                 .messages(UserMessage.from("What is in this image?", imageUrl))
-                .maxTokens(100)
+                .maxCompletionTokens(100)
                 .build();
 
         // when
