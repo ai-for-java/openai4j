@@ -76,7 +76,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .n(1)
                 .stream(false)
                 .stop("one", "two")
-                .maxTokens(3)
+                .maxCompletionTokens(3)
                 .presencePenalty(0.0)
                 .frequencyPenalty(0.0)
                 .logitBias(singletonMap("50256", -100))
@@ -609,7 +609,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(ChatCompletionModel.GPT_4O)
                 .messages(UserMessage.from("What is in this image?", imageUrl))
-                .maxTokens(100)
+                .maxCompletionTokens(100)
                 .build();
 
         // when
