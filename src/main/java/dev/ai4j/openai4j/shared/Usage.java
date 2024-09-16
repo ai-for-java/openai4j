@@ -16,16 +16,23 @@ import java.util.Objects;
 public final class Usage {
 
     @JsonProperty
+    private final Integer totalTokens;
+    @JsonProperty
     private final Integer promptTokens;
     @JsonProperty
     private final Integer completionTokens;
     @JsonProperty
-    private final Integer totalTokens;
+    private final CompletionTokensDetails completionTokensDetails;
 
     private Usage(Builder builder) {
+        this.totalTokens = builder.totalTokens;
         this.promptTokens = builder.promptTokens;
         this.completionTokens = builder.completionTokens;
-        this.totalTokens = builder.totalTokens;
+        this.completionTokensDetails = builder.completionTokensDetails;
+    }
+
+    public Integer totalTokens() {
+        return totalTokens;
     }
 
     public Integer promptTokens() {
@@ -36,8 +43,8 @@ public final class Usage {
         return completionTokens;
     }
 
-    public Integer totalTokens() {
-        return totalTokens;
+    public CompletionTokensDetails completionTokensDetails() {
+        return completionTokensDetails;
     }
 
     @Override
@@ -48,26 +55,29 @@ public final class Usage {
     }
 
     private boolean equalTo(Usage another) {
-        return Objects.equals(promptTokens, another.promptTokens)
+        return Objects.equals(totalTokens, another.totalTokens)
+                && Objects.equals(promptTokens, another.promptTokens)
                 && Objects.equals(completionTokens, another.completionTokens)
-                && Objects.equals(totalTokens, another.totalTokens);
+                && Objects.equals(completionTokensDetails, another.completionTokensDetails);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
+        h += (h << 5) + Objects.hashCode(totalTokens);
         h += (h << 5) + Objects.hashCode(promptTokens);
         h += (h << 5) + Objects.hashCode(completionTokens);
-        h += (h << 5) + Objects.hashCode(totalTokens);
+        h += (h << 5) + Objects.hashCode(completionTokensDetails);
         return h;
     }
 
     @Override
     public String toString() {
         return "Usage{"
-                + "promptTokens=" + promptTokens
+                + "totalTokens=" + totalTokens
+                + ", promptTokens=" + promptTokens
                 + ", completionTokens=" + completionTokens
-                + ", totalTokens=" + totalTokens
+                + ", completionTokensDetails=" + completionTokensDetails
                 + "}";
     }
 
@@ -80,11 +90,17 @@ public final class Usage {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static final class Builder {
 
+        private Integer totalTokens;
         private Integer promptTokens;
         private Integer completionTokens;
-        private Integer totalTokens;
+        private CompletionTokensDetails completionTokensDetails;
 
         private Builder() {
+        }
+
+        public Builder totalTokens(Integer totalTokens) {
+            this.totalTokens = totalTokens;
+            return this;
         }
 
         public Builder promptTokens(Integer promptTokens) {
@@ -97,8 +113,8 @@ public final class Usage {
             return this;
         }
 
-        public Builder totalTokens(Integer totalTokens) {
-            this.totalTokens = totalTokens;
+        public Builder completionTokensDetails(CompletionTokensDetails completionTokensDetails) {
+            this.completionTokensDetails = completionTokensDetails;
             return this;
         }
 

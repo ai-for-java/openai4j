@@ -441,6 +441,15 @@
     "allPublicFields": true
   },
   {
+    "name": "dev.ai4j.openai4j.shared.CompletionTokensDetails",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
     "name": "dev.ai4j.openai4j.shared.Usage",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,

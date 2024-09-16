@@ -113,6 +113,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         Usage usage = usageReference.get();
         assertThat(usage.promptTokens()).isGreaterThan(0);
         assertThat(usage.completionTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokensDetails().reasoningTokens()).isEqualTo(0);
         assertThat(usage.totalTokens()).isEqualTo(usage.promptTokens() + usage.completionTokens());
     }
 
