@@ -1,20 +1,33 @@
 package dev.ai4j.openai4j.chat;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class ResponseFormat {
 
-    private final Object type;
+    private final ResponseFormatType type;
+
+    private final Optional<String> json_schema;
 
     public ResponseFormat(ResponseFormatType type) {
         this.type = type;
+        this.json_schema = Optional.empty();
     }
 
     public ResponseFormat(String type) {
-        this.type = type;
+        this(ResponseFormatType.valueOf(type.toUpperCase()));
     }
 
-    public Object type() {
+    public ResponseFormat(ResponseFormatType type, String json_schema) {
+        this.type = type;
+        this.json_schema = Optional.of(json_schema);
+    }
+
+    public ResponseFormat(String type, String json_schema) {
+        this(ResponseFormatType.valueOf(type.toUpperCase()), json_schema);
+    }
+
+    public ResponseFormatType type() {
         return type;
     }
 
@@ -40,6 +53,7 @@ public class ResponseFormat {
     public String toString() {
         return "ResponseFormat{" +
                 "type=" + type +
+                "json_schema="+ json_schema +
                 "}";
     }
 }
