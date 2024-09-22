@@ -1,4 +1,4 @@
-package dev.ai4j.openai4j.chat;
+package dev.ai4j.openai4j.shared;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

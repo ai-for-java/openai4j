@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import dev.ai4j.openai4j.shared.StreamOptions;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ public final class CompletionRequest {
     @JsonProperty
     private final Boolean stream;
     @JsonProperty
+    private final StreamOptions streamOptions;
+    @JsonProperty
     private final Integer logprobs;
     @JsonProperty
     private final Boolean echo;
@@ -63,6 +66,7 @@ public final class CompletionRequest {
         this.topP = builder.topP;
         this.n = builder.n;
         this.stream = builder.stream;
+        this.streamOptions = builder.streamOptions;
         this.logprobs = builder.logprobs;
         this.echo = builder.echo;
         this.stop = builder.stop;
@@ -103,6 +107,10 @@ public final class CompletionRequest {
 
     public Boolean stream() {
         return stream;
+    }
+
+    public StreamOptions streamOptions() {
+        return streamOptions;
     }
 
     public Integer logprobs() {
@@ -153,6 +161,7 @@ public final class CompletionRequest {
                 && Objects.equals(topP, another.topP)
                 && Objects.equals(n, another.n)
                 && Objects.equals(stream, another.stream)
+                && Objects.equals(streamOptions, another.streamOptions)
                 && Objects.equals(logprobs, another.logprobs)
                 && Objects.equals(echo, another.echo)
                 && Objects.equals(stop, another.stop)
@@ -174,6 +183,7 @@ public final class CompletionRequest {
         h += (h << 5) + Objects.hashCode(topP);
         h += (h << 5) + Objects.hashCode(n);
         h += (h << 5) + Objects.hashCode(stream);
+        h += (h << 5) + Objects.hashCode(streamOptions);
         h += (h << 5) + Objects.hashCode(logprobs);
         h += (h << 5) + Objects.hashCode(echo);
         h += (h << 5) + Objects.hashCode(stop);
@@ -196,6 +206,7 @@ public final class CompletionRequest {
                 + ", topP=" + topP
                 + ", n=" + n
                 + ", stream=" + stream
+                + ", streamOptions=" + streamOptions
                 + ", logprobs=" + logprobs
                 + ", echo=" + echo
                 + ", stop=" + stop
@@ -224,6 +235,7 @@ public final class CompletionRequest {
         private Double topP;
         private Integer n;
         private Boolean stream;
+        private StreamOptions streamOptions;
         private Integer logprobs;
         private Boolean echo;
         private List<String> stop;
@@ -245,6 +257,7 @@ public final class CompletionRequest {
             topP(request.topP);
             n(request.n);
             stream(request.stream);
+            streamOptions(request.streamOptions);
             logprobs(request.logprobs);
             echo(request.echo);
             stop(request.stop);
@@ -297,6 +310,11 @@ public final class CompletionRequest {
 
         public Builder stream(Boolean stream) {
             this.stream = stream;
+            return this;
+        }
+
+        public Builder streamOptions(StreamOptions streamOptions) {
+            this.streamOptions = streamOptions;
             return this;
         }
 

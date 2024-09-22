@@ -225,15 +225,6 @@
     "allPublicFields": true
   },
   {
-    "name": "dev.ai4j.openai4j.chat.StreamOptions",
-    "allDeclaredConstructors": true,
-    "allPublicConstructors": true,
-    "allDeclaredMethods": true,
-    "allPublicMethods": true,
-    "allDeclaredFields": true,
-    "allPublicFields": true
-  },
-  {
     "name": "dev.ai4j.openai4j.chat.SystemMessage",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
@@ -442,6 +433,15 @@
   },
   {
     "name": "dev.ai4j.openai4j.shared.CompletionTokensDetails",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "dev.ai4j.openai4j.shared.StreamOptions",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
     "allDeclaredMethods": true,
