@@ -3,10 +3,13 @@ package dev.ai4j.openai4j.completion;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import dev.ai4j.openai4j.ResponseHandle;
+import dev.ai4j.openai4j.shared.StreamOptions;
+import dev.ai4j.openai4j.shared.Usage;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -45,23 +48,46 @@ class CompletionStreamingTest extends RateLimitAwareTest {
     @Test
     void testCustomizableApi() throws Exception {
 
+        // given
         StringBuilder responseBuilder = new StringBuilder();
         CompletableFuture<String> future = new CompletableFuture<>();
+        AtomicReference<Usage> usageReference = new AtomicReference<>();
 
         CompletionRequest request = CompletionRequest.builder()
                 .prompt(PROMPT)
+                .streamOptions(StreamOptions.builder()
+                        .includeUsage(true)
+                        .build())
                 .build();
 
-
+        // when
         client.completion(request)
-                .onPartialResponse(response -> responseBuilder.append(response.text()))
+                .onPartialResponse(response -> {
+                    for (CompletionChoice choice : response.choices()) {
+                        String text = choice.text();
+                        if (text != null) {
+                            responseBuilder.append(text);
+                        }
+                    }
+                    Usage usage = response.usage();
+                    if (usage != null) {
+                        usageReference.set(usage);
+                    }
+                })
                 .onComplete(() -> future.complete(responseBuilder.toString()))
                 .onError(Throwable::printStackTrace)
                 .execute();
 
-
         String response = future.get(30, SECONDS);
+
+        // then
         assertThat(response).containsIgnoringCase("hello world");
+
+        Usage usage = usageReference.get();
+        assertThat(usage.promptTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokens()).isGreaterThan(0);
+        assertThat(usage.completionTokensDetails()).isNull();
+        assertThat(usage.totalTokens()).isEqualTo(usage.promptTokens() + usage.completionTokens());
     }
 
     @Test

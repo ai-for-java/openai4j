@@ -3,6 +3,7 @@ package dev.ai4j.openai4j.chat;
 import dev.ai4j.openai4j.OpenAiClient;
 import dev.ai4j.openai4j.RateLimitAwareTest;
 import dev.ai4j.openai4j.ResponseHandle;
+import dev.ai4j.openai4j.shared.StreamOptions;
 import dev.ai4j.openai4j.shared.Usage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
