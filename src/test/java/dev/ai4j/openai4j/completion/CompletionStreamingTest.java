@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class CompletionStreamingTest extends RateLimitAwareTest {
 
@@ -91,7 +92,7 @@ class CompletionStreamingTest extends RateLimitAwareTest {
     }
 
     @Test
-    void testCancelStreamingAfterStreamingStarted() throws InterruptedException {
+    void testCancelStreamingAfterStreamingStarted() throws Exception {
 
         OpenAiClient client = OpenAiClient.builder()
                 // without caching
@@ -101,45 +102,27 @@ class CompletionStreamingTest extends RateLimitAwareTest {
                 .logStreamingResponses()
                 .build();
 
-        AtomicBoolean streamingStarted = new AtomicBoolean(false);
-        AtomicBoolean streamingCancelled = new AtomicBoolean(false);
-        AtomicBoolean cancellationSucceeded = new AtomicBoolean(true);
+        final AtomicBoolean streamingCancelled = new AtomicBoolean(false);
+        final AtomicReference<ResponseHandle> atomicReference = new AtomicReference<>();
+        final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
 
         ResponseHandle responseHandle = client.completion("Write a poem about AI in 10 words")
                 .onPartialResponse(partialResponse -> {
-                    streamingStarted.set(true);
-                    System.out.println("[[streaming started]]");
-                    if (streamingCancelled.get()) {
-                        cancellationSucceeded.set(false);
-                        System.out.println("[[cancellation failed]]");
+                    if (! streamingCancelled.getAndSet(true)) {
+                        CompletableFuture.runAsync(() -> {
+                            atomicReference.get().cancel();
+                            completableFuture.complete(null);
+                        });
                     }
                 })
-                .onComplete(() -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
-                .onError(e -> {
-                    cancellationSucceeded.set(false);
-                    System.out.println("[[cancellation failed]]");
-                })
+                .onComplete(() -> fail("Response completed"))
+                .onError(e -> fail("Response errored"))
                 .execute();
 
-        while (!streamingStarted.get()) {
-            Thread.sleep(10);
-        }
+        atomicReference.set(responseHandle);
+        completableFuture.get();
 
-        newSingleThreadExecutor().execute(() -> {
-            responseHandle.cancel();
-            streamingCancelled.set(true);
-            System.out.println("[[streaming cancelled]]");
-        });
-
-        while (!streamingCancelled.get()) {
-            Thread.sleep(10);
-        }
-        Thread.sleep(2000);
-
-        assertThat(cancellationSucceeded).isTrue();
+        assertThat(streamingCancelled).isTrue();
     }
 
     @Test
