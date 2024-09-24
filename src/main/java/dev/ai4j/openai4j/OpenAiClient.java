@@ -15,6 +15,8 @@ import dev.ai4j.openai4j.moderation.ModerationResponse;
 import dev.ai4j.openai4j.moderation.ModerationResult;
 import dev.ai4j.openai4j.spi.OpenAiClientBuilderFactory;
 import dev.ai4j.openai4j.spi.ServiceHelper;
+import okhttp3.Dispatcher;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.file.Path;
@@ -156,6 +158,7 @@ public abstract class OpenAiClient {
         public Duration connectTimeout = Duration.ofSeconds(60);
         public Duration readTimeout = Duration.ofSeconds(60);
         public Duration writeTimeout = Duration.ofSeconds(60);
+        public Dispatcher dispatcher;
         public Proxy proxy;
         public String userAgent;
         public boolean logRequests;
@@ -257,6 +260,11 @@ public abstract class OpenAiClient {
                 throw new IllegalArgumentException("writeTimeout cannot be null");
             }
             this.writeTimeout = writeTimeout;
+            return (B) this;
+        }
+
+        public B dispatcher(Dispatcher dispatcher) {
+            this.dispatcher = dispatcher;
             return (B) this;
         }
 
