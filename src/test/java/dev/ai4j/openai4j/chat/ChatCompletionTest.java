@@ -620,17 +620,17 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                             put("name", JsonStringSchema.builder().build());
                             put("children", JsonArraySchema.builder()
-                                    .items(JsonRefSchema.builder().ref("#/$defs/person").build())
+                                    .items(JsonReferenceSchema.builder().reference("#/$defs/person").build())
                                     .build());
                         }})
                         .required(asList("name", "children"))
                         .additionalProperties(false)
-                        .defs(new LinkedHashMap<String, JsonSchemaElement>() {{
+                        .definitions(new LinkedHashMap<String, JsonSchemaElement>() {{
                             put("person", JsonObjectSchema.builder()
                                     .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                                         put("name", JsonStringSchema.builder().build());
                                         put("children", JsonArraySchema.builder()
-                                                .items(JsonRefSchema.builder().ref("#/$defs/person").build())
+                                                .items(JsonReferenceSchema.builder().reference("#/$defs/person").build())
                                                 .build());
                                     }})
                                     .required(asList("name", "children"))
@@ -676,7 +676,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                             put("name", JsonStringSchema.builder().build());
                             put("children", JsonArraySchema.builder()
-                                    .items(JsonRefSchema.builder().ref("#").build())
+                                    .items(JsonReferenceSchema.builder().reference("#").build())
                                     .build());
                         }})
                         .required(asList("name", "children"))

@@ -10,41 +10,41 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.Objects;
 
-@JsonDeserialize(builder = JsonRefSchema.Builder.class)
+@JsonDeserialize(builder = JsonReferenceSchema.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class JsonRefSchema extends JsonSchemaElement { // TODO name
+public class JsonReferenceSchema extends JsonSchemaElement {
 
     @JsonProperty("$ref")
-    private final String ref;
+    private final String reference;
 
-    public JsonRefSchema(Builder builder) {
+    public JsonReferenceSchema(Builder builder) {
         super(null);
-        this.ref = builder.ref;
+        this.reference = builder.reference;
     }
 
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
-        return another instanceof JsonRefSchema
-                && equalTo((JsonRefSchema) another);
+        return another instanceof JsonReferenceSchema
+                && equalTo((JsonReferenceSchema) another);
     }
 
-    private boolean equalTo(JsonRefSchema another) {
-        return Objects.equals(ref, another.ref);
+    private boolean equalTo(JsonReferenceSchema another) {
+        return Objects.equals(reference, another.reference);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + Objects.hashCode(ref);
+        h += (h << 5) + Objects.hashCode(reference);
         return h;
     }
 
     @Override
     public String toString() {
-        return "JsonRefSchema{" +
-                "ref=" + ref +
+        return "JsonReferenceSchema{" +
+                "reference=" + reference +
                 "}";
     }
 
@@ -57,15 +57,15 @@ public class JsonRefSchema extends JsonSchemaElement { // TODO name
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Builder {
 
-        private String ref;
+        private String reference;
 
-        public Builder ref(String ref) {
-            this.ref = ref;
+        public Builder reference(String reference) {
+            this.reference = reference;
             return this;
         }
 
-        public JsonRefSchema build() {
-            return new JsonRefSchema(this);
+        public JsonReferenceSchema build() {
+            return new JsonReferenceSchema(this);
         }
     }
 }
