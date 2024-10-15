@@ -607,6 +607,111 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 "{\"name\":{\"first_name\":\"Klaus\",\"last_name\":\"Heisler\"},\"age\":37}");
     }
 
+
+    @Test
+    void testJsonResponseFormatWithExplicitRecursion() {
+
+        // given
+        boolean strict = true;
+
+        JsonSchema jsonSchema = JsonSchema.builder()
+                .name("person")
+                .schema(JsonObjectSchema.builder()
+                        .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("name", JsonStringSchema.builder().build());
+                            put("children", JsonArraySchema.builder()
+                                    .items(JsonReferenceSchema.builder()
+                                            .reference("#/$defs/person") // explicit recursion
+                                            .build())
+                                    .build());
+                        }})
+                        .required(asList("name", "children"))
+                        .additionalProperties(false)
+                        .definitions(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("person", JsonObjectSchema.builder()
+                                    .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                                        put("name", JsonStringSchema.builder().build());
+                                        put("children", JsonArraySchema.builder()
+                                                .items(JsonReferenceSchema.builder()
+                                                        .reference("#/$defs/person") // explicit recursion
+                                                        .build())
+                                                .build());
+                                    }})
+                                    .required(asList("name", "children"))
+                                    .additionalProperties(false)
+                                    .build());
+                        }})
+                        .build())
+                .strict(strict)
+                .build();
+
+        ResponseFormat responseFormat = ResponseFormat.builder()
+                .type(JSON_SCHEMA)
+                .jsonSchema(jsonSchema)
+                .build();
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4O_MINI)
+                .addUserMessage("Extract information from the following text: Anna has 2 children: David and Kate")
+                .responseFormat(responseFormat)
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        assertThat(response.content()).isEqualToIgnoringWhitespace(
+                "{\"name\":\"Anna\",\"children\":[" +
+                        "{\"name\":\"David\",\"children\":[]}," +
+                        "{\"name\":\"Kate\",\"children\":[]}" +
+                        "]}");
+    }
+
+    @Test
+    void testJsonResponseFormatWithRootRecursion() {
+
+        // given
+        boolean strict = true;
+
+        JsonSchema jsonSchema = JsonSchema.builder()
+                .name("person")
+                .schema(JsonObjectSchema.builder()
+                        .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("name", JsonStringSchema.builder().build());
+                            put("children", JsonArraySchema.builder()
+                                    .items(JsonReferenceSchema.builder()
+                                            .reference("#") // root recursion
+                                            .build())
+                                    .build());
+                        }})
+                        .required(asList("name", "children"))
+                        .additionalProperties(false)
+                        .build())
+                .strict(strict)
+                .build();
+
+        ResponseFormat responseFormat = ResponseFormat.builder()
+                .type(JSON_SCHEMA)
+                .jsonSchema(jsonSchema)
+                .build();
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4O_MINI)
+                .addUserMessage("Extract information from the following text: Anna has 2 children: David and Kate")
+                .responseFormat(responseFormat)
+                .build();
+
+        // when
+        ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        assertThat(response.content()).isEqualToIgnoringWhitespace(
+                "{\"name\":\"Anna\",\"children\":[" +
+                        "{\"name\":\"David\",\"children\":[]}," +
+                        "{\"name\":\"Kate\",\"children\":[]}" +
+                        "]}");
+    }
+
     @Test
     void testGpt4Vision() {
 

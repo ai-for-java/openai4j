@@ -23,6 +23,8 @@ public class JsonObjectSchema extends JsonSchemaElement {
     private final List<String> required;
     @JsonProperty("additionalProperties")
     private final Boolean additionalProperties;
+    @JsonProperty("$defs")
+    private final Map<String, JsonSchemaElement> definitions;
 
     public JsonObjectSchema(Builder builder) {
         super("object");
@@ -30,6 +32,7 @@ public class JsonObjectSchema extends JsonSchemaElement {
         this.properties = new LinkedHashMap<>(builder.properties);
         this.required = new ArrayList<>(builder.required);
         this.additionalProperties = builder.additionalProperties;
+        this.definitions = builder.definitions == null ? null : new LinkedHashMap<>(builder.definitions);
     }
 
     @Override
@@ -43,7 +46,8 @@ public class JsonObjectSchema extends JsonSchemaElement {
         return Objects.equals(description, another.description)
                 && Objects.equals(properties, another.properties)
                 && Objects.equals(required, another.required)
-                && Objects.equals(additionalProperties, another.additionalProperties);
+                && Objects.equals(additionalProperties, another.additionalProperties)
+                && Objects.equals(definitions, another.definitions);
     }
 
     @Override
@@ -53,6 +57,7 @@ public class JsonObjectSchema extends JsonSchemaElement {
         h += (h << 5) + Objects.hashCode(properties);
         h += (h << 5) + Objects.hashCode(required);
         h += (h << 5) + Objects.hashCode(additionalProperties);
+        h += (h << 5) + Objects.hashCode(definitions);
         return h;
     }
 
@@ -63,6 +68,7 @@ public class JsonObjectSchema extends JsonSchemaElement {
                 ", properties=" + properties +
                 ", required=" + required +
                 ", additionalProperties=" + additionalProperties +
+                ", definitions=" + definitions +
                 "}";
     }
 
@@ -79,6 +85,7 @@ public class JsonObjectSchema extends JsonSchemaElement {
         private Map<String, JsonSchemaElement> properties = new LinkedHashMap<>();
         private List<String> required = new ArrayList<>();
         private Boolean additionalProperties;
+        private Map<String, JsonSchemaElement> definitions;
 
         public Builder description(String description) {
             this.description = description;
@@ -97,6 +104,11 @@ public class JsonObjectSchema extends JsonSchemaElement {
 
         public Builder additionalProperties(Boolean additionalProperties) {
             this.additionalProperties = additionalProperties;
+            return this;
+        }
+
+        public Builder definitions(Map<String, JsonSchemaElement> definitions) {
+            this.definitions = definitions;
             return this;
         }
 
