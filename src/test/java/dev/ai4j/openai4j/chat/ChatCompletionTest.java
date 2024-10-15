@@ -621,7 +621,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
                             put("name", JsonStringSchema.builder().build());
                             put("children", JsonArraySchema.builder()
                                     .items(JsonReferenceSchema.builder()
-                                            .reference("#/$defs/person")
+                                            .reference("#/$defs/person") // explicit recursion
                                             .build())
                                     .build());
                         }})
@@ -632,7 +632,9 @@ class ChatCompletionTest extends RateLimitAwareTest {
                                     .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                                         put("name", JsonStringSchema.builder().build());
                                         put("children", JsonArraySchema.builder()
-                                                .items(JsonReferenceSchema.builder().reference("#/$defs/person").build())
+                                                .items(JsonReferenceSchema.builder()
+                                                        .reference("#/$defs/person") // explicit recursion
+                                                        .build())
                                                 .build());
                                     }})
                                     .required(asList("name", "children"))
