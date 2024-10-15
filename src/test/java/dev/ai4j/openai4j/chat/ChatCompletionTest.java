@@ -609,7 +609,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
 
     @Test
-    void testJsonResponseFormatWithRecursion() {
+    void testJsonResponseFormatWithExplicitRecursion() {
 
         // given
         boolean strict = true;
@@ -620,7 +620,9 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                             put("name", JsonStringSchema.builder().build());
                             put("children", JsonArraySchema.builder()
-                                    .items(JsonReferenceSchema.builder().reference("#/$defs/person").build())
+                                    .items(JsonReferenceSchema.builder()
+                                            .reference("#/$defs/person")
+                                            .build())
                                     .build());
                         }})
                         .required(asList("name", "children"))
@@ -663,9 +665,8 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         "]}");
     }
 
-    // TODO remove?
     @Test
-    void testJsonResponseFormatWithRecursion2() {
+    void testJsonResponseFormatWithRootRecursion() {
 
         // given
         boolean strict = true;
@@ -676,7 +677,9 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
                             put("name", JsonStringSchema.builder().build());
                             put("children", JsonArraySchema.builder()
-                                    .items(JsonReferenceSchema.builder().reference("#").build())
+                                    .items(JsonReferenceSchema.builder()
+                                            .reference("#") // root recursion
+                                            .build())
                                     .build());
                         }})
                         .required(asList("name", "children"))
