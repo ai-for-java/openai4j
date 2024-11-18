@@ -13,9 +13,12 @@ import java.util.Map;
 import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O_MINI;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argument;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argumentsAsMap;
-import static dev.ai4j.openai4j.chat.ResponseFormatType.*;
+import static dev.ai4j.openai4j.chat.ResponseFormatType.JSON_OBJECT;
+import static dev.ai4j.openai4j.chat.ResponseFormatType.JSON_SCHEMA;
+import static dev.ai4j.openai4j.chat.ResponseFormatType.TEXT;
 import static dev.ai4j.openai4j.chat.ToolType.FUNCTION;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
@@ -710,6 +713,69 @@ class ChatCompletionTest extends RateLimitAwareTest {
                         "{\"name\":\"David\",\"children\":[]}," +
                         "{\"name\":\"Kate\",\"children\":[]}" +
                         "]}");
+    }
+
+    @Test
+    void testJsonResponseFormatWithAnyOf() {
+
+        // given
+        boolean strict = true;
+
+        final JsonObjectSchema circle = JsonObjectSchema.builder()
+                .description("Circle")
+                .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                    put("radius", JsonNumberSchema.builder().build());
+                }})
+                .required(singletonList("radius"))
+                .additionalProperties(false)
+                .build();
+        final JsonObjectSchema rectangle = JsonObjectSchema.builder()
+                .description("Rectangle")
+                .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                    put("width", JsonNumberSchema.builder().build());
+                    put("height", JsonNumberSchema.builder().build());
+                }})
+                .required(asList("width", "height"))
+                .additionalProperties(false)
+                .build();
+        final JsonSchema jsonSchema = JsonSchema.builder()
+                .name("shapes")
+                .schema(JsonObjectSchema.builder()
+                        .description("Shapes")
+                        .properties(new LinkedHashMap<String, JsonSchemaElement>() {{
+                            put("shapes", JsonArraySchema.builder()
+                                    .items(JsonAnyOfSchema.builder()
+                                            .description("Shape")
+                                            .anyOf(asList(circle, rectangle))
+                                            .build())
+                                    .build()
+                            );
+                        }})
+                        .required(singletonList("shapes"))
+                        .additionalProperties(false)
+                        .build())
+                .strict(strict)
+                .build();
+
+        final ResponseFormat responseFormat = ResponseFormat.builder()
+                .type(JSON_SCHEMA)
+                .jsonSchema(jsonSchema)
+                .build();
+
+        final ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_4O_MINI)
+                .addUserMessage("Extract information from the following text:\n" +
+                        "1. A circle with a radius of 5\n" +
+                        "2. A rectangle with a width of 10 and a height of 20")
+                .responseFormat(responseFormat)
+                .build();
+
+        // when
+        final ChatCompletionResponse response = client.chatCompletion(request).execute();
+
+        // then
+        assertThat(response.content()).isEqualToIgnoringWhitespace(
+                "{\"shapes\":[{\"radius\":5},{\"width\":10,\"height\":20}]}");
     }
 
     @Test
