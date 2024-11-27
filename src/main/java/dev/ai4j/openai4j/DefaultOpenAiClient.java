@@ -163,14 +163,14 @@ public class DefaultOpenAiClient extends OpenAiClient {
     @Override
     public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(OpenAiClientContext context,
         ChatCompletionRequest request) {
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(request.stream()).build();
 
         return new RequestExecutor<>(
                 openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
                 r -> r,
                 okHttpClient,
                 formatUrl("chat/completions"),
-                () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
+                () -> ChatCompletionRequest.builder().from(request).stream(request.stream()).build(),
                 ChatCompletionResponse.class,
                 r -> r,
                 logStreamingResponses
@@ -181,14 +181,14 @@ public class DefaultOpenAiClient extends OpenAiClient {
     public SyncOrAsyncOrStreaming<String> chatCompletion(OpenAiClientContext context, String userMessage) {
         ChatCompletionRequest request = ChatCompletionRequest.builder().addUserMessage(userMessage).build();
 
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(request.stream()).build();
 
         return new RequestExecutor<>(
                 openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
                 ChatCompletionResponse::content,
                 okHttpClient,
                 formatUrl("chat/completions"),
-                () -> ChatCompletionRequest.builder().from(request).stream(true).build(),
+                () -> ChatCompletionRequest.builder().from(request).stream(request.stream()).build(),
                 ChatCompletionResponse.class,
                 r -> r.choices().get(0).delta().content(),
                 logStreamingResponses
