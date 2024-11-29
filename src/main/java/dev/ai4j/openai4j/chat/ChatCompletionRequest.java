@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import dev.ai4j.openai4j.shared.StreamOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,8 @@ public final class ChatCompletionRequest {
     @JsonProperty
     private final Integer maxTokens;
     @JsonProperty
+    private final Integer maxCompletionTokens;
+    @JsonProperty
     private final Double presencePenalty;
     @JsonProperty
     private final Double frequencyPenalty;
@@ -77,6 +80,7 @@ public final class ChatCompletionRequest {
         this.streamOptions = builder.streamOptions;
         this.stop = builder.stop;
         this.maxTokens = builder.maxTokens;
+        this.maxCompletionTokens = builder.maxCompletionTokens;
         this.presencePenalty = builder.presencePenalty;
         this.frequencyPenalty = builder.frequencyPenalty;
         this.logitBias = builder.logitBias;
@@ -124,6 +128,10 @@ public final class ChatCompletionRequest {
 
     public Integer maxTokens() {
         return maxTokens;
+    }
+
+    public Integer maxCompletionTokens() {
+        return maxCompletionTokens;
     }
 
     public Double presencePenalty() {
@@ -189,6 +197,7 @@ public final class ChatCompletionRequest {
                 && Objects.equals(streamOptions, another.streamOptions)
                 && Objects.equals(stop, another.stop)
                 && Objects.equals(maxTokens, another.maxTokens)
+                && Objects.equals(maxCompletionTokens, another.maxCompletionTokens)
                 && Objects.equals(presencePenalty, another.presencePenalty)
                 && Objects.equals(frequencyPenalty, another.frequencyPenalty)
                 && Objects.equals(logitBias, another.logitBias)
@@ -214,6 +223,7 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(streamOptions);
         h += (h << 5) + Objects.hashCode(stop);
         h += (h << 5) + Objects.hashCode(maxTokens);
+        h += (h << 5) + Objects.hashCode(maxCompletionTokens);
         h += (h << 5) + Objects.hashCode(presencePenalty);
         h += (h << 5) + Objects.hashCode(frequencyPenalty);
         h += (h << 5) + Objects.hashCode(logitBias);
@@ -240,6 +250,7 @@ public final class ChatCompletionRequest {
                 + ", streamOptions=" + streamOptions
                 + ", stop=" + stop
                 + ", maxTokens=" + maxTokens
+                + ", maxCompletionTokens=" + maxCompletionTokens
                 + ", presencePenalty=" + presencePenalty
                 + ", frequencyPenalty=" + frequencyPenalty
                 + ", logitBias=" + logitBias
@@ -272,6 +283,7 @@ public final class ChatCompletionRequest {
         private StreamOptions streamOptions;
         private List<String> stop;
         private Integer maxTokens;
+        private Integer maxCompletionTokens;
         private Double presencePenalty;
         private Double frequencyPenalty;
         private Map<String, Integer> logitBias;
@@ -299,6 +311,7 @@ public final class ChatCompletionRequest {
             streamOptions(instance.streamOptions);
             stop(instance.stop);
             maxTokens(instance.maxTokens);
+            maxCompletionTokens(instance.maxCompletionTokens);
             presencePenalty(instance.presencePenalty);
             frequencyPenalty(instance.frequencyPenalty);
             logitBias(instance.logitBias);
@@ -403,8 +416,17 @@ public final class ChatCompletionRequest {
             return stop(asList(stop));
         }
 
+        /**
+         * @deprecated use {@link #maxCompletionTokens(Integer)} instead
+         */
+        @Deprecated
         public Builder maxTokens(Integer maxTokens) {
             this.maxTokens = maxTokens;
+            return this;
+        }
+
+        public Builder maxCompletionTokens(Integer maxCompletionTokens) {
+            this.maxCompletionTokens = maxCompletionTokens;
             return this;
         }
 

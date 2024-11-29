@@ -10,49 +10,46 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.util.Objects;
 
-@JsonDeserialize(builder = StreamOptions.Builder.class)
+@JsonDeserialize(builder = JsonReferenceSchema.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public final class StreamOptions {
+public class JsonReferenceSchema extends JsonSchemaElement {
 
-    @JsonProperty
-    private final Boolean includeUsage;
+    @JsonProperty("$ref")
+    private final String reference;
 
-    public StreamOptions(Builder builder) {
-        this.includeUsage = builder.includeUsage;
-    }
-
-    public Boolean includeUsage() {
-        return includeUsage;
+    public JsonReferenceSchema(Builder builder) {
+        super(null);
+        this.reference = builder.reference;
     }
 
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
-        return another instanceof StreamOptions
-                && equalTo((StreamOptions) another);
+        return another instanceof JsonReferenceSchema
+                && equalTo((JsonReferenceSchema) another);
     }
 
-    private boolean equalTo(StreamOptions another) {
-        return Objects.equals(includeUsage, another.includeUsage);
+    private boolean equalTo(JsonReferenceSchema another) {
+        return Objects.equals(reference, another.reference);
     }
 
     @Override
     public int hashCode() {
         int h = 5381;
-        h += (h << 5) + Objects.hashCode(includeUsage);
+        h += (h << 5) + Objects.hashCode(reference);
         return h;
     }
 
     @Override
     public String toString() {
-        return "StreamOptions{" +
-                "includeUsage=" + includeUsage +
+        return "JsonReferenceSchema{" +
+                "reference=" + reference +
                 "}";
     }
 
-    public static StreamOptions.Builder builder() {
-        return new StreamOptions.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     @JsonPOJOBuilder(withPrefix = "")
@@ -60,15 +57,15 @@ public final class StreamOptions {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Builder {
 
-        private Boolean includeUsage;
+        private String reference;
 
-        public StreamOptions.Builder includeUsage(Boolean includeUsage) {
-            this.includeUsage = includeUsage;
+        public Builder reference(String reference) {
+            this.reference = reference;
             return this;
         }
 
-        public StreamOptions build() {
-            return new StreamOptions(this);
+        public JsonReferenceSchema build() {
+            return new JsonReferenceSchema(this);
         }
     }
 }
