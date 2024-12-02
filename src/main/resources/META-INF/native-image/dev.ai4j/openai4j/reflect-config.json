@@ -459,6 +459,15 @@
     "allPublicFields": true
   },
   {
+    "name": "dev.ai4j.openai4j.shared.PromptTokensDetails",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
     "name": "dev.ai4j.openai4j.shared.StreamOptions",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
