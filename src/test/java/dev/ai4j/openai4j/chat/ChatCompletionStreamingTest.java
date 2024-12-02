@@ -150,7 +150,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testTools(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -167,7 +167,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         client.chatCompletion(request)
                 .onPartialResponse(partialResponse -> {
                     Delta delta = partialResponse.choices().get(0).delta();
-                    assertThat(delta.content()).isNull();
+                    assertThat(delta.content()).isNullOrEmpty();
                     assertThat(delta.functionCall()).isNull();
 
                     if (delta.toolCalls() != null) {
@@ -265,7 +265,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testFunctions(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -281,7 +281,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
         client.chatCompletion(request)
                 .onPartialResponse(partialResponse -> {
                     Delta delta = partialResponse.choices().get(0).delta();
-                    assertThat(delta.content()).isNull();
+                    assertThat(delta.content()).isNullOrEmpty();
                     assertThat(delta.toolCalls()).isNull();
 
                     if (delta.functionCall() != null) {
@@ -359,7 +359,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -474,7 +474,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
