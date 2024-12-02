@@ -31,6 +31,8 @@ public final class ChatCompletionResponse {
     private final Usage usage;
     @JsonProperty
     private final String systemFingerprint;
+    @JsonProperty
+    private final String serviceTier;
 
     private ChatCompletionResponse(Builder builder) {
         this.id = builder.id;
@@ -39,6 +41,7 @@ public final class ChatCompletionResponse {
         this.choices = builder.choices;
         this.usage = builder.usage;
         this.systemFingerprint = builder.systemFingerprint;
+        this.serviceTier = builder.serviceTier;
     }
 
     public String id() {
@@ -65,6 +68,10 @@ public final class ChatCompletionResponse {
         return systemFingerprint;
     }
 
+    public String serviceTier() {
+        return serviceTier;
+    }
+
     /**
      * Convenience method to get the content of the message from the first choice.
      */
@@ -85,7 +92,8 @@ public final class ChatCompletionResponse {
                 && Objects.equals(model, another.model)
                 && Objects.equals(choices, another.choices)
                 && Objects.equals(usage, another.usage)
-                && Objects.equals(systemFingerprint, another.systemFingerprint);
+                && Objects.equals(systemFingerprint, another.systemFingerprint)
+                && Objects.equals(serviceTier, another.serviceTier);
     }
 
     @Override
@@ -97,6 +105,7 @@ public final class ChatCompletionResponse {
         h += (h << 5) + Objects.hashCode(choices);
         h += (h << 5) + Objects.hashCode(usage);
         h += (h << 5) + Objects.hashCode(systemFingerprint);
+        h += (h << 5) + Objects.hashCode(serviceTier);
         return h;
     }
 
@@ -109,6 +118,7 @@ public final class ChatCompletionResponse {
                 + ", choices=" + choices
                 + ", usage=" + usage
                 + ", systemFingerprint=" + systemFingerprint
+                + ", serviceTier=" + serviceTier
                 + "}";
     }
 
@@ -127,6 +137,7 @@ public final class ChatCompletionResponse {
         private List<ChatCompletionChoice> choices;
         private Usage usage;
         private String systemFingerprint;
+        private String serviceTier;
 
         private Builder() {
         }
@@ -160,6 +171,11 @@ public final class ChatCompletionResponse {
 
         public Builder systemFingerprint(String systemFingerprint) {
             this.systemFingerprint = systemFingerprint;
+            return this;
+        }
+
+        public Builder serviceTier(String serviceTier) {
+            this.serviceTier = serviceTier;
             return this;
         }
 
