@@ -64,6 +64,12 @@ public final class ChatCompletionRequest {
     @JsonProperty
     private final Boolean parallelToolCalls;
     @JsonProperty
+    private final Boolean store;
+    @JsonProperty
+    private final Map<String, String> metadata;
+    @JsonProperty
+    private final String serviceTier;
+    @JsonProperty
     @Deprecated
     private final List<Function> functions;
     @JsonProperty
@@ -90,6 +96,9 @@ public final class ChatCompletionRequest {
         this.tools = builder.tools;
         this.toolChoice = builder.toolChoice;
         this.parallelToolCalls = builder.parallelToolCalls;
+        this.store = builder.store;
+        this.metadata = builder.metadata;
+        this.serviceTier = builder.serviceTier;
         this.functions = builder.functions;
         this.functionCall = builder.functionCall;
     }
@@ -170,6 +179,18 @@ public final class ChatCompletionRequest {
         return parallelToolCalls;
     }
 
+    public Boolean store() {
+        return store;
+    }
+
+    public Map<String, String> metadata() {
+        return metadata;
+    }
+
+    public String serviceTier() {
+        return serviceTier;
+    }
+
     @Deprecated
     public List<Function> functions() {
         return functions;
@@ -207,6 +228,9 @@ public final class ChatCompletionRequest {
                 && Objects.equals(tools, another.tools)
                 && Objects.equals(toolChoice, another.toolChoice)
                 && Objects.equals(parallelToolCalls, another.parallelToolCalls)
+                && Objects.equals(store, another.store)
+                && Objects.equals(metadata, another.metadata)
+                && Objects.equals(serviceTier, another.serviceTier)
                 && Objects.equals(functions, another.functions)
                 && Objects.equals(functionCall, another.functionCall);
     }
@@ -233,6 +257,9 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(tools);
         h += (h << 5) + Objects.hashCode(toolChoice);
         h += (h << 5) + Objects.hashCode(parallelToolCalls);
+        h += (h << 5) + Objects.hashCode(store);
+        h += (h << 5) + Objects.hashCode(metadata);
+        h += (h << 5) + Objects.hashCode(serviceTier);
         h += (h << 5) + Objects.hashCode(functions);
         h += (h << 5) + Objects.hashCode(functionCall);
         return h;
@@ -260,6 +287,9 @@ public final class ChatCompletionRequest {
                 + ", tools=" + tools
                 + ", toolChoice=" + toolChoice
                 + ", parallelToolCalls=" + parallelToolCalls
+                + ", store=" + store
+                + ", metadata=" + metadata
+                + ", serviceTier=" + serviceTier
                 + ", functions=" + functions
                 + ", functionCall=" + functionCall
                 + "}";
@@ -293,6 +323,9 @@ public final class ChatCompletionRequest {
         private List<Tool> tools;
         private Object toolChoice;
         private Boolean parallelToolCalls;
+        private Boolean store;
+        private Map<String, String> metadata;
+        private String serviceTier;
         @Deprecated
         private List<Function> functions;
         @Deprecated
@@ -321,6 +354,9 @@ public final class ChatCompletionRequest {
             tools(instance.tools);
             toolChoice(instance.toolChoice);
             parallelToolCalls(instance.parallelToolCalls);
+            store(instance.store);
+            metadata(instance.metadata);
+            serviceTier(instance.serviceTier);
             functions(instance.functions);
             functionCall(instance.functionCall);
             return this;
@@ -500,6 +536,23 @@ public final class ChatCompletionRequest {
 
         public Builder parallelToolCalls(Boolean parallelToolCalls) {
             this.parallelToolCalls = parallelToolCalls;
+            return this;
+        }
+
+        public Builder store(Boolean store) {
+            this.store = store;
+            return this;
+        }
+
+        public Builder metadata(Map<String, String> metadata) {
+            if (metadata != null) {
+                this.metadata = unmodifiableMap(metadata);
+            }
+            return this;
+        }
+
+        public Builder serviceTier(String serviceTier) {
+            this.serviceTier = serviceTier;
             return this;
         }
 

@@ -20,6 +20,8 @@ public final class Usage {
     @JsonProperty
     private final Integer promptTokens;
     @JsonProperty
+    private final PromptTokensDetails promptTokensDetails;
+    @JsonProperty
     private final Integer completionTokens;
     @JsonProperty
     private final CompletionTokensDetails completionTokensDetails;
@@ -27,6 +29,7 @@ public final class Usage {
     private Usage(Builder builder) {
         this.totalTokens = builder.totalTokens;
         this.promptTokens = builder.promptTokens;
+        this.promptTokensDetails = builder.promptTokensDetails;
         this.completionTokens = builder.completionTokens;
         this.completionTokensDetails = builder.completionTokensDetails;
     }
@@ -37,6 +40,10 @@ public final class Usage {
 
     public Integer promptTokens() {
         return promptTokens;
+    }
+
+    public PromptTokensDetails promptTokensDetails() {
+        return promptTokensDetails;
     }
 
     public Integer completionTokens() {
@@ -57,6 +64,7 @@ public final class Usage {
     private boolean equalTo(Usage another) {
         return Objects.equals(totalTokens, another.totalTokens)
                 && Objects.equals(promptTokens, another.promptTokens)
+                && Objects.equals(promptTokensDetails, another.promptTokensDetails)
                 && Objects.equals(completionTokens, another.completionTokens)
                 && Objects.equals(completionTokensDetails, another.completionTokensDetails);
     }
@@ -66,6 +74,7 @@ public final class Usage {
         int h = 5381;
         h += (h << 5) + Objects.hashCode(totalTokens);
         h += (h << 5) + Objects.hashCode(promptTokens);
+        h += (h << 5) + Objects.hashCode(promptTokensDetails);
         h += (h << 5) + Objects.hashCode(completionTokens);
         h += (h << 5) + Objects.hashCode(completionTokensDetails);
         return h;
@@ -76,6 +85,7 @@ public final class Usage {
         return "Usage{"
                 + "totalTokens=" + totalTokens
                 + ", promptTokens=" + promptTokens
+                + ", promptTokensDetails=" + promptTokensDetails
                 + ", completionTokens=" + completionTokens
                 + ", completionTokensDetails=" + completionTokensDetails
                 + "}";
@@ -92,6 +102,7 @@ public final class Usage {
 
         private Integer totalTokens;
         private Integer promptTokens;
+        private PromptTokensDetails promptTokensDetails;
         private Integer completionTokens;
         private CompletionTokensDetails completionTokensDetails;
 
@@ -105,6 +116,11 @@ public final class Usage {
 
         public Builder promptTokens(Integer promptTokens) {
             this.promptTokens = promptTokens;
+            return this;
+        }
+
+        public Builder promptTokensDetails(PromptTokensDetails promptTokensDetails) {
+            this.promptTokensDetails = promptTokensDetails;
             return this;
         }
 

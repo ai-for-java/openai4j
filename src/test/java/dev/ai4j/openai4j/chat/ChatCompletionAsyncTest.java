@@ -96,7 +96,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
     void testTools(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -158,7 +158,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
     void testFunctions(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -214,7 +214,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -276,7 +276,7 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)

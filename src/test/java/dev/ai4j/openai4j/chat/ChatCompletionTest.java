@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -87,12 +88,24 @@ class ChatCompletionTest extends RateLimitAwareTest {
                 .user("Klaus")
                 .responseFormat(TEXT)
                 .seed(42)
+                .store(true)
+                .metadata(new HashMap<String, String>(){{
+                    put("one", "1");
+                    put("two", "2");
+                }})
+                .serviceTier("default")
                 .build();
 
         // when
         ChatCompletionResponse response = client.chatCompletion(request).execute();
 
         // then
+        assertThat(response.id()).isNotBlank();
+        assertThat(response.created()).isPositive();
+        assertThat(response.model()).isNotBlank();
+        // TODO assertThat(response.systemFingerprint()).isNotBlank();
+        assertThat(response.serviceTier()).isNotBlank();
+
         assertThat(response.choices()).hasSize(1);
         assertThat(response.choices().get(0).message().content()).containsIgnoringCase("hello world");
 
@@ -100,9 +113,12 @@ class ChatCompletionTest extends RateLimitAwareTest {
 
         Usage usage = response.usage();
         assertThat(usage.promptTokens()).isGreaterThan(0);
+        assertThat(usage.promptTokensDetails().cachedTokens()).isEqualTo(0);
+
         assertThat(usage.completionTokens()).isGreaterThan(0);
         assertThat(usage.completionTokensDetails().reasoningTokens()).isEqualTo(0);
-        assertThat(usage.totalTokens()).isGreaterThan(usage.promptTokens() + usage.completionTokens());
+
+        assertThat(usage.totalTokens()).isEqualTo(usage.promptTokens() + usage.completionTokens());
     }
 
     @ParameterizedTest
@@ -112,7 +128,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testTools(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -292,7 +308,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testFunctions(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -341,7 +357,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testToolChoice(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
@@ -396,7 +412,7 @@ class ChatCompletionTest extends RateLimitAwareTest {
     void testFunctionChoice(ChatCompletionModel model) {
 
         // given
-        UserMessage userMessage = UserMessage.from("What is the weather in Boston?");
+        UserMessage userMessage = UserMessage.from("What is the weather in Boston in Celsius?");
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(model)
