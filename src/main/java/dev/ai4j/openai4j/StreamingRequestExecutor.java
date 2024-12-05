@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -19,6 +20,8 @@ import static dev.ai4j.openai4j.Utils.toException;
 class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
     private static final Logger log = LoggerFactory.getLogger(StreamingRequestExecutor.class);
+
+    private final AtomicBoolean streamingCompletionCalled = new AtomicBoolean(false);
 
     private final OkHttpClient okHttpClient;
     private final String endpointUrl;
@@ -168,6 +171,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
                 if ("[DONE]".equals(data)) {
                     streamingCompletionCallback.run();
+                    streamingCompletionCalled.set(true);
                     return;
                 }
 
@@ -191,6 +195,10 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
                 if (logStreamingResponses) {
                     log.debug("onClosed()");
+                }
+
+                if (!streamingCompletionCalled.get()) {
+                    streamingCompletionCallback.run();
                 }
             }
 
