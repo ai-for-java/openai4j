@@ -84,6 +84,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testCustomizableApi(ChatCompletionModel model) throws Exception {
 
@@ -146,6 +147,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testTools(ChatCompletionModel model) throws Exception {
 
@@ -261,6 +263,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testFunctions(ChatCompletionModel model) throws Exception {
 
@@ -355,6 +358,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testToolChoice(ChatCompletionModel model) throws Exception {
 
@@ -470,6 +474,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testFunctionChoice(ChatCompletionModel model) throws Exception {
 
@@ -566,6 +571,7 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
             "GPT_4", "GPT_4_0613", // Does not support parallel tools
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testParallelTools(ChatCompletionModel model) throws Exception {
 
@@ -725,7 +731,8 @@ class ChatCompletionStreamingTest extends RateLimitAwareTest {
     @ParameterizedTest
     @EnumSource(value = ChatCompletionModel.class, mode = EXCLUDE, names = {
             "GPT_4_32K", "GPT_4_32K_0314", "GPT_4_32K_0613", // I don't have access to these models
-            "GPT_4", "GPT_4_0613" // Does not support response_format
+            "GPT_4", "GPT_4_0613", // Does not support response_format
+            "GPT_4O_AUDIO_PREVIEW" // works only when input contains audio
     })
     void testJsonResponseFormat(ChatCompletionModel model) throws Exception {
 
