@@ -8,6 +8,8 @@ public enum ChatCompletionModel {
 
     GPT_4O_MINI("gpt-4o-mini"), // alias
     GPT_4O_MINI_2024_07_18("gpt-4o-mini-2024-07-18"), // structured outputs in json mode
+    
+    GPT_4O_AUDIO_PREVIEW("gpt-4o-audio-preview"),
 
     GPT_3_5_TURBO("gpt-3.5-turbo"), // alias
     GPT_3_5_TURBO_1106("gpt-3.5-turbo-1106"),

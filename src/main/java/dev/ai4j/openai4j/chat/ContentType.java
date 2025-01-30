@@ -7,5 +7,7 @@ public enum ContentType {
     @JsonProperty("text")
     TEXT,
     @JsonProperty("image_url")
-    IMAGE_URL
+    IMAGE_URL,
+    @JsonProperty("input_audio")
+    AUDIO
 }
