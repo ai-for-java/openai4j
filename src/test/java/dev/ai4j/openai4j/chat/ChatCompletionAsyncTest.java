@@ -6,18 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O;
-import static dev.ai4j.openai4j.chat.ChatCompletionModel.GPT_4O_AUDIO_PREVIEW;
 import static dev.ai4j.openai4j.chat.ChatCompletionTest.*;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argument;
 import static dev.ai4j.openai4j.chat.FunctionCallUtil.argumentsAsMap;
@@ -487,23 +482,25 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         // then
         assertThat(response.content()).containsIgnoringCase("cat");
     }
-    
+
     @Test
-    void testGpt4Audio() throws ExecutionException, InterruptedException, TimeoutException, IOException, URISyntaxException {
+    void testGpt4Audio() throws Exception {
+
         // given
-        URL resource = getClass().getClassLoader().getResource("sample.b64");;
+        URL resource = getClass().getClassLoader().getResource("sample.b64");
         final byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
-        
+
         ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model(GPT_4O_AUDIO_PREVIEW)
+                .model("gpt-4o-audio-preview")
                 .messages(UserMessage.builder()
-                        .addText("Give a summary of the audio")
+                        .addText("What is on the audio?")
                         .addInputAudio(InputAudio.builder()
                                 .format("wav")
                                 .data(new String(bytes))
                                 .build())
                         .build())
                 .maxCompletionTokens(100)
+                .temperature(0.0)
                 .build();
 
         CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
@@ -517,6 +514,6 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
         ChatCompletionResponse response = future.get(30, SECONDS);
 
         // then
-        assertThat(response.choices()).isNotEmpty();
-    } 
+        assertThat(response.content()).containsIgnoringCase("hello");
+    }
 }
