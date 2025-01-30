@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -478,5 +481,39 @@ class ChatCompletionAsyncTest extends RateLimitAwareTest {
 
         // then
         assertThat(response.content()).containsIgnoringCase("cat");
+    }
+
+    @Test
+    void testGpt4Audio() throws Exception {
+
+        // given
+        URL resource = getClass().getClassLoader().getResource("sample.b64");
+        final byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
+
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model("gpt-4o-audio-preview")
+                .messages(UserMessage.builder()
+                        .addText("What is on the audio?")
+                        .addInputAudio(InputAudio.builder()
+                                .format("wav")
+                                .data(new String(bytes))
+                                .build())
+                        .build())
+                .maxCompletionTokens(100)
+                .temperature(0.0)
+                .build();
+
+        CompletableFuture<ChatCompletionResponse> future = new CompletableFuture<>();
+
+        // when
+        client.chatCompletion(request)
+                .onResponse(future::complete)
+                .onError(future::completeExceptionally)
+                .execute();
+
+        ChatCompletionResponse response = future.get(30, SECONDS);
+
+        // then
+        assertThat(response.content()).containsIgnoringCase("hello");
     }
 }

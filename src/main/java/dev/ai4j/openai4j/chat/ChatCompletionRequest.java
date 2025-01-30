@@ -68,6 +68,8 @@ public final class ChatCompletionRequest {
     @JsonProperty
     private final Map<String, String> metadata;
     @JsonProperty
+    private final String reasoningEffort;
+    @JsonProperty
     private final String serviceTier;
     @JsonProperty
     @Deprecated
@@ -98,6 +100,7 @@ public final class ChatCompletionRequest {
         this.parallelToolCalls = builder.parallelToolCalls;
         this.store = builder.store;
         this.metadata = builder.metadata;
+        this.reasoningEffort = builder.reasoningEffort;
         this.serviceTier = builder.serviceTier;
         this.functions = builder.functions;
         this.functionCall = builder.functionCall;
@@ -187,6 +190,10 @@ public final class ChatCompletionRequest {
         return metadata;
     }
 
+    public String reasoningEffort() {
+        return reasoningEffort;
+    }
+
     public String serviceTier() {
         return serviceTier;
     }
@@ -230,6 +237,7 @@ public final class ChatCompletionRequest {
                 && Objects.equals(parallelToolCalls, another.parallelToolCalls)
                 && Objects.equals(store, another.store)
                 && Objects.equals(metadata, another.metadata)
+                && Objects.equals(reasoningEffort, another.reasoningEffort)
                 && Objects.equals(serviceTier, another.serviceTier)
                 && Objects.equals(functions, another.functions)
                 && Objects.equals(functionCall, another.functionCall);
@@ -259,6 +267,7 @@ public final class ChatCompletionRequest {
         h += (h << 5) + Objects.hashCode(parallelToolCalls);
         h += (h << 5) + Objects.hashCode(store);
         h += (h << 5) + Objects.hashCode(metadata);
+        h += (h << 5) + Objects.hashCode(reasoningEffort);
         h += (h << 5) + Objects.hashCode(serviceTier);
         h += (h << 5) + Objects.hashCode(functions);
         h += (h << 5) + Objects.hashCode(functionCall);
@@ -289,6 +298,7 @@ public final class ChatCompletionRequest {
                 + ", parallelToolCalls=" + parallelToolCalls
                 + ", store=" + store
                 + ", metadata=" + metadata
+                + ", reasoningEffort=" + reasoningEffort
                 + ", serviceTier=" + serviceTier
                 + ", functions=" + functions
                 + ", functionCall=" + functionCall
@@ -325,6 +335,7 @@ public final class ChatCompletionRequest {
         private Boolean parallelToolCalls;
         private Boolean store;
         private Map<String, String> metadata;
+        private String reasoningEffort;
         private String serviceTier;
         @Deprecated
         private List<Function> functions;
@@ -356,6 +367,7 @@ public final class ChatCompletionRequest {
             parallelToolCalls(instance.parallelToolCalls);
             store(instance.store);
             metadata(instance.metadata);
+            reasoningEffort(instance.reasoningEffort);
             serviceTier(instance.serviceTier);
             functions(instance.functions);
             functionCall(instance.functionCall);
@@ -548,6 +560,11 @@ public final class ChatCompletionRequest {
             if (metadata != null) {
                 this.metadata = unmodifiableMap(metadata);
             }
+            return this;
+        }
+
+        public Builder reasoningEffort(String reasoningEffort) {
+            this.reasoningEffort = reasoningEffort;
             return this;
         }
 
