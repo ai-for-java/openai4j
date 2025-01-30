@@ -132,7 +132,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
     @Override
     public SyncOrAsyncOrStreaming<CompletionResponse> completion(OpenAiClientContext context,
         CompletionRequest request) {
-        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
+        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(false).build();
 
         return new RequestExecutor<>(
                 openAiApi.completions(context.headers(), syncRequest, apiVersion),
@@ -150,7 +150,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
     public SyncOrAsyncOrStreaming<String> completion(OpenAiClientContext context, String prompt) {
         CompletionRequest request = CompletionRequest.builder().prompt(prompt).build();
 
-        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(null).build();
+        CompletionRequest syncRequest = CompletionRequest.builder().from(request).stream(false).build();
 
         return new RequestExecutor<>(
                 openAiApi.completions(context.headers(), syncRequest, apiVersion),
@@ -167,7 +167,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
     @Override
     public SyncOrAsyncOrStreaming<ChatCompletionResponse> chatCompletion(OpenAiClientContext context,
         ChatCompletionRequest request) {
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(false).build();
 
         return new RequestExecutor<>(
                 openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
@@ -185,7 +185,7 @@ public class DefaultOpenAiClient extends OpenAiClient {
     public SyncOrAsyncOrStreaming<String> chatCompletion(OpenAiClientContext context, String userMessage) {
         ChatCompletionRequest request = ChatCompletionRequest.builder().addUserMessage(userMessage).build();
 
-        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(null).build();
+        ChatCompletionRequest syncRequest = ChatCompletionRequest.builder().from(request).stream(false).build();
 
         return new RequestExecutor<>(
                 openAiApi.chatCompletions(context.headers(), syncRequest, apiVersion),
