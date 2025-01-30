@@ -21,11 +21,14 @@ public final class Content {
     private final String text;
     @JsonProperty
     private final ImageUrl imageUrl;
+    @JsonProperty
+    private final InputAudio inputAudio;
 
     public Content(Builder builder) {
         this.type = builder.type;
         this.text = builder.text;
         this.imageUrl = builder.imageUrl;
+        this.inputAudio = builder.inputAudio;
     }
 
     public ContentType type() {
@@ -40,6 +43,10 @@ public final class Content {
         return imageUrl;
     }
 
+    public InputAudio inputAudio() {
+        return inputAudio;
+    }
+
     @Override
     public boolean equals(Object another) {
         if (this == another) return true;
@@ -50,7 +57,8 @@ public final class Content {
     private boolean equalTo(Content another) {
         return Objects.equals(type, another.type)
                 && Objects.equals(text, another.text)
-                && Objects.equals(imageUrl, another.imageUrl);
+                && Objects.equals(imageUrl, another.imageUrl)
+                && Objects.equals(inputAudio, another.inputAudio);
     }
 
     @Override
@@ -59,6 +67,7 @@ public final class Content {
         h += (h << 5) + Objects.hashCode(type);
         h += (h << 5) + Objects.hashCode(text);
         h += (h << 5) + Objects.hashCode(imageUrl);
+        h += (h << 5) + Objects.hashCode(inputAudio);
         return h;
     }
 
@@ -68,6 +77,7 @@ public final class Content {
                 "type=" + type +
                 ", text=" + text +
                 ", imageUrl=" + imageUrl +
+                ", inputAudio=" + inputAudio +
                 "}";
     }
 
@@ -83,6 +93,7 @@ public final class Content {
         private ContentType type;
         private String text;
         private ImageUrl imageUrl;
+        private InputAudio inputAudio;
 
         public Builder type(ContentType type) {
             this.type = type;
@@ -96,6 +107,11 @@ public final class Content {
 
         public Builder imageUrl(ImageUrl imageUrl) {
             this.imageUrl = imageUrl;
+            return this;
+        }
+
+        public Builder inputAudio(InputAudio inputAudio) {
+            this.inputAudio = inputAudio;
             return this;
         }
 

@@ -107,9 +107,7 @@ public final class UserMessage implements Message {
         }
 
         public Builder addText(String text) {
-            if (this.content == null) {
-                this.content = new ArrayList<>();
-            }
+            initializeContent();
             Content content = Content.builder()
                     .type(TEXT)
                     .text(text)
@@ -123,9 +121,7 @@ public final class UserMessage implements Message {
         }
 
         public Builder addImageUrl(String imageUrl, ImageDetail imageDetail) {
-            if (this.content == null) {
-                this.content = new ArrayList<>();
-            }
+            initializeContent();
             Content content = Content.builder()
                     .type(IMAGE_URL)
                     .imageUrl(ImageUrl.builder()
@@ -141,6 +137,18 @@ public final class UserMessage implements Message {
             for (String imageUrl : imageUrls) {
                 addImageUrl(imageUrl);
             }
+            return this;
+        }
+        
+        public Builder addInputAudio(InputAudio inputAudio) {
+            initializeContent();
+            this.content.add(
+                Content.builder()
+                    .type(ContentType.AUDIO)
+                    .inputAudio(inputAudio)
+                .build()
+            );
+            
             return this;
         }
 
@@ -163,6 +171,12 @@ public final class UserMessage implements Message {
 
         public UserMessage build() {
             return new UserMessage(this);
+        }
+
+        private void initializeContent() {
+            if (this.content == null) {
+                this.content = new ArrayList<>();
+            }
         }
     }
 }
