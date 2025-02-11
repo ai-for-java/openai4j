@@ -1,3 +1,5 @@
+# ⚠️This repository is no longer maintained ⚠️
+
 # Java client library for OpenAI API
 
 This is an unofficial Java client library that helps to connect your Java applications with OpenAI API.
